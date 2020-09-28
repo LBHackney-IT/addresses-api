@@ -13,14 +13,14 @@ namespace AddressesAPI.Tests.V1.UseCase
 {
     public class GetAllUseCaseTests
     {
-        private Mock<IAddressesGateway> _mockGateway;
+        private Mock<IExampleGateway> _mockGateway;
         private GetAllUseCase _classUnderTest;
         private Fixture _fixture;
 
         [SetUp]
         public void SetUp()
         {
-            _mockGateway = new Mock<IAddressesGateway>();
+            _mockGateway = new Mock<IExampleGateway>();
             _classUnderTest = new GetAllUseCase(_mockGateway.Object);
             _fixture = new Fixture();
         }
