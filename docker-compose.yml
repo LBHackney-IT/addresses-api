@@ -1,10 +1,10 @@
 version: "3.2"
 
 services:
-  base-api:
-    image: base-api
+  addresses-api:
+    image: addresses-api
     build:
-      context: BaseApi/
+      context: AddressesAPI/
       dockerfile: ./Dockerfile
     ports:
       - 3000:3000
@@ -19,11 +19,11 @@ services:
     volumes:
       - ./database:/docker-entrypoint-initdb.d
 
-  base-api-test:
-    image: base-api-test
+  addresses-api-test:
+    image: addresses-api-test
     build:
       context: .
-      dockerfile: BaseApi.Tests/Dockerfile
+      dockerfile: AddressesAPI.Tests/Dockerfile
     environment:
       - DB_HOST=test-database
       - DB_PORT=5432
