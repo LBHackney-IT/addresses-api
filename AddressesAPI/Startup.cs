@@ -120,7 +120,7 @@ namespace AddressesAPI
 
         private static void RegisterGateways(IServiceCollection services)
         {
-            services.AddScoped<IAddressesGateway, AddressesGateway>();
+            services.AddScoped<IExampleGateway, ExampleGateway>();
         }
 
         private static void RegisterUseCases(IServiceCollection services)

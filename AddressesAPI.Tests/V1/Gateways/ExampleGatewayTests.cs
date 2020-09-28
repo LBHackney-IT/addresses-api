@@ -10,15 +10,15 @@ namespace AddressesAPI.Tests.V1.Gateways
     //TODO: Rename Tests to match gateway name
     //For instruction on how to run tests please see the wiki: https://github.com/LBHackney-IT/lbh-base-api/wiki/Running-the-test-suite.
     [TestFixture]
-    public class AddressesGatewayTests : DatabaseTests
+    public class ExampleGatewayTests : DatabaseTests
     {
         private readonly Fixture _fixture = new Fixture();
-        private AddressesGateway _classUnderTest;
+        private ExampleGateway _classUnderTest;
 
         [SetUp]
         public void Setup()
         {
-            _classUnderTest = new AddressesGateway(DatabaseContext);
+            _classUnderTest = new ExampleGateway(DatabaseContext);
         }
 
         [Test]

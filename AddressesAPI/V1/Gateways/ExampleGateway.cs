@@ -6,11 +6,11 @@ using AddressesAPI.V1.Infrastructure;
 namespace AddressesAPI.V1.Gateways
 {
     //TODO: Rename to match the data source that is being accessed in the gateway eg. MosaicGateway
-    public class AddressesGateway : IAddressesGateway
+    public class ExampleGateway : IExampleGateway
     {
         private readonly DatabaseContext _databaseContext;
 
-        public AddressesGateway(DatabaseContext databaseContext)
+        public ExampleGateway(DatabaseContext databaseContext)
         {
             _databaseContext = databaseContext;
         }

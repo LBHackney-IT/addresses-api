@@ -3,7 +3,7 @@ using AddressesAPI.V1.Domain;
 
 namespace AddressesAPI.V1.Gateways
 {
-    public interface IAddressesGateway
+    public interface IExampleGateway
     {
         Entity GetEntityById(int id);
 
