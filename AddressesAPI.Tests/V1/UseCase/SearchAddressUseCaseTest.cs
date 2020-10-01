@@ -17,12 +17,12 @@ namespace AddressesAPI.Tests.V1.UseCase
     public class SearchAddressUseCaseTest
     {
         private readonly ISearchAddressUseCase _classUnderTest;
-        private readonly Mock<IAddressesGateway> _fakeGateway;
+        private readonly Mock<IAddressesGatewayTSQL> _fakeGateway;
 
 
         public SearchAddressUseCaseTest()
         {
-            _fakeGateway = new Mock<IAddressesGateway>();
+            _fakeGateway = new Mock<IAddressesGatewayTSQL>();
 
             _classUnderTest = new SearchAddressUseCase(_fakeGateway.Object);
         }

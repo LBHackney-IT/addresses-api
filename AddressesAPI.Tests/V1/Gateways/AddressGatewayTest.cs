@@ -9,12 +9,12 @@ namespace AddressesAPI.Tests.V1.Gateways
     public class AddressGatewayTest : TestDatabaseFixture
     {
 
-        private IAddressesGateway _classUnderTest;
+        private IAddressesGatewayTSQL _classUnderTest;
 
         [SetUp]
         public void SetUp()
         {
-            _classUnderTest = new AddressesGateway(ConnectionString);
+            _classUnderTest = new AddressesGatewayTSQL(ConnectionString);
         }
 
         [Test]
