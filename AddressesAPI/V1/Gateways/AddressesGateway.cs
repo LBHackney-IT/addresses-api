@@ -11,6 +11,12 @@ namespace AddressesAPI.V1.Gateways
 {
     public class AddressesGateway : IAddressesGateway
     {
+        private readonly AddressesContext _addressesContext;
+        public AddressesGateway(AddressesContext addressesContext)
+        {
+            _addressesContext = addressesContext;
+        }
+
         private readonly string _connectionString;
         public AddressesGateway(string connectionString)
         {

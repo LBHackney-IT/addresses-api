@@ -117,7 +117,7 @@ namespace AddressesAPI
 
             if (connectionString != null)
             {
-                services.AddDbContext<DatabaseContext>(
+                services.AddDbContext<AddressesContext>(
                     opt => opt.UseNpgsql(connectionString));
             }
         }
