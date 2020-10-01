@@ -38,7 +38,7 @@ namespace AddressesAPI.Tests.V1.UseCase
                 addressID = lpi_key
             };
 
-            await _classUnderTest.ExecuteAsync(request);
+            await _classUnderTest.ExecuteAsync(request).ConfigureAwait(true);
 
             _fakeGateway.Verify();
         }
@@ -90,7 +90,7 @@ namespace AddressesAPI.Tests.V1.UseCase
                 addressID = lpi_key
             };
             //act
-            var response = await _classUnderTest.ExecuteAsync(request);
+            var response = await _classUnderTest.ExecuteAsync(request).ConfigureAwait(true);
             //assert
             response.Addresses.Should().BeNull();
         }
@@ -133,7 +133,7 @@ namespace AddressesAPI.Tests.V1.UseCase
             _fakeGateway.Setup(s => s.GetSingleAddressAsync(lpi_key))
                 .ReturnsAsync(address);
 
-            var response = await _classUnderTest.ExecuteAsync(request);
+            var response = await _classUnderTest.ExecuteAsync(request).ConfigureAwait(true);
 
             response.Should().NotBeNull();
 

@@ -37,7 +37,7 @@ namespace AddressesAPI.Tests.V1.Gateways
             var uprn = 1234578912;
             TestDataHelper.InsertCrossRef(uprn, Db);
 
-            var response = await _classUnderTest.GetAddressCrossReferenceAsync(uprn);
+            var response = await _classUnderTest.GetAddressCrossReferenceAsync(uprn).ConfigureAwait(true);
             response.Should().NotBeNull();
             response[0].UPRN.Should().Equals(uprn);
 

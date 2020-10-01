@@ -67,7 +67,7 @@ namespace AddressesAPI.Tests.V1.Controllers
             var request = new SearchAddressRequest { AddressStatus = null };
 
             //act
-            var response = await _classUnderTest.GetAddresses(request);
+            var response = await _classUnderTest.GetAddresses(request).ConfigureAwait(true);
 
             //assert
             response.Should().NotBeNull();

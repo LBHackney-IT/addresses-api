@@ -53,9 +53,9 @@ namespace AddressesAPI.Tests.V1.UseCase
                     i.Postcode.Equals("RM3 0FS") && i.Gazetteer == GlobalConstants.Gazetteer.Local)))
                 .ReturnsAsync((addresses, 1));
 
-            var response = await _classUnderTest.ExecuteAsync(request);
+            var response = await _classUnderTest.ExecuteAsync(request).ConfigureAwait(true);
             response.Should().NotBeNull();
-            response.Addresses.Count().Should().Equals(1);
+            response.Addresses.Count.Should().Equals(1);
             response.TotalCount.Should().Equals(1);
             response.Addresses[0].Gazetteer.Should().Equals(gazetteer);
         }
@@ -74,7 +74,7 @@ namespace AddressesAPI.Tests.V1.UseCase
                 PostCode = postcode
             };
             //act
-            var response = await _classUnderTest.ExecuteAsync(request);
+            var response = await _classUnderTest.ExecuteAsync(request).ConfigureAwait(true);
             //assert
             response.Addresses.Should().BeNull();
         }
@@ -103,9 +103,9 @@ namespace AddressesAPI.Tests.V1.UseCase
                     s.SearchAddressesAsync(It.Is<SearchParameters>(i => i.Postcode.Equals("RM3 0FS"))))
                 .ReturnsAsync((addresses, 2));
 
-            var response = await _classUnderTest.ExecuteAsync(request);
+            var response = await _classUnderTest.ExecuteAsync(request).ConfigureAwait(true);
             response.Should().NotBeNull();
-            response.Addresses.Count().Should().Equals(2);
+            response.Addresses.Count.Should().Equals(2);
             response.TotalCount.Should().Equals(2);
         }
 
@@ -150,7 +150,7 @@ namespace AddressesAPI.Tests.V1.UseCase
                     s.SearchAddressesAsync(It.Is<SearchParameters>(i => i.Postcode.Equals("RM3 0FS"))))
                 .ReturnsAsync((addresses, 1));
 
-            var response = await _classUnderTest.ExecuteAsync(request);
+            var response = await _classUnderTest.ExecuteAsync(request).ConfigureAwait(true);
 
             response.Should().NotBeNull();
             response.Addresses[0].ShouldEqual(address);
