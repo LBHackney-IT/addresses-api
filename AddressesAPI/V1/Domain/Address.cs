@@ -2,13 +2,13 @@ namespace AddressesAPI.V1.Domain
 {
     public class Address : SimpleAddress
     {
-        public string Line1 { get; set; }
-        public string Line2 { get; set; }
-        public string Line3 { get; set; }
-        public string Line4 { get; set; }
-        public string Town { get; set; }
-        public string Postcode { get; set; }
-        public long UPRN { get; set; }
+        public new string Line1 { get; set; }
+        public new string Line2 { get; set; }
+        public new string Line3 { get; set; }
+        public new string Line4 { get; set; }
+        public new string Town { get; set; }
+        public new string Postcode { get; set; }
+        public new long UPRN { get; set; }
 
         //address detailed fields
         public string AddressKey { get; set; }
