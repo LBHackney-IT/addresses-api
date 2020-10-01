@@ -21,7 +21,6 @@ namespace AddressesAPI.Tests.V1.Gateways
         public async Task can_retrieve_using_address_id()
         {
             var key = "xxxxxxxxxxxxxx";
-            //var expectedAddress = Fake.GenerateAddressProvidingKey(key);
             TestDataHelper.InsertAddress(key, Db);
 
             var response = await _classUnderTest.GetSingleAddressAsync(key).ConfigureAwait(true);
