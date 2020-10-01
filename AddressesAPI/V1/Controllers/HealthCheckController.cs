@@ -4,9 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AddressesAPI.V1.Controllers
 {
+    [ApiVersion("1")]
+    [Produces("application/json")]
     [Route("api/v1/healthcheck")]
     [ApiController]
-    [Produces("application/json")]
     public class HealthCheckController : BaseController
     {
         [HttpGet]
@@ -25,6 +26,5 @@ namespace AddressesAPI.V1.Controllers
         {
             ThrowOpsErrorUsecase.Execute();
         }
-
     }
 }
