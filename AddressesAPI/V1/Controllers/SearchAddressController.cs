@@ -26,7 +26,6 @@ namespace AddressesAPI.V1.Controllers
             _searchAddressValidator = searchAddressValidator;
         }
 
-
         /// <summary>
         /// Search Controller V1 to search for addresses
         /// </summary>
@@ -65,10 +64,8 @@ namespace AddressesAPI.V1.Controllers
                 var response = await _searchAddressUseCase.ExecuteAsync(request).ConfigureAwait(false);
                 return HandleResponse(response);
             }
-            else
-            {
-                return new BadRequestObjectResult(new APIResponse<BadRequestException>(new BadRequestException(new RequestValidationResponse(validationResults))));
-            }
+
+            return new BadRequestObjectResult(new APIResponse<BadRequestException>(new BadRequestException(new RequestValidationResponse(validationResults))));
         }
 
     }

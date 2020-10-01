@@ -32,9 +32,9 @@ namespace AddressesAPI.Tests
         [SetUp]
         public void BaseSetup()
         {
+            ConnectToDbUsingSqlClient();
             _factory = new MockWebApplicationFactory<TStartup>(_connection);
             Client = _factory.CreateClient();
-            ConnectToDbUsingSqlClient();
             // StartTransactionWithEf();
         }
 
@@ -67,6 +67,7 @@ namespace AddressesAPI.Tests
             _transaction.Rollback();
             _transaction.Dispose();
         }
+
         private void ConnectToPostgresDbUsingEf()
         {
             _connection = new NpgsqlConnection(ConnectionString.TestDatabase());
@@ -89,8 +90,11 @@ namespace AddressesAPI.Tests
                 DotNetEnv.Env.Load(dotenv);
                 _connectionString = DotNetEnv.Env.GetString("LLPGConnectionString");
             }
+            Environment.SetEnvironmentVariable("LLPGConnectionString", _connectionString);
+
             Db = new SqlConnection(_connectionString);
             Db.Open();
         }
     }
+
 }
