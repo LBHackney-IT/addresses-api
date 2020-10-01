@@ -9,11 +9,11 @@ namespace AddressesAPI.V1.UseCase
 {
     public class GetAddressCrossReferenceUseCase : IGetAddressCrossReferenceUseCase
     {
-        private readonly IAddressesGateway _addressGateway;
+        private readonly IAddressesGatewayTSQL _addressGatewayTsql;
 
-        public GetAddressCrossReferenceUseCase(IAddressesGateway addressesGateway)
+        public GetAddressCrossReferenceUseCase(IAddressesGatewayTSQL addressesGatewayTsql)
         {
-            _addressGateway = addressesGateway;
+            _addressGatewayTsql = addressesGatewayTsql;
         }
 
         public async Task<GetAddressCrossReferenceResponse> ExecuteAsync(GetAddressCrossReferenceRequest request)
@@ -25,7 +25,7 @@ namespace AddressesAPI.V1.UseCase
             if (!validationResponse.IsValid)
                 throw new BadRequestException(validationResponse);
 
-            var response = await _addressGateway.GetAddressCrossReferenceAsync(request.uprn).ConfigureAwait(false);
+            var response = await _addressGatewayTsql.GetAddressCrossReferenceAsync(request.uprn).ConfigureAwait(false);
 
             if (response == null)
                 return new GetAddressCrossReferenceResponse();
