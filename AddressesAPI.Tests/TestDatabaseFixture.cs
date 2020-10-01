@@ -17,7 +17,7 @@ namespace AddressesAPI.Tests
             ConnectionString = Environment.GetEnvironmentVariable("LLPGConnectionString");
             if (ConnectionString == null)
             {
-                var dotenv = Path.GetRelativePath(Directory.GetCurrentDirectory(), "../../../../AddressesApi.Tests/.env");
+                var dotenv = Path.GetRelativePath(Directory.GetCurrentDirectory(), "../../../../database.env");
                 DotNetEnv.Env.Load(dotenv);
                 ConnectionString = DotNetEnv.Env.GetString("LLPGConnectionString");
             }
