@@ -107,26 +107,26 @@ namespace AddressesAPI.V1.Boundary.Responses
         /// <summary>
         /// Only included if format query parameter is set to detailed.
         /// </summary>
-        public int AddressStartDate { get; set; }
+        public int addressStartDate { get; set; }
         /// <summary>
         /// Only included if format query parameter is set to detailed.
         /// </summary>
-        public int AddressEndDate { get; set; }
+        public int addressEndDate { get; set; }
         /// <summary>
         /// Only included if format query parameter is set to detailed.
         /// </summary>
-        public int AddressChangeDate { get; set; }
+        public int addressChangeDate { get; set; }
         /// <summary>
         /// Only included if format query parameter is set to detailed.
         /// </summary>
-        public int PropertyStartDate { get; set; }
+        public int propertyStartDate { get; set; }
         /// <summary>
         /// Only included if format query parameter is set to detailed.
         /// </summary>
-        public int PropertyEndDate { get; set; }
+        public int propertyEndDate { get; set; }
         /// <summary>
         /// Only included if format query parameter is set to detailed.
         /// </summary>
-        public int PropertyChangeDate { get; set; }
+        public int propertyChangeDate { get; set; }
     }
 }
