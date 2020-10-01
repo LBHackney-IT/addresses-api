@@ -21,14 +21,14 @@ namespace AddressesAPI.V1.Controllers
         /// <summary>
         /// Returns an address from the given addressID or LPI_Key
         /// </summary>
-        /// <param name="addressID"></param>
+        /// <param name="addressId"></param>
         /// <returns></returns>
         [HttpGet, MapToApiVersion("1")]
         [Route("{addressID}")]
         [ProducesResponseType(typeof(APIResponse<SearchAddressResponse>), 200)]
-        public async Task<IActionResult> GetAddress(string addressID)
+        public async Task<IActionResult> GetAddress(string addressId)
         {
-            var request = new GetAddressRequest { addressID = addressID };
+            var request = new GetAddressRequest { addressID = addressId };
             var response = await _getAddressUseCase.ExecuteAsync(request).ConfigureAwait(false);
 
             return HandleResponse(response);
