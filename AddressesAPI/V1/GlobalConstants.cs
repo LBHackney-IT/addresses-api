@@ -9,13 +9,13 @@ namespace AddressesAPI.V1
 
 
         //?#? ToDo: Organise these better, and get the streets connection
-        public const string LLPG_ADDRESSES_JSON = "ConnectionSettings:LLPG:DEV";
+        public const string LlpgAddressesJson = "ConnectionSettings:LLPG:DEV";
 
-        public const string NLPG_ADDRESSES_JSON = "ConnectionSettings:NLPG:DEV";
+        public const string NlpgAddressesJson = "ConnectionSettings:NLPG:DEV";
 
-        public const string NLPGCOMBINED_ADDRESSES_JSON = "ConnectionSettings:NLPG_COMBINED:DEV";
+        public const string NlpgcombinedAddressesJson = "ConnectionSettings:NLPG_COMBINED:DEV";
 
-        public const string LLPG_STREETS_JSON = "ConnectionSettings:LLPG_STREETS:DEV";
+        public const string LlpgStreetsJson = "ConnectionSettings:LLPG_STREETS:DEV";
 
         public enum Format
         {

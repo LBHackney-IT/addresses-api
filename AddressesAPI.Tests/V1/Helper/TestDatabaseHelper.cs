@@ -36,6 +36,7 @@ namespace AddressesAPI.Tests.V1.Helper
             command.Parameters.Add("@LPI_KEY", SqlDbType.VarChar);
             command.Parameters["@LPI_KEY"].Value = key;
             command.ExecuteNonQuery();
+            command.Dispose();
         }
 
         public static void InsertCrossRef(int uprn, SqlConnection db)
@@ -58,6 +59,7 @@ namespace AddressesAPI.Tests.V1.Helper
             command.Parameters.Add("@XREF_END_DATE", SqlDbType.DateTime);
             command.Parameters["@XREF_END_DATE"].Value = DateTime.Now;
             command.ExecuteNonQuery();
+            command.Dispose();
         }
 
     }

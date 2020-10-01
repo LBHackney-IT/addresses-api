@@ -26,7 +26,7 @@ namespace AddressesAPI.Tests.V1.UseCase
         [TestCase("cat")]
         [TestCase("provizional")]
         [TestCase("alternative,hystorical")]
-        public void GivenAnAddressStatusValueThatDoesntMachAllowedOnes_WhenCallingValidation_ItReturnsAnError(string addressStatusVal)
+        public void GivenAnAddressStatusValueThatDoesntMatchAllowedOnes_WhenCallingValidation_ItReturnsAnError(string addressStatusVal)
         {
             var request = new SearchAddressRequest { AddressStatus = addressStatusVal };
             _classUnderTest.ShouldHaveValidationErrorFor(x => x.AddressStatus, request).WithErrorMessage("Value for the parameter is not valid.");
@@ -357,7 +357,10 @@ namespace AddressesAPI.Tests.V1.UseCase
         {
             Environment.SetEnvironmentVariable("ALLOWED_ADDRESSSTATUS_VALUES", null);
 
-            Action createValidator = () => new SearchAddressValidator();
+            Action createValidator = () =>
+            {
+                var dummy = new SearchAddressValidator();
+            };
 
             createValidator.Should().Throw<MissingEnvironmentVariableException>();
         }

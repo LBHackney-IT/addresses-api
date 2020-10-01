@@ -37,7 +37,7 @@ namespace AddressesAPI.Tests.V1.UseCase
                 uprn = uprn
             };
 
-            await _classUnderTest.ExecuteAsync(request);
+            await _classUnderTest.ExecuteAsync(request).ConfigureAwait(true);
 
             _fakeGateway.Verify();
         }
@@ -56,7 +56,7 @@ namespace AddressesAPI.Tests.V1.UseCase
                 uprn = uprn
             };
             //act
-            var response = await _classUnderTest.ExecuteAsync(request);
+            var response = await _classUnderTest.ExecuteAsync(request).ConfigureAwait(true);
             //assert
             response.AddressCrossReferences.Count.Should().Be(0);
         }
@@ -80,7 +80,7 @@ namespace AddressesAPI.Tests.V1.UseCase
             _fakeGateway.Setup(s => s.GetAddressCrossReferenceAsync(10024389298))
                 .ReturnsAsync(crossReferences);
 
-            var response = await _classUnderTest.ExecuteAsync(request);
+            var response = await _classUnderTest.ExecuteAsync(request).ConfigureAwait(true);
             response.Should().NotBeNull();
             response.AddressCrossReferences.Count.Should().Be(1);
             response.AddressCrossReferences.First().UPRN.Should().Be(uprn);
@@ -113,7 +113,7 @@ namespace AddressesAPI.Tests.V1.UseCase
             _fakeGateway.Setup(s => s.GetAddressCrossReferenceAsync(10024389298))
                 .ReturnsAsync(crossReferences);
 
-            var response = await _classUnderTest.ExecuteAsync(request);
+            var response = await _classUnderTest.ExecuteAsync(request).ConfigureAwait(true);
             response.Should().NotBeNull();
             response.AddressCrossReferences.Count.Should().Be(3);
             response.AddressCrossReferences.First().UPRN.Should().Be(uprn);

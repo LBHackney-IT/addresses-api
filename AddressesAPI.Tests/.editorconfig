@@ -1,0 +1,4 @@
+[*.cs]
+#Naming
+# Allow only identifiers in tests to contain the underscore (_) character.
+dotnet_diagnostic.CA1707.severity = none
