@@ -20,7 +20,7 @@ namespace AddressesAPI.V1.Gateways
         /// <summary>
         /// Return an address for a given LPI_Key
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="addressId"></param>
         /// <returns></returns>
         public async Task<Address> GetSingleAddressAsync(string addressId)
         {
