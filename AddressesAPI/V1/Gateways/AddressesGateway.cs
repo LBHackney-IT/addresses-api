@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AddressesAPI.V1.Domain;
+using AddressesAPI.V1.Infrastructure;
 using AddressCrossReference = AddressesAPI.V1.Domain.AddressCrossReference;
 #pragma warning disable 1998
 // CS1998 Requires await operators with async functions.
@@ -10,6 +11,12 @@ namespace AddressesAPI.V1.Gateways
 {
     public class AddressesGateway : IAddressesGateway
     {
+        private readonly AddressesContext _addressesContext;
+        public AddressesGateway(AddressesContext addressesContext)
+        {
+            _addressesContext = addressesContext;
+        }
+
         private readonly string _connectionString;
         public AddressesGateway(string connectionString)
         {
