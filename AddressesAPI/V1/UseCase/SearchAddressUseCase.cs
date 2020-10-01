@@ -11,11 +11,11 @@ namespace AddressesAPI.V1.UseCase
 {
     public class SearchAddressUseCase : ISearchAddressUseCase
     {
-        private readonly IAddressesGateway _addressGateway;
+        private readonly IAddressesGatewayTSQL _addressGatewayTsql;
 
-        public SearchAddressUseCase(IAddressesGateway addressesGateway)
+        public SearchAddressUseCase(IAddressesGatewayTSQL addressesGatewayTsql)
         {
-            _addressGateway = addressesGateway;
+            _addressGatewayTsql = addressesGatewayTsql;
         }
 
         public async Task<SearchAddressResponse> ExecuteAsync(SearchAddressRequest request)
@@ -24,7 +24,7 @@ namespace AddressesAPI.V1.UseCase
             if (!validationResponse.IsValid) throw new BadRequestException(validationResponse);
 
             var searchParameters = MapRequestToSearchParameters(request);
-            var (results, totalCount) = await _addressGateway.SearchAddressesAsync(searchParameters).ConfigureAwait(false);
+            var (results, totalCount) = await _addressGatewayTsql.SearchAddressesAsync(searchParameters).ConfigureAwait(false);
 
             if (results == null)
                 return new SearchAddressResponse();

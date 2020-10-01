@@ -16,12 +16,12 @@ namespace AddressesAPI.Tests.V1.UseCase
     public class GetAddressCrossReferenceUseCaseTest
     {
         private IGetAddressCrossReferenceUseCase _classUnderTest;
-        private Mock<IAddressesGateway> _fakeGateway;
+        private Mock<IAddressesGatewayTSQL> _fakeGateway;
 
         [SetUp]
         public void SetUp()
         {
-            _fakeGateway = new Mock<IAddressesGateway>();
+            _fakeGateway = new Mock<IAddressesGatewayTSQL>();
             _classUnderTest = new GetAddressCrossReferenceUseCase(_fakeGateway.Object);
         }
 
