@@ -25,16 +25,27 @@ namespace AddressesAPI.Tests
                 .UseStartup<Startup>();
             builder.ConfigureServices(services =>
             {
-                var dbBuilder = new DbContextOptionsBuilder();
-                dbBuilder.UseNpgsql(_connection);
-                var context = new AddressesContext(dbBuilder.Options);
-                services.AddSingleton(context);
-
-                var serviceProvider = services.BuildServiceProvider();
-                var dbContext = serviceProvider.GetRequiredService<AddressesContext>();
-
+                var dbContext = ConfigureDatabaseContext(services);
                 dbContext.Database.EnsureCreated();
             });
         }
+
+        private AddressesContext ConfigureDatabaseContext(IServiceCollection services)
+        {
+            var dbBuilder = new DbContextOptionsBuilder();
+            dbBuilder.UseNpgsql(_connection);
+            var context = new AddressesContext(dbBuilder.Options);
+            services.AddSingleton(context);
+            context.Dispose();
+
+            var serviceProvider = services.BuildServiceProvider();
+            var dbContext = serviceProvider.GetRequiredService<AddressesContext>();
+            return dbContext;
+
+        }
+
+
+
+
     }
 }

@@ -18,7 +18,7 @@ namespace AddressesAPI.Tests.V1.Gateways
         }
 
         [Test]
-        public async Task can_retrieve_using_address_id()
+        public async Task Can_retrieve_using_address_id()
         {
             var key = "xxxxxxxxxxxxxx";
             TestDataHelper.InsertAddress(key, Db);
@@ -32,7 +32,7 @@ namespace AddressesAPI.Tests.V1.Gateways
         }
 
         [Test]
-        public async Task can_retrieve_crossref_using_uprn()
+        public async Task Can_retrieve_crossref_using_uprn()
         {
             var uprn = 1234578912;
             TestDataHelper.InsertCrossRef(uprn, Db);
