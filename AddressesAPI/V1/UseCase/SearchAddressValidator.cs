@@ -1,0 +1,76 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using AddressesAPI.V1.Boundary.Requests;
+using AddressesAPI.V1.Domain;
+using AddressesAPI.V1.UseCase.Interfaces;
+using FluentValidation;
+
+namespace AddressesAPI.V1.UseCase
+{
+    public class SearchAddressValidator : AbstractValidator<SearchAddressRequest>, ISearchAddressValidator
+    {
+        private readonly string[] _allowedAddressStatusValues;
+
+        public SearchAddressValidator()
+        {
+            try { _allowedAddressStatusValues = Environment.GetEnvironmentVariable("ALLOWED_ADDRESSSTATUS_VALUES").Split(";"); }
+            catch (Exception) { throw new MissingEnvironmentVariableException("ALLOWED_ADDRESSSTATUS_VALUES"); }
+
+            RuleFor(r => r.AddressStatus).NotNull().NotEmpty();
+            RuleFor(r => r.AddressStatus).Must(CanBeAnyCombinationOfAllowedValues).WithMessage("Value for the parameter is not valid.");
+
+            RuleFor(r => r.PostCode).Matches(new Regex("^((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]))))( )?(([0-9][A-Za-z]?[A-Za-z]?)?))$")).WithMessage("Must provide at least the first part of the postcode.");
+
+            RuleFor(r => r).Must(CheckForAtLeastOneMandatoryFilterPropertyWithGazetteerLocal).WithMessage("You must provide at least one of (uprn, usrn, postcode, street, usagePrimary, usageCode), when gazeteer is 'local'.");
+            RuleFor(r => r).Must(CheckForAtLeastOneMandatoryFilterPropertyWithGazetteerBoth).WithMessage("You must provide at least one of (uprn, usrn, postcode), when gazetteer is 'both'.");
+
+            RuleFor(r => r.RequestFields).Must(CheckForInvalidProperties).WithMessage("Invalid properties have been provided.");
+        }
+
+        private static bool CheckForInvalidProperties(List<string> requestFields)
+        {
+            if (requestFields == null) //When the api runs - this will never be null. However this will become null in the context of other validation tests, making them crash. Because fluent validations testshelper doesn't isolate different rules one from another.
+            {
+                return true; // returning true, because there can't be any invalid parameter names, when there no parameters provided.
+            }
+
+            var allProperties = typeof(SearchAddressRequest).GetProperties().Where(prop => prop.Name != "Errors" && prop.Name != "RequestFields").Select(prop => prop.Name).ToList();
+
+            var invalidParameters = requestFields.Except(allProperties, StringComparer.OrdinalIgnoreCase);
+
+            return !invalidParameters.Any();
+        }
+
+        private static bool CheckForAtLeastOneMandatoryFilterPropertyWithGazetteerLocal(SearchAddressRequest request)
+        {
+            return request.Gazetteer != GlobalConstants.Gazetteer.Local
+                   || request.UPRN != null
+                   || request.USRN != null
+                   || request.PostCode != null
+                   || request.Street != null
+                   || request.usagePrimary != null
+                   || request.usageCode != null;
+        }
+
+        private static bool CheckForAtLeastOneMandatoryFilterPropertyWithGazetteerBoth(SearchAddressRequest request)
+        {
+            return request.Gazetteer != GlobalConstants.Gazetteer.Both
+                   || request.UPRN != null
+                   || request.USRN != null
+                   || request.PostCode != null;
+        }
+
+        private bool CanBeAnyCombinationOfAllowedValues(string addressStatus)
+        {
+            if (string.IsNullOrEmpty(addressStatus))
+            {
+                return false;
+            }
+            var separateValuesArray = addressStatus.Split(",");
+
+            return separateValuesArray.All(value => _allowedAddressStatusValues.Contains(value));
+        }
+    }
+}

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using AddressesAPI.V1.Boundary.Requests.RequestValidators;
 using AddressesAPI.V1.Gateways;
 using AddressesAPI.V1.Infrastructure;
 using AddressesAPI.V1.UseCase;
@@ -31,8 +32,7 @@ namespace AddressesAPI
 
         public IConfiguration Configuration { get; }
         private static List<ApiVersionDescription> _apiVersions { get; set; }
-        //TODO update the below to the name of your API
-        private const string ApiName = "Your API Name";
+        private const string ApiName = "Addresses API";
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public static void ConfigureServices(IServiceCollection services)
@@ -114,19 +114,27 @@ namespace AddressesAPI
         {
             var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
 
-            services.AddDbContext<DatabaseContext>(
-                opt => opt.UseNpgsql(connectionString));
+
+            if (connectionString != null)
+            {
+                services.AddDbContext<DatabaseContext>(
+                    opt => opt.UseNpgsql(connectionString));
+            }
         }
 
         private static void RegisterGateways(IServiceCollection services)
         {
-            services.AddScoped<IExampleGateway, ExampleGateway>();
+            var llpgConnectionString = Environment.GetEnvironmentVariable("LLPGConnectionString");
+
+            services.AddScoped<IAddressesGateway>(s => new AddressesGateway(llpgConnectionString));
         }
 
         private static void RegisterUseCases(IServiceCollection services)
         {
-            services.AddScoped<IGetAllUseCase, GetAllUseCase>();
-            services.AddScoped<IGetByIdUseCase, GetByIdUseCase>();
+            services.AddScoped<ISearchAddressValidator, SearchAddressValidator>();
+            services.AddScoped<ISearchAddressUseCase, SearchAddressUseCase>();
+            services.AddScoped<IGetSingleAddressUseCase, GetSingleAddressUseCase>();
+            services.AddScoped<IGetAddressCrossReferenceUseCase, GetAddressCrossReferenceUseCase>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

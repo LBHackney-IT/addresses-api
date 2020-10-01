@@ -25,19 +25,15 @@ services:
       context: .
       dockerfile: AddressesAPI.Tests/Dockerfile
     environment:
-      - DB_HOST=test-database
-      - DB_PORT=5432
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=mypassword
-      - DB_DATABASE=testdb
+      - LLPGConnectionString=Data Source=test-database;Initial Catalog=StubAdd;Integrated Security=False;User ID=sa;Password=Rooty-Tooty
     links:
       - test-database
   test-database:
     image: test-database
     build:
       context: .
-      dockerfile: database/Dockerfile
+      dockerfile: databaseTSQL/Dockerfile
     ports:
-      - 5432:5432
+      - 6666:1433
     env_file:
       - database.env

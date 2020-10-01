@@ -1,14 +1,13 @@
 # Addresses API
 
+The Addresses API let you search the local and national address database. Local being the addresses which Hackney Council holds a record for.
+
+This API is based on the [HackneyAddressesAPI](https://github.com/LBHackney-IT/HackneyAddressesAPI) with some improvements and updates.
 
 ## Stack
 
 - .NET Core as a web framework.
 - nUnit as a test framework.
-
-## Dependencies
-
-- Universal Housing Simulator
 
 ## Contributing
 
@@ -20,44 +19,35 @@
 4. Rename the initial template.
 5. Open it in your IDE.
 
-### Renaming
-
-The renaming of `base-api` into `SomethingElseApi` can be done by running a Renamer powershell script. To do so:
-1. Open the powershell and navigate to this directory's root.
-2. Run the script using the following command:
-```
-.\Renamer.ps1 -apiName My_Api
-```
-
-If your ***script execution policy*** prevents you from running the script, you can temporarily ***bypass*** that with:
-```
-powershell -noprofile -ExecutionPolicy Bypass -file .\Renamer.ps1 -apiName My_Api
-```
-
-Or you can change your execution policy, prior to running the script, permanently with _(this disables security so, be cautious)_:
-```
-Set-ExecutionPolicy Unrestricted
-```
-
-After the renaming is done, the ***script will ask you if you want to delete it as well***, as it's useless now - It's your choice.
-
 ### Development
 
 To serve the application, run it using your IDE of choice, we use Visual Studio CE and JetBrains Rider on Mac.
 
-The application can also be served locally using docker:
-1.  Add you security credentials to AWS CLI.
-```sh
-$ aws configure
-```
-2. Log into AWS ECR.
-```sh
-$ aws ecr get-login --no-include-email
-```
-3. Build and serve the application. It will be available in the port 3000.
+The application can also be served locally using Docker. It will be available on port 3000.
 ```sh
 $ make build && make serve
 ```
+### Running the tests
+
+You can run the tests in a container:
+
+$ make test
+
+Or locally if you prefer:
+
+$ dotnet test
+
+In order to configure the local test database you should first run:
+$ docker-compose up -d test-database
+$ make migrate-local-test-database
+
+To run database tests locally (e.g. via Visual Studio) the `CONNECTION_STRING` environment variable will need to be populated with:
+
+`Host=localhost;Database=entitycore;Username=postgres;Password=mypassword"`
+
+Note: The Host name needs to be the name of the stub database docker-compose service, in order to run tests via Docker.
+
+If changes to the database schema are made then the docker image for the database will have to be removed and recreated. The restart-db make command will do this for you.
 
 ### Release process
 
@@ -93,23 +83,7 @@ Both the API and Test projects have been set up to **treat all warnings from the
 However, we can select which errors to suppress by setting the severity of the responsible rule to none, e.g `dotnet_analyzer_diagnostic.<Category-or-RuleId>.severity = none`, within the `.editorconfig` file.
 Documentation on how to do this can be found [here](https://docs.microsoft.com/en-us/visualstudio/code-quality/use-roslyn-analyzers?view=vs-2019).
 
-## Testing
-
-### Run the tests
-
-```sh
-$ make test
-```
-
-To run database tests locally (e.g. via Visual Studio) the `CONNECTION_STRING` environment variable will need to be populated with:
-
-`Host=localhost;Database=testdb;Username=postgres;Password=mypassword"`
-
-Note: The Host name needs to be the name of the stub database docker-compose service, in order to run tests via Docker.
-
-If changes to the database schema are made then the docker image for the database will have to be removed and recreated. The restart-db make command will do this for you.
-
-### Agreed Testing Approach
+## Agreed Testing Approach
 - Use nUnit, FluentAssertions and Moq
 - Always follow a TDD approach
 - Tests should be independent of each other
@@ -143,6 +117,6 @@ If changes to the database schema are made then the docker image for the databas
 - **Rashmi Shetty**, Product Owner at London Borough of Hackney (rashmi.shetty@hackney.gov.uk)
 
 [docker-download]: https://www.docker.com/products/docker-desktop
-[universal-housing-simulator]: https://github.com/LBHackney-IT/lbh-universal-housing-simulator
+[docker-compose]: https://docs.docker.com/compose/install
 [made-tech]: https://madetech.com/
 [AWS-CLI]: https://aws.amazon.com/cli/
