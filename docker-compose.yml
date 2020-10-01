@@ -25,7 +25,7 @@ services:
       context: .
       dockerfile: AddressesAPI.Tests/Dockerfile
     environment:
-      - LLPGConnectionString="Data Source=test-database:6666;Initial Catalog=StubAdd;Integrated Security=False;User ID=sa;Password=Rooty-Tooty"
+      - LLPGConnectionString=Data Source=test-database;Initial Catalog=StubAdd;Integrated Security=False;User ID=sa;Password=Rooty-Tooty
     links:
       - test-database
   test-database:
