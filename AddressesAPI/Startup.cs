@@ -42,7 +42,7 @@ namespace AddressesAPI
                 .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
                 .AddNewtonsoftJson(options =>
                     options.SerializerSettings.Converters.Add(new StringEnumConverter()))
-                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);;
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0); ;
             services.AddApiVersioning(o =>
             {
                 o.DefaultApiVersion = new ApiVersion(1, 0);

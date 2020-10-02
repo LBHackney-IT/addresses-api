@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
-using AddressesAPI.V1.Boundary.Responses;
 using LBHAddressesAPI.Infrastructure.V1.Validation;
 
-namespace LBHAddressesAPI.Infrastructure.V1.API
+namespace AddressesAPI.V1.Boundary.Responses.Metadata
 {
     public class APIError
     {
@@ -11,6 +10,7 @@ namespace LBHAddressesAPI.Infrastructure.V1.API
         public IList<ExecutionError> Errors { get; set; }
         public IList<ValidationError> ValidationErrors { get; set; }
 
+        public APIError() { }
         public APIError(RequestValidationResponse validationResponse)
         {
             if (validationResponse == null)

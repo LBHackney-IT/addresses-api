@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using AddressesAPI.V1.Boundary.Requests;
-using AddressesAPI.V1.Domain;
 using AddressesAPI.V1.UseCase.Interfaces;
 using FluentValidation;
 
@@ -59,7 +58,7 @@ namespace AddressesAPI.V1.UseCase
 
         private static bool CanBeAnyCombinationOfAllowedValues(string addressStatus)
         {
-            var allowedValues = new List<string>{ "historical", "alternative", "approved preferred", "provisional"};
+            var allowedValues = new List<string> { "historical", "alternative", "approved preferred", "provisional" };
             if (string.IsNullOrEmpty(addressStatus))
             {
                 return false;

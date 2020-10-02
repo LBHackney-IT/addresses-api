@@ -350,19 +350,5 @@ namespace AddressesAPI.Tests.V1.UseCase
         }
 
         #endregion
-
-        //Keep this at the end....
-        [Test]
-        public void GivenThereIsNoEnvironmentVariableForAddressStatus_WhenValidationIsInvoked_TheErrorIsReturned()
-        {
-            Environment.SetEnvironmentVariable("ALLOWED_ADDRESSSTATUS_VALUES", null);
-
-            Action createValidator = () =>
-            {
-                var dummy = new SearchAddressValidator();
-            };
-
-            createValidator.Should().Throw<MissingEnvironmentVariableException>();
-        }
     }
 }
