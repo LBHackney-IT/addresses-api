@@ -4,7 +4,7 @@ GO
 USE StubAdd;
 GO
 
-/****** Object:  Table [dbo].[hackney_address]    Script Date: 04/04/2019 12:32:33 ******/
+/****** Object:  Table [dbo].[hackney_address]    Script Date: 01/10/2020 16:32:33 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -20,6 +20,7 @@ CREATE TABLE [dbo].[hackney_address](
 	[parent_uprn] [float] NULL,
 	[blpu_start_date] [int] NULL,
 	[blpu_end_date] [int] NULL,
+	[blpu_last_update_date] [int] NULL,
 	[blpu_state] [smallint] NULL,
 	[blpu_state_date] [int] NULL,
 	[blpu_class] [varchar](4) NULL,
@@ -33,6 +34,7 @@ CREATE TABLE [dbo].[hackney_address](
 	[unit_number] [nvarchar](17) NULL,
 	[lpi_level] [nvarchar](30) NULL,
 	[pao_text] [nvarchar](90) NULL,
+	[paon_start_num] [smallint] NULL,
 	[building_number] [nvarchar](17) NULL,
 	[street_description] [nvarchar](100) NOT NULL,
 	[locality] [nvarchar](35) NULL,
@@ -52,7 +54,7 @@ CREATE TABLE [dbo].[hackney_address](
 	[line4] [nvarchar](30) NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[national_address]    Script Date: 04/04/2019 12:32:33 ******/
+/****** Object:  Table [dbo].[national_address]    Script Date: 01/10/2020 16:32:33 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -68,8 +70,9 @@ CREATE TABLE [dbo].[national_address](
 	[parent_uprn] [float] NULL,
 	[blpu_start_date] [int] NOT NULL,
 	[blpu_end_date] [int] NULL,
+	[blpu_last_update_date] [int] NOT NULL,
 	[blpu_state] [smallint] NULL,
-	[blpu_state_date] [int] NOT NULL,
+	[blpu_state_date] [int] NULL,
 	[blpu_class] [varchar](6) NOT NULL,
 	[usage_description] [varchar](1006) NOT NULL,
 	[usage_primary] [varchar](250) NOT NULL,
@@ -81,6 +84,7 @@ CREATE TABLE [dbo].[national_address](
 	[unit_number] [nvarchar](17) NULL,
 	[lpi_level] [nvarchar](30) NULL,
 	[pao_text] [nvarchar](90) NULL,
+	[paon_start_num] [smallint] NULL,
 	[building_number] [nvarchar](17) NULL,
 	[street_description] [nvarchar](100) NOT NULL,
 	[locality] [varchar](100) NULL,
@@ -94,13 +98,13 @@ CREATE TABLE [dbo].[national_address](
 	[longitude] [numeric](12, 9) NULL,
 	[latitude] [numeric](12, 9) NULL,
 	[gazetteer] [varchar](8) NOT NULL,
-	[line1] [varchar](max) NULL,
-	[line2] [varchar](max) NULL,
-	[line3] [varchar](max) NULL,
-	[line4] [varchar](max) NULL
-) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+	[line1] [nvarchar](200) NULL,
+	[line2] [nvarchar](200) NULL,
+	[line3] [nvarchar](200) NULL,
+	[line4] [nvarchar](100) NULL
+	) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[hackney_xref]    Script Date: 04/04/2019 12:32:33 ******/
+/****** Object:  Table [dbo].[hackney_xref]    Script Date: 01/10/2020 16:32:33 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -114,5 +118,5 @@ CREATE TABLE [dbo].[hackney_xref](
 	[xref_end_date] [date] NULL
 ) ON [PRIMARY]
 GO
-create view [dbo].[combined_address] as  SELECT * FROM dbo.hackney_address   UNION ALL  SELECT * FROM dbo.national_address   ; 
+create view [dbo].[combined_address] as  SELECT * FROM dbo.hackney_address   UNION ALL  SELECT * FROM dbo.national_address;
 GO

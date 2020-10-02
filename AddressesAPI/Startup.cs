@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using AddressesAPI.V1.Boundary.Requests.RequestValidators;
 using AddressesAPI.V1.Gateways;
 using AddressesAPI.V1.Infrastructure;
 using AddressesAPI.V1.UseCase;
@@ -19,6 +18,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json.Converters;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace AddressesAPI
@@ -39,7 +39,10 @@ namespace AddressesAPI
         {
             services
                 .AddMvc()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
+                .AddNewtonsoftJson(options =>
+                    options.SerializerSettings.Converters.Add(new StringEnumConverter()))
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);;
             services.AddApiVersioning(o =>
             {
                 o.DefaultApiVersion = new ApiVersion(1, 0);

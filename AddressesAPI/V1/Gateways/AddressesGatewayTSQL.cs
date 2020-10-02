@@ -71,7 +71,16 @@ namespace AddressesAPI.V1.Gateways
                     }
                     else
                     {
-                        var all = multi.Read<SimpleAddress>()?.Select(x => (Address) x).ToList();
+                        var all = multi.Read<SimpleAddress>()?.Select(x => new Address
+                        {
+                            Line1 = x.Line1,
+                            Line2 = x.Line2,
+                            Line3 = x.Line3,
+                            Line4 = x.Line4,
+                            Town = x.Town,
+                            Postcode = x.Postcode,
+                            UPRN = x.UPRN
+                        }).ToList();
                         totalCount = multi.Read<int>().Single();
                         result = all?.ToList();
                     }

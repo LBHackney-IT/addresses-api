@@ -3,7 +3,7 @@ using System.Net;
 using LBHAddressesAPI.Infrastructure.V1.API;
 using Newtonsoft.Json;
 
-namespace AddressesAPI.V1.Boundary.Responses
+namespace AddressesAPI.V1.Boundary.Responses.Metadata
 {
     /// <summary>
     /// API Response wrapper for all API responses
@@ -23,6 +23,11 @@ namespace AddressesAPI.V1.Boundary.Responses
 
         [JsonProperty("error")]
         public APIError Error { get; set; }
+
+        public APIResponse()
+        {
+
+        }
 
         public APIResponse(BadRequestException ex)
         {

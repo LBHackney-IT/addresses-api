@@ -11,13 +11,8 @@ namespace AddressesAPI.V1.UseCase
 {
     public class SearchAddressValidator : AbstractValidator<SearchAddressRequest>, ISearchAddressValidator
     {
-        private readonly string[] _allowedAddressStatusValues;
-
         public SearchAddressValidator()
         {
-            try { _allowedAddressStatusValues = Environment.GetEnvironmentVariable("ALLOWED_ADDRESSSTATUS_VALUES").Split(";"); }
-            catch (Exception) { throw new MissingEnvironmentVariableException("ALLOWED_ADDRESSSTATUS_VALUES"); }
-
             RuleFor(r => r.AddressStatus).NotNull().NotEmpty();
             RuleFor(r => r.AddressStatus).Must(CanBeAnyCombinationOfAllowedValues).WithMessage("Value for the parameter is not valid.");
 
@@ -62,15 +57,16 @@ namespace AddressesAPI.V1.UseCase
                    || request.PostCode != null;
         }
 
-        private bool CanBeAnyCombinationOfAllowedValues(string addressStatus)
+        private static bool CanBeAnyCombinationOfAllowedValues(string addressStatus)
         {
+            var allowedValues = new List<string>{ "historical", "alternative", "approved preferred", "provisional"};
             if (string.IsNullOrEmpty(addressStatus))
             {
                 return false;
             }
             var separateValuesArray = addressStatus.Split(",");
 
-            return separateValuesArray.All(value => _allowedAddressStatusValues.Contains(value));
+            return separateValuesArray.All(value => allowedValues.Contains(value.ToLower()));
         }
     }
 }
