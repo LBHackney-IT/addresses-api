@@ -64,6 +64,8 @@ namespace AddressesAPI.Tests.V1.E2ETests
             returnedRecord.Postcode.Should().BeEquivalentTo(addressRecord.postcode);
         }
 
+        //TODO: We would want this to return 400 rather than 500
+
         [Test]
         public async Task GetAddressReturns500WhenAddressIdParameterIsNot14Characters()
         {
@@ -95,6 +97,29 @@ namespace AddressesAPI.Tests.V1.E2ETests
 
             response.StatusCode.Should().Be(400);
             response.ReasonPhrase.Should().Be("Bad Request");
+        }
+
+        //TODO: We would want this to return a 404 rather than 200
+
+        [Test]
+        public async Task GetAddressReturnsNoAddressesIfAddressIdParameterDoesNotMatchARecordInTheDatabase()
+        {
+
+            var addressId = _faker.Random.String2(14);
+            TestDataHelper.InsertAddress(addressId, Db);
+
+            var differentId = _faker.Random.String2(14);
+
+            var url = new Uri($"api/v1/addresses/{differentId}", UriKind.Relative);
+
+            var response = await Client.GetAsync(url).ConfigureAwait(true);
+
+            response.StatusCode.Should().Be(200);
+
+            var convertedResponse = await ConvertToResponseObject(response).ConfigureAwait(true);
+
+            convertedResponse.Error.Should().BeNull();
+            convertedResponse.Data.Addresses.Should().BeNull();
         }
     }
 }
