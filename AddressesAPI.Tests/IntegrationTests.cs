@@ -25,7 +25,6 @@ namespace AddressesAPI.Tests
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            Environment.SetEnvironmentVariable("ALLOWED_ADDRESSSTATUS_VALUES", "historical;alternative;approved preferred;provisional");
             // ConnectToPostgresDbUsingEf();
         }
 
@@ -33,6 +32,7 @@ namespace AddressesAPI.Tests
         public void BaseSetup()
         {
             ConnectToDbUsingSqlClient();
+            ClearDatabase();
             _factory = new MockWebApplicationFactory<TStartup>(_connection);
             Client = _factory.CreateClient();
             // StartTransactionWithEf();
@@ -80,6 +80,14 @@ namespace AddressesAPI.Tests
             _builder.UseNpgsql(_connection);
         }
 
+        private void ClearDatabase()
+        {
+            var commandText = "DELETE FROM [dbo].[hackney_address]; DELETE FROM [dbo].[national_address]; DELETE FROM [dbo].[hackney_xref];";
+
+            var command = new SqlCommand(commandText, Db);
+            command.ExecuteNonQuery();
+            command.Dispose();
+        }
 
         private void ConnectToDbUsingSqlClient()
         {

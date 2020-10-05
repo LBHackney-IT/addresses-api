@@ -1,6 +1,9 @@
+using System.Collections.Generic;
 using AddressesAPI.V1.Boundary.Responses;
 using AddressesAPI.V1.Domain;
 using FluentAssertions;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace AddressesAPI.Tests.V1.Helper
 {

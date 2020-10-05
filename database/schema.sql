@@ -36,6 +36,8 @@ CREATE TABLE dbo.hackney_address(
 	planning_use_class varchar(50) NULL,
 	neverexport bit NOT NULL,
 	longitude float NULL,
+	blpu_last_update_date int NULL,
+	paon_start_num smallint NULL,
 	latitude float NULL,
 	gazetteer varchar(5) NOT NULL,
 	line1 nvarchar(90) NULL,
@@ -50,6 +52,7 @@ CREATE TABLE dbo.national_address(
 	lpi_logical_status varchar(18) NULL,
 	lpi_start_date int NOT NULL,
 	lpi_end_date int NULL,
+    blpu_last_update_date int NULL,
 	lpi_last_update_date int NOT NULL,
 	usrn int NOT NULL,
 	uprn float NOT NULL,
@@ -57,7 +60,8 @@ CREATE TABLE dbo.national_address(
 	blpu_start_date int NOT NULL,
 	blpu_end_date int NULL,
 	blpu_state smallint NULL,
-	blpu_state_date int NOT NULL,
+	paon_start_num smallint NULL,
+	blpu_state_date int NULL,
 	blpu_class varchar(6) NOT NULL,
 	usage_description varchar(1006) NOT NULL,
 	usage_primary varchar(250) NOT NULL,
@@ -82,10 +86,10 @@ CREATE TABLE dbo.national_address(
 	longitude numeric(12, 9) NULL,
 	latitude numeric(12, 9) NULL,
 	gazetteer varchar(8) NOT NULL,
-	line1 varchar(max) NULL,
-	line2 varchar(max) NULL,
-	line3 varchar(max) NULL,
-	line4 varchar(max) NULL
+	line1 varchar(200) NULL,
+	line2 varchar(200) NULL,
+	line3 varchar(200) NULL,
+	line4 varchar(100) NULL
 )
 
 /****** Object:  Table [dbo].[hackney_xref]    Script Date: 04/04/2019 12:32:33 ******/

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AddressesAPI.V1.Boundary.Requests;
 using AddressesAPI.V1.Boundary.Responses;
 using AddressesAPI.V1.Boundary.Responses.Data;
+using AddressesAPI.V1.Boundary.Responses.Metadata;
 using AddressesAPI.V1.Controllers;
 using AddressesAPI.V1.UseCase.Interfaces;
 using FluentAssertions;
