@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using AddressesAPI.V1.Boundary.Requests;
 using AddressesAPI.V1.Boundary.Responses;
 using AddressesAPI.V1.Boundary.Responses.Metadata;
+using AddressesAPI.V1.Domain;
 using AddressesAPI.V1.UseCase.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -36,7 +37,7 @@ namespace AddressesAPI.V1.Controllers
         {
             try
             {
-            var request = new GetAddressCrossReferenceRequest { uprn = uprn };
+                var request = new GetAddressCrossReferenceRequest { uprn = uprn };
                 return Ok(_getAddressCrossReferenceUseCase.ExecuteAsync(request).ConfigureAwait(false));
             }
             catch (NotFoundException e)

@@ -1,3 +1,4 @@
+using AddressesAPI.Tests.V1.Helper;
 using AddressesAPI.V1.Boundary.Responses;
 using AutoFixture;
 using Bogus;
@@ -15,13 +16,21 @@ namespace AddressesAPI.Tests.V1.E2ETests
     public class GetAddressCrossReferenceIntegrationTests : IntegrationTests<Startup>
     {
         private readonly Faker _faker = new Faker();
-        private readonly IFixture _fixture = new Fixture();
+        //private readonly IFixture _fixture = new Fixture();
         [Test]
         public async Task GetCrossReferenceAddressReturns200()
         {
-            var crossReferenceKey = "wqegdsfsldmal";
+            var uprn = _faker.Random.Int();
+            TestDataHelper.InsertCrossRef(uprn, Db);
             var response = await CallEndpointWithQueryParameters().ConfigureAwait(true);
             response.StatusCode.Should().Be(200);
+        }
+
+        [Test]
+        public async Task WillReturnNotFoundForAnInvalidUprn()
+        {
+            var response = await CallEndpointWithQueryParameters().ConfigureAwait(true);
+            response.StatusCode.Should().Be(404);
         }
 
         private async Task<HttpResponseMessage> CallEndpointWithQueryParameters()
