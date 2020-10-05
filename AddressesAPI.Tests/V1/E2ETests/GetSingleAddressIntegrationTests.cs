@@ -48,29 +48,29 @@ namespace AddressesAPI.Tests.V1.E2ETests
             response.StatusCode.Should().Be(200);
 
             var apiResponse = await ConvertToResponseObject(response).ConfigureAwait(true);
+
             apiResponse.Error.Should().BeNull();
 
-            var singleAddress = apiResponse.Data.Addresses.FirstOrDefault();
+            var returnedRecord = apiResponse.Data.Addresses.FirstOrDefault();
 
-            singleAddress.AddressKey.Should().Be(addressId);
-            singleAddress.USRN.Should().Be(addressRecord.usrn);
-            singleAddress.UPRN.Should().Be(addressRecord.uprn);
-            singleAddress.Line1.Should().BeEquivalentTo(addressRecord.line1);
-            singleAddress.Line2.Should().BeEquivalentTo(addressRecord.line2);
-            singleAddress.Line3.Should().BeEquivalentTo(addressRecord.line3);
-            singleAddress.Line4.Should().BeEquivalentTo(addressRecord.line4);
-            singleAddress.Town.Should().BeEquivalentTo(addressRecord.town);
-            singleAddress.Postcode.Should().BeEquivalentTo(addressRecord.postcode);
+            returnedRecord.AddressKey.Should().Be(addressId);
+            returnedRecord.USRN.Should().Be(addressRecord.usrn);
+            returnedRecord.UPRN.Should().Be(addressRecord.uprn);
+            returnedRecord.Line1.Should().BeEquivalentTo(addressRecord.line1);
+            returnedRecord.Line2.Should().BeEquivalentTo(addressRecord.line2);
+            returnedRecord.Line3.Should().BeEquivalentTo(addressRecord.line3);
+            returnedRecord.Line4.Should().BeEquivalentTo(addressRecord.line4);
+            returnedRecord.Town.Should().BeEquivalentTo(addressRecord.town);
+            returnedRecord.Postcode.Should().BeEquivalentTo(addressRecord.postcode);
         }
 
         [Test]
-        public async Task GetAddressReturns500WhenAddressIdParameterIsLessThan14Characters()
+        public async Task GetAddressReturns500WhenAddressIdParameterIsNot14Characters()
         {
 
             var addressId = _faker.Random.String2(14);
             TestDataHelper.InsertAddress(addressId, Db);
 
-            // Validation - addressID must be 14 characters
             var incorrectLength = addressId.Substring(0, 10);
 
             var url = new Uri($"api/v1/addresses/{incorrectLength}", UriKind.Relative);
@@ -88,7 +88,6 @@ namespace AddressesAPI.Tests.V1.E2ETests
             var addressId = _faker.Random.String2(14);
             TestDataHelper.InsertAddress(addressId, Db);
 
-            // Validation - addressID must be 14 characters
             const string emptyId = "";
             var url = new Uri($"api/v1/addresses/{emptyId}", UriKind.Relative);
 
