@@ -43,21 +43,6 @@ namespace AddressesAPI.Tests
             return dbContext;
         }
 
-        private AddressesContext ConfigureDatabaseContext(IServiceCollection services)
-        {
-            var dbBuilder = new DbContextOptionsBuilder();
-            dbBuilder.UseNpgsql(_connection);
-            var context = new AddressesContext(dbBuilder.Options);
-            services.AddSingleton(context);
-            context.Dispose();
-
-            var serviceProvider = services.BuildServiceProvider();
-            var dbContext = serviceProvider.GetRequiredService<AddressesContext>();
-            return dbContext;
-
-        }
-
-
 
 
     }

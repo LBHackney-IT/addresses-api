@@ -25,7 +25,7 @@ namespace AddressesAPI.Tests.V1.Controllers
         }
 
         [Test]
-        public async Task GivenValidAddressRequest_WhenCallingGet_ThenShouldReturnAPIResponseListOfAddresses()
+        public void GivenValidAddressRequest_WhenCallingGet_ThenShouldReturnAPIResponseListOfAddresses()
         {
             //arrange
             _mock.Setup(s => s.ExecuteAsync(It.IsAny<GetAddressCrossReferenceRequest>()))
@@ -36,13 +36,10 @@ namespace AddressesAPI.Tests.V1.Controllers
             long uprn = 12345;
 
             //act
-            var response = await _classUnderTest.GetAddressCrossReference(uprn).ConfigureAwait(false);
+            var response = _classUnderTest.GetAddressCrossReference(uprn) as OkObjectResult;
             //assert
             response.Should().NotBeNull();
-            response.Should().BeOfType<ObjectResult>();
-            var objectResult = response as ObjectResult;
-            var getAddresses = objectResult?.Value as APIResponse<GetAddressCrossReferenceResponse>;
-            getAddresses.Should().NotBeNull();
+            response.Should().BeOfType<OkObjectResult>();
         }
     }
 }

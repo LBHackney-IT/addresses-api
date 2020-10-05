@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using AddressesAPI.V1.Boundary.Requests;
 using AddressesAPI.V1.Boundary.Responses;
+using AddressesAPI.V1.Domain;
 using AddressesAPI.V1.UseCase.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,8 +15,6 @@ namespace AddressesAPI.V1.Controllers
     public class GetAddressCrossReferenceController : BaseController
     {
         private readonly IGetAddressCrossReferenceUseCase _getAddressCrossReferenceUseCase;
-
-
         public GetAddressCrossReferenceController(IGetAddressCrossReferenceUseCase getAddressCrossReferenceUseCase)
         {
             _getAddressCrossReferenceUseCase = getAddressCrossReferenceUseCase;
@@ -33,12 +32,18 @@ namespace AddressesAPI.V1.Controllers
         [ProducesResponseType(typeof(APIResponse<GetAddressCrossReferenceResponse>), 200)]
         [HttpGet]
         [Route("{uprn}/crossreferences")]
-        public async Task<IActionResult> GetAddressCrossReference(long uprn)
+        public IActionResult GetAddressCrossReference(long uprn)
         {
+            try
+            {
             var request = new GetAddressCrossReferenceRequest { uprn = uprn };
-            var response = await _getAddressCrossReferenceUseCase.ExecuteAsync(request).ConfigureAwait(false);
-            //We convert the result to an APIResponse via extensions on BaseController
-            return HandleResponse(response);
+                return Ok(_getAddressCrossReferenceUseCase.ExecuteAsync(request).ConfigureAwait(false));
+            }
+            catch (NotFoundException e)
+            {
+                return NotFound(e.Message);
+            }
+           
         }
 
     }
