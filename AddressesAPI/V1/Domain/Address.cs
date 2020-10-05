@@ -26,11 +26,11 @@ namespace AddressesAPI.V1.Domain
         public double Northing { get; set; }
         public double Longitude { get; set; }
         public double Latitude { get; set; }
-        public int addressStartDate { get; set; }
-        public int addressEndDate { get; set; }
-        public int addressChangeDate { get; set; }
-        public int propertyStartDate { get; set; }
-        public int propertyEndDate { get; set; }
-        public int propertyChangeDate { get; set; }
+        public int AddressStartDate { get; set; }
+        public int AddressEndDate { get; set; }
+        public int AddressChangeDate { get; set; }
+        public int PropertyStartDate { get; set; }
+        public int PropertyEndDate { get; set; }
+        public int PropertyChangeDate { get; set; }
     }
 }

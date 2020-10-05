@@ -154,17 +154,8 @@ namespace AddressesAPI.V1.Infrastructure
         /// <returns>whether to include parent shells or not</returns>
         private static bool IncludeParentShell(SearchParameters request)
         {
-            if (!string.IsNullOrEmpty(request.UsagePrimary))
-            {
-                if (request.UsagePrimary.ToLower().Replace(" ", "").Contains("parentshell"))
-                {
-                    return true;
-                }
-                else
-                    return false;
-            }
-            else
-                return false;
+            if (string.IsNullOrEmpty(request.UsagePrimary)) return false;
+            return request.UsagePrimary.ToLower().Replace(" ", "").Contains("parentshell");
         }
 
         private static string GetAddressesQuery(GlobalConstants.Format format)
