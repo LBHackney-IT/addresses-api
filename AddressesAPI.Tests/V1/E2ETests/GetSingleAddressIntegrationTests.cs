@@ -97,12 +97,5 @@ namespace AddressesAPI.Tests.V1.E2ETests
             response.StatusCode.Should().Be(400);
             response.ReasonPhrase.Should().Be("Bad Request");
         }
-
-
-        private static async Task<APIResponse<SearchAddressResponse>> ConvertToResponseObject(HttpResponseMessage response)
-        {
-            var data = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
-            return JsonConvert.DeserializeObject<APIResponse<SearchAddressResponse>>(data);
-        }
     }
 }
