@@ -19,7 +19,7 @@ namespace AddressesAPI.Tests.V1.E2ETests
         private readonly IFixture _fixture = new Fixture();
 
         [Test]
-        public async Task GetAddressReturns200()
+        public async Task GetAddressReturns200WithValidAddressIdParameter()
         {
             var addressId = _faker.Random.String2(14);
             TestDataHelper.InsertAddress(addressId, Db);
@@ -61,6 +61,41 @@ namespace AddressesAPI.Tests.V1.E2ETests
             singleAddress.Line4.Should().BeEquivalentTo(addressRecord.line4);
             singleAddress.Town.Should().BeEquivalentTo(addressRecord.town);
             singleAddress.Postcode.Should().BeEquivalentTo(addressRecord.postcode);
+        }
+
+        [Test]
+        public async Task GetAddressReturns500WhenAddressIdParameterIsLessThan14Characters()
+        {
+
+            var addressId = _faker.Random.String2(14);
+            TestDataHelper.InsertAddress(addressId, Db);
+
+            // Validation - addressID must be 14 characters
+            var incorrectLength = addressId.Substring(0, 10);
+
+            var url = new Uri($"api/v1/addresses/{incorrectLength}", UriKind.Relative);
+
+            var response = await Client.GetAsync(url).ConfigureAwait(true);
+
+            response.StatusCode.Should().Be(500);
+            response.ReasonPhrase.Should().Be("Internal Server Error");
+        }
+
+        [Test]
+        public async Task GetAddressReturns400IfAddressIdParameterIsEmpty()
+        {
+
+            var addressId = _faker.Random.String2(14);
+            TestDataHelper.InsertAddress(addressId, Db);
+
+            // Validation - addressID must be 14 characters
+            const string emptyId = "";
+            var url = new Uri($"api/v1/addresses/{emptyId}", UriKind.Relative);
+
+            var response = await Client.GetAsync(url).ConfigureAwait(true);
+
+            response.StatusCode.Should().Be(400);
+            response.ReasonPhrase.Should().Be("Bad Request");
         }
 
 
