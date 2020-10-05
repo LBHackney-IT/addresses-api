@@ -18,13 +18,9 @@ namespace AddressesAPI.V1.Boundary.Requests
 
         public SearchAddressRequest()
         {
-            this.AddressStatus = "approved preferred";
-            this.Gazetteer = GlobalConstants.Gazetteer.Both;
+            AddressStatus = "approved preferred";
+            Gazetteer = GlobalConstants.Gazetteer.Both;
         }
-
-        //    [FromQuery]string PropertyClassCode = null/*,
-        // Parent shells??
-
 
         /// <summary>
         /// Postcode partial match i.e. "E8 4" will return addresses that have a postcode starting with E84**
@@ -104,7 +100,6 @@ namespace AddressesAPI.V1.Boundary.Requests
         /// Approved Preferred (Default)
         /// Historical
         /// Provisional
-        /// Rejected Internal
         /// </summary>
         public string AddressStatus { get; set; }
 
