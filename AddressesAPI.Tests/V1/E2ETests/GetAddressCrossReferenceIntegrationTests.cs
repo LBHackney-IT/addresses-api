@@ -1,5 +1,6 @@
 using AddressesAPI.Tests.V1.Helper;
 using AddressesAPI.V1.Boundary.Responses;
+using AddressesAPI.V1.Boundary.Responses.Metadata;
 using AutoFixture;
 using Bogus;
 using FluentAssertions;
@@ -26,23 +27,16 @@ namespace AddressesAPI.Tests.V1.E2ETests
             response.StatusCode.Should().Be(200);
         }
 
-        [Test]
-        public async Task WillReturnNotFoundForAnInvalidUprn()
-        {
-            var response = await CallEndpointWithQueryParameters().ConfigureAwait(true);
-            response.StatusCode.Should().Be(404);
-        }
-
         private async Task<HttpResponseMessage> CallEndpointWithQueryParameters()
         {
             var url = new Uri("api/v1/properties/{uprn}/crossreferences", UriKind.Relative);
             return await Client.GetAsync(url).ConfigureAwait(true);
         }
 
-        private static async Task<GetAddressCrossReferenceResponse> ConvertToResponseObject(HttpResponseMessage response)
+        private static async Task<APIResponse<GetAddressCrossReferenceResponse>> ConvertToResponseObject(HttpResponseMessage response)
         {
             var data = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
-            return JsonConvert.DeserializeObject<GetAddressCrossReferenceResponse>(data);
+            return JsonConvert.DeserializeObject<APIResponse<GetAddressCrossReferenceResponse>>(data);
         }
     }
 }
