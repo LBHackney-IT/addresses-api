@@ -35,7 +35,7 @@ namespace AddressesAPI.Tests
             ClearDatabase();
             _factory = new MockWebApplicationFactory<TStartup>(_connection);
             Client = _factory.CreateClient();
-            // StartTransactionWithEf();
+            //StartTransactionWithEf();
         }
 
         [TearDown]
@@ -43,7 +43,7 @@ namespace AddressesAPI.Tests
         {
             Client.Dispose();
             _factory.Dispose();
-            // RollbackEfTransaction();
+            //RollbackEfTransaction();
         }
 
 

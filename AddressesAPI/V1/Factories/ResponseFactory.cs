@@ -2,16 +2,16 @@ using System.Collections.Generic;
 using System.Linq;
 using AddressesAPI.V1.Boundary.Responses;
 using AddressesAPI.V1.Domain;
-using AddressCrossReference = AddressesAPI.V1.Boundary.Responses.Data.AddressCrossReference;
+using AddressCrossReferenceResponse = AddressesAPI.V1.Boundary.Responses.Data.AddressCrossReferenceResponse;
 using AddressCrossReferenceDomain = AddressesAPI.V1.Domain.AddressCrossReference;
 
 namespace AddressesAPI.V1.Factories
 {
     public static class ResponseFactory
     {
-        public static AddressCrossReference ToResponse(this AddressCrossReferenceDomain domain)
+        public static AddressCrossReferenceResponse ToResponse(this AddressCrossReferenceDomain domain)
         {
-            return new AddressCrossReference
+            return new AddressCrossReferenceResponse
             {
                 code = domain.code,
                 name = domain.name,
@@ -64,7 +64,7 @@ namespace AddressesAPI.V1.Factories
             };
         }
 
-        public static List<AddressCrossReference> ToResponse(this IEnumerable<AddressCrossReferenceDomain> domainList)
+        public static List<AddressCrossReferenceResponse> ToResponse(this IEnumerable<AddressCrossReferenceDomain> domainList)
         {
             return domainList.Select(domain => domain.ToResponse()).ToList();
         }

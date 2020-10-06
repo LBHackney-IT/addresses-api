@@ -7,7 +7,7 @@ namespace AddressesAPI.V1.Boundary.Responses
     public class GetAddressCrossReferenceResponse
     {
         [JsonProperty("addresscrossreferences")]
-        public List<AddressCrossReference> AddressCrossReferences { get; set; }
+        public List<AddressCrossReferenceResponse> AddressCrossReferences { get; set; }
 
     }
 }

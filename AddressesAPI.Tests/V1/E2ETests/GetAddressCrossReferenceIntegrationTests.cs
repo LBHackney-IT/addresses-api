@@ -17,20 +17,56 @@ namespace AddressesAPI.Tests.V1.E2ETests
     public class GetAddressCrossReferenceIntegrationTests : IntegrationTests<Startup>
     {
         private readonly Faker _faker = new Faker();
-        //private readonly IFixture _fixture = new Fixture();
+        private readonly Fixture _fixture = new Fixture();
         [Test]
         public async Task GetCrossReferenceAddressReturns200()
         {
             var uprn = _faker.Random.Int();
             TestDataHelper.InsertCrossRef(uprn, Db);
-            var response = await CallEndpointWithQueryParameters().ConfigureAwait(true);
+
+            var url = new Uri($"api/v1/properties/{uprn}/crossreferences", UriKind.Relative);
+            var response = await Client.GetAsync(url).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);
+
+            var convertedResponse = await ConvertToResponseObject(response).ConfigureAwait(true);
+
+            convertedResponse.Error.Should().BeNull();
         }
 
-        private async Task<HttpResponseMessage> CallEndpointWithQueryParameters()
+        [Test]
+        public async Task GetDetailedCrossReferenceAddressRecord()
         {
-            var url = new Uri("api/v1/properties/{uprn}/crossreferences", UriKind.Relative);
-            return await Client.GetAsync(url).ConfigureAwait(true);
+            var uprn = _faker.Random.Int();
+            var record = _fixture.Build<DatabaseCrossRefAddressRecord>()
+                                               .With(add => add.UPRN, uprn)
+                                               .Create();
+            TestDataHelper.InsertCrossRef(uprn, Db, record);
+
+            var url = new Uri($"api/v1/properties/{uprn}/crossreferences", UriKind.Relative);
+            var response = await Client.GetAsync(url).ConfigureAwait(true);
+            response.StatusCode.Should().Be(200);
+
+            var apiResponse = await ConvertToResponseObject(response).ConfigureAwait(true);
+
+            apiResponse.Error.Should().BeNull();
+
+            var recordReturned = apiResponse.Data.AddressCrossReferences.FirstOrDefault();
+            recordReturned.UPRN.Should().Be(uprn);
+            recordReturned.name.Should().Be(record.Name);
+            recordReturned.value.Should().Be(record.Value);
+            recordReturned.code.Should().Be(record.Code);
+            recordReturned.crossRefKey.Should().Be(record.CrossRefKey);
+            recordReturned.endDate.Should().Be(record.EndDate.Value.Date);
+        }
+        [Test]
+        public async Task Get404WhenUPRNIsNotProvided()
+        {
+            var uprn = _faker.Random.Int();
+            TestDataHelper.InsertCrossRef(uprn, Db);
+
+            var url = new Uri($"api/v1/properties/crossreferences", UriKind.Relative);
+            var response = await Client.GetAsync(url).ConfigureAwait(true);
+            response.StatusCode.Should().Be(404);
         }
 
         private static async Task<APIResponse<GetAddressCrossReferenceResponse>> ConvertToResponseObject(HttpResponseMessage response)
@@ -38,5 +74,8 @@ namespace AddressesAPI.Tests.V1.E2ETests
             var data = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
             return JsonConvert.DeserializeObject<APIResponse<GetAddressCrossReferenceResponse>>(data);
         }
+
+
+
     }
 }

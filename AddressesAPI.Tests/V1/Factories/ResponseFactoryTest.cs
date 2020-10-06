@@ -1,5 +1,5 @@
 using AddressesAPI.V1.Boundary.Responses;
-using AddressCrossReferenceResponse = AddressesAPI.V1.Boundary.Responses.Data.AddressCrossReference;
+using AddressCrossReferenceResponse = AddressesAPI.V1.Boundary.Responses.Data.AddressCrossReferenceResponse;
 using AddressesAPI.V1.Domain;
 using AddressesAPI.V1.Factories;
 using AutoFixture;

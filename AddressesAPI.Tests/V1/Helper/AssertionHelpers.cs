@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using AddressesAPI.V1.Boundary.Responses;
+using AddressesAPI.V1.Boundary.Responses.Data;
 using AddressesAPI.V1.Domain;
 using FluentAssertions;
 using Newtonsoft.Json;
@@ -9,7 +10,7 @@ namespace AddressesAPI.Tests.V1.Helper
 {
     public static class AssertionHelpers
     {
-        public static void ShouldEqual(this AddressResponse received, Address expected)
+        public static void AddressShouldEqual(this AddressResponse received, Address expected)
         {
             received.AddressKey.Should().BeEquivalentTo(expected.AddressKey);
             received.Postcode.Should().NotBeNullOrEmpty();

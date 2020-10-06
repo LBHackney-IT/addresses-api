@@ -61,25 +61,20 @@ namespace AddressesAPI.Tests.V1.Helper
             command.Dispose();
         }
 
-        public static void InsertCrossRef(int uprn, SqlConnection db)
+        public static void InsertCrossRef(int uprn, SqlConnection db, DatabaseCrossRefAddressRecord request = null)
         {
-            var commandText = "insert into [dbo].[hackney_xref] ([xref_key],[uprn],[xref_code],[xref_name],[xref_value],[xref_end_date]) ";
+            var commandText = "insert into [dbo].[hackney_xref] ([xref_key],[uprn],[xref_code],[xref_name],[xref_value],[xref_end_date])";
             commandText += " VALUES(@XREF_KEY,@UPRN,@XREF_CODE,@XREF_NAME,@XREF_VALUE,@XREF_END_DATE);";
 
             var command = new SqlCommand(commandText, db);
 
-            command.Parameters.Add("@XREF_KEY", SqlDbType.VarChar);
-            command.Parameters["@XREF_KEY"].Value = "5360X123456789";
-            command.Parameters.Add("@UPRN", SqlDbType.Float);
-            command.Parameters["@UPRN"].Value = uprn;
-            command.Parameters.Add("@XREF_CODE", SqlDbType.VarChar);
-            command.Parameters["@XREF_CODE"].Value = "5360CO";
-            command.Parameters.Add("@XREF_NAME", SqlDbType.VarChar);
-            command.Parameters["@XREF_NAME"].Value = "BX COMPANIES HOUSE";
-            command.Parameters.Add("@XREF_VALUE", SqlDbType.VarChar);
-            command.Parameters["@XREF_VALUE"].Value = "* (Y) 1CR";
-            command.Parameters.Add("@XREF_END_DATE", SqlDbType.DateTime);
-            command.Parameters["@XREF_END_DATE"].Value = DateTime.Now;
+            command.Parameters.AddWithValue("@XREF_KEY", request?.CrossRefKey ?? "5360X123456789");
+            command.Parameters.AddWithValue("@UPRN", uprn);
+            command.Parameters.AddWithValue("@XREF_CODE", request?.Code ?? "5360CO");
+            command.Parameters.AddWithValue("@XREF_NAME", request?.Name ?? "BX COMPANIES HOUSE");
+            command.Parameters.AddWithValue("@XREF_VALUE", request?.Value ?? "* (Y) 1CR");
+            command.Parameters.AddWithValue("@XREF_END_DATE", request?.EndDate ?? DateTime.Now);
+
             command.ExecuteNonQuery();
             command.Dispose();
         }
@@ -151,5 +146,20 @@ namespace AddressesAPI.Tests.V1.Helper
         [MaxLength(30)]
         public string line4 { get; set; }
         public short? paon_start_num { get; set; }
+    }
+
+    public class DatabaseCrossRefAddressRecord
+    {
+        [MaxLength(14)]
+        public string CrossRefKey { get; set; }
+        public long UPRN { get; set; }
+
+        [MaxLength(6)]
+        public string Code { get; set; }
+        [MaxLength(100)]
+        public string Name { get; set; }
+        [MaxLength(50)]
+        public string Value { get; set; }
+        public DateTime? EndDate { get; set; }
     }
 }
