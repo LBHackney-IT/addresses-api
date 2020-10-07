@@ -52,11 +52,11 @@ namespace AddressesAPI.Tests.V1.E2ETests
 
             var recordReturned = apiResponse.Data.AddressCrossReferences.FirstOrDefault();
             recordReturned.UPRN.Should().Be(uprn);
-            recordReturned.name.Should().Be(record.Name);
-            recordReturned.value.Should().Be(record.Value);
-            recordReturned.code.Should().Be(record.Code);
-            recordReturned.crossRefKey.Should().Be(record.CrossRefKey);
-            recordReturned.endDate.Should().Be(record.EndDate.Value.Date);
+            recordReturned.Name.Should().Be(record.Name);
+            recordReturned.Value.Should().Be(record.Value);
+            recordReturned.Code.Should().Be(record.Code);
+            recordReturned.CrossRefKey.Should().Be(record.CrossRefKey);
+            recordReturned.EndDate.Should().Be(record.EndDate.Value.Date);
         }
         [Test]
         public async Task Get404WhenUPRNIsNotProvided()
@@ -67,6 +67,17 @@ namespace AddressesAPI.Tests.V1.E2ETests
             var url = new Uri($"api/v1/properties/crossreferences", UriKind.Relative);
             var response = await Client.GetAsync(url).ConfigureAwait(true);
             response.StatusCode.Should().Be(404);
+        }
+
+        [Test]
+        public async Task Get404WhenAddressCannotBeFound()
+        {
+            var uprn = _faker.Random.Int();
+
+            var url = new Uri($"api/v1/properties/{uprn}", UriKind.Relative);
+            var response = await Client.GetAsync(url).ConfigureAwait(true);
+            response.StatusCode.Should().Be(404);
+
         }
 
         private static async Task<APIResponse<GetAddressCrossReferenceResponse>> ConvertToResponseObject(HttpResponseMessage response)

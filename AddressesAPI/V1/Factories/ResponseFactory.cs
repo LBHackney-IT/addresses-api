@@ -13,11 +13,11 @@ namespace AddressesAPI.V1.Factories
         {
             return new AddressCrossReferenceResponse
             {
-                code = domain.code,
-                name = domain.name,
-                value = domain.value,
-                endDate = domain.endDate,
-                crossRefKey = domain.crossRefKey,
+                Code = domain.Code,
+                Name = domain.Name,
+                Value = domain.Value,
+                EndDate = domain.EndDate,
+                CrossRefKey = domain.CrossRefKey,
                 UPRN = domain.UPRN
             };
         }

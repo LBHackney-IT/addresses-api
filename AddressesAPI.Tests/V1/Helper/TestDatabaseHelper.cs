@@ -28,15 +28,15 @@ namespace AddressesAPI.Tests.V1.Helper
             var command = new SqlCommand(commandText, db);
 
             command.Parameters.AddWithValue("@LPI_KEY", key);
-            command.Parameters.AddWithValue("@UPRN", request?.uprn ?? 10008227619);
-            command.Parameters.AddWithValue("@USRN", request?.usrn ?? 20900579);
-            command.Parameters.AddWithValue("@LINE_1", request?.line1 ?? "37-38 DALSTON CROSS SHOPPING CENTRE");
-            command.Parameters.AddWithValue("@LINE_2", request?.line2 ?? "64 KINGSLAND HIGH STREET");
-            command.Parameters.AddWithValue("@LINE_3", request?.line3 ?? "LONDON");
-            command.Parameters.AddWithValue("@LINE_4", request?.line4 ?? "");
-            command.Parameters.AddWithValue("@TOWN", request?.town ?? "LONDON");
-            command.Parameters.AddWithValue("@POSTCODE", request?.postcode ?? "E8 2LX");
-            command.Parameters.AddWithValue("@POSTCODE_NO_SPACE", request?.postcode?.Replace(" ", "") ?? "E82LX");
+            command.Parameters.AddWithValue("@UPRN", request?.Uprn ?? 10008227619);
+            command.Parameters.AddWithValue("@USRN", request?.Usrn ?? 20900579);
+            command.Parameters.AddWithValue("@LINE_1", request?.Line1 ?? "37-38 DALSTON CROSS SHOPPING CENTRE");
+            command.Parameters.AddWithValue("@LINE_2", request?.Line2 ?? "64 KINGSLAND HIGH STREET");
+            command.Parameters.AddWithValue("@LINE_3", request?.Line3 ?? "LONDON");
+            command.Parameters.AddWithValue("@LINE_4", request?.Line4 ?? "");
+            command.Parameters.AddWithValue("@TOWN", request?.Town ?? "LONDON");
+            command.Parameters.AddWithValue("@POSTCODE", request?.Postcode ?? "E8 2LX");
+            command.Parameters.AddWithValue("@POSTCODE_NO_SPACE", request?.Postcode?.Replace(" ", "") ?? "E82LX");
 
             command.ExecuteNonQuery();
             command.Dispose();
@@ -82,70 +82,70 @@ namespace AddressesAPI.Tests.V1.Helper
     public class DatabaseAddressRecord
     {
         [MaxLength(14)]
-        public string lpi_key { get; set; }
+        public string Lpi_key { get; set; }
         [MaxLength(14)]
-        public string lpi_logical_status { get; set; }
-        public int lpi_start_date { get; set; }
-        public int? lpi_end_date { get; set; }
-        public int lpi_last_update_date { get; set; }
-        public int usrn { get; set; }
-        public long uprn { get; set; }
-        public float? parent_uprn { get; set; }
-        public int? blpu_start_date { get; set; }
-        public int? blpu_end_date { get; set; }
-        public short? blpu_state { get; set; }
-        public int? blpu_state_date { get; set; }
+        public string Lpi_logical_status { get; set; }
+        public int Lpi_start_date { get; set; }
+        public int? Lpi_end_date { get; set; }
+        public int Lpi_last_update_date { get; set; }
+        public int Usrn { get; set; }
+        public long Uprn { get; set; }
+        public float? Parent_uprn { get; set; }
+        public int? Blpu_start_date { get; set; }
+        public int? Blpu_end_date { get; set; }
+        public short? Blpu_state { get; set; }
+        public int? Blpu_state_date { get; set; }
         [MaxLength(4)]
-        public string blpu_class { get; set; }
+        public string Blpu_class { get; set; }
         [MaxLength(160)]
-        public string usage_description { get; set; }
+        public string Usage_description { get; set; }
         [MaxLength(250)]
-        public string usage_primary { get; set; }
-        public bool property_shell { get; set; }
-        public decimal easting { get; set; }
-        public decimal northing { get; set; }
+        public string Usage_primary { get; set; }
+        public bool Property_shell { get; set; }
+        public decimal Easting { get; set; }
+        public decimal Northing { get; set; }
         [MaxLength(100)]
-        public string organisation { get; set; }
+        public string Organisation { get; set; }
         [MaxLength(90)]
-        public string sao_text { get; set; }
+        public string Sao_text { get; set; }
         [MaxLength(17)]
-        public string unit_number { get; set; }
+        public string Unit_number { get; set; }
         [MaxLength(30)]
-        public string lpi_level { get; set; }
+        public string Lpi_level { get; set; }
         [MaxLength(90)]
-        public string pao_text { get; set; }
+        public string Pao_text { get; set; }
         [MaxLength(17)]
-        public string building_number { get; set; }
+        public string Building_number { get; set; }
         [MaxLength(100)]
-        public string street_description { get; set; }
+        public string Street_description { get; set; }
         [MaxLength(35)]
-        public string locality { get; set; }
+        public string Locality { get; set; }
         [MaxLength(100)]
-        public string ward { get; set; }
+        public string Ward { get; set; }
         [MaxLength(30)]
-        public string town { get; set; }
+        public string Town { get; set; }
         [MaxLength(30)]
-        public string county { get; set; }
+        public string County { get; set; }
         [MaxLength(8)]
-        public string postcode { get; set; }
+        public string Postcode { get; set; }
         [MaxLength(8)]
-        public string postcode_nospace { get; set; }
+        public string Postcode_nospace { get; set; }
         [MaxLength(50)]
-        public string planning_use_class { get; set; }
-        public bool neverexport { get; set; }
-        public float longitude { get; set; }
-        public float latitude { get; set; }
+        public string Planning_use_class { get; set; }
+        public bool Neverexport { get; set; }
+        public float Longitude { get; set; }
+        public float Latitude { get; set; }
         [MaxLength(5)]
-        public string gazetteer { get; set; }
+        public string Gazetteer { get; set; }
         [MaxLength(90)]
-        public string line1 { get; set; }
+        public string Line1 { get; set; }
         [MaxLength(120)]
-        public string line2 { get; set; }
+        public string Line2 { get; set; }
         [MaxLength(120)]
-        public string line3 { get; set; }
+        public string Line3 { get; set; }
         [MaxLength(30)]
-        public string line4 { get; set; }
-        public short? paon_start_num { get; set; }
+        public string Line4 { get; set; }
+        public short? Paon_start_num { get; set; }
     }
 
     public class DatabaseCrossRefAddressRecord
