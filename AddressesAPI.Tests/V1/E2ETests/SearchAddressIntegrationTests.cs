@@ -53,12 +53,12 @@ namespace AddressesAPI.Tests.V1.E2ETests
             var addressKey = _faker.Random.String2(14);
             var queryParameters = new DatabaseAddressRecord
             {
-                uprn = _faker.Random.Int(),
+                Uprn = _faker.Random.Int(),
             };
             TestDataHelper.InsertAddress(addressKey, Db, queryParameters);
             AddSomeRandomAddressToTheDatabase();
 
-            var queryString = $"UPRN={queryParameters.uprn}&AddressStatus=Historical&Format=Detailed";
+            var queryString = $"UPRN={queryParameters.Uprn}&AddressStatus=Historical&Format=Detailed";
 
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);
@@ -74,12 +74,12 @@ namespace AddressesAPI.Tests.V1.E2ETests
             var addressKey = _faker.Random.String2(14);
             var queryParameters = new DatabaseAddressRecord
             {
-                usrn = _faker.Random.Int(),
+                Usrn = _faker.Random.Int(),
             };
             TestDataHelper.InsertAddress(addressKey, Db, queryParameters);
             AddSomeRandomAddressToTheDatabase();
 
-            var queryString = $"USRN={queryParameters.usrn}&AddressStatus=Historical&Format=Detailed";
+            var queryString = $"USRN={queryParameters.Usrn}&AddressStatus=Historical&Format=Detailed";
 
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);
@@ -95,17 +95,17 @@ namespace AddressesAPI.Tests.V1.E2ETests
             var addressKey = _faker.Random.String2(14);
             var addressDetails = new DatabaseAddressRecord
             {
-                uprn = _faker.Random.Int(),
-                line1 = _faker.Address.StreetName(),
-                line2 = _faker.Address.StreetAddress(),
-                line3 = _faker.Address.County(),
-                line4 = _faker.Address.Country(),
-                town = _faker.Address.City(),
-                postcode = "E41JJ",
+                Uprn = _faker.Random.Int(),
+                Line1 = _faker.Address.StreetName(),
+                Line2 = _faker.Address.StreetAddress(),
+                Line3 = _faker.Address.County(),
+                Line4 = _faker.Address.Country(),
+                Town = _faker.Address.City(),
+                Postcode = "E41JJ",
             };
             TestDataHelper.InsertAddress(addressKey, Db, addressDetails);
             AddSomeRandomAddressToTheDatabase();
-            var queryString = $"UPRN={addressDetails.uprn}&AddressStatus=Historical&Format=Simple";
+            var queryString = $"UPRN={addressDetails.Uprn}&AddressStatus=Historical&Format=Simple";
 
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);
@@ -115,13 +115,13 @@ namespace AddressesAPI.Tests.V1.E2ETests
             var receivedAddress = returnedAddress.Data.Addresses.First();
             receivedAddress.Should().BeEquivalentTo(new AddressResponse
             {
-                Line1 = addressDetails.line1,
-                Line2 = addressDetails.line2,
-                Line3 = addressDetails.line3,
-                Line4 = addressDetails.line4,
-                Town = addressDetails.town,
-                Postcode = addressDetails.postcode,
-                UPRN = addressDetails.uprn
+                Line1 = addressDetails.Line1,
+                Line2 = addressDetails.Line2,
+                Line3 = addressDetails.Line3,
+                Line4 = addressDetails.Line4,
+                Town = addressDetails.Town,
+                Postcode = addressDetails.Postcode,
+                UPRN = addressDetails.Uprn
             });
         }
 
@@ -131,13 +131,13 @@ namespace AddressesAPI.Tests.V1.E2ETests
             var addressKey = _faker.Random.String2(14);
             var queryParameters = new DatabaseAddressRecord
             {
-                uprn = _faker.Random.Int(),
+                Uprn = _faker.Random.Int(),
             };
             TestDataHelper.InsertAddress(addressKey, Db, queryParameters, localOnly: false);
 
             AddSomeRandomAddressToTheDatabase(count: 3);
             AddSomeRandomAddressToTheDatabase(count: 3, gazetteer: "national");
-            var queryString = $"UPRN={queryParameters.uprn}&AddressStatus=Historical&Format=Detailed&Gazetteer=Both";
+            var queryString = $"UPRN={queryParameters.Uprn}&AddressStatus=Historical&Format=Detailed&Gazetteer=Both";
 
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);

@@ -36,7 +36,7 @@ namespace AddressesAPI.Tests.V1.E2ETests
         {
             var addressId = _faker.Random.String2(14);
             var addressRecord = _fixture.Build<DatabaseAddressRecord>()
-                .With(add => add.lpi_key, addressId)
+                .With(add => add.Lpi_key, addressId)
                 .Create();
 
             TestDataHelper.InsertAddress(addressId, Db, addressRecord);
@@ -54,14 +54,14 @@ namespace AddressesAPI.Tests.V1.E2ETests
             var returnedRecord = apiResponse.Data.Addresses.FirstOrDefault();
 
             returnedRecord.AddressKey.Should().Be(addressId);
-            returnedRecord.USRN.Should().Be(addressRecord.usrn);
-            returnedRecord.UPRN.Should().Be(addressRecord.uprn);
-            returnedRecord.Line1.Should().BeEquivalentTo(addressRecord.line1);
-            returnedRecord.Line2.Should().BeEquivalentTo(addressRecord.line2);
-            returnedRecord.Line3.Should().BeEquivalentTo(addressRecord.line3);
-            returnedRecord.Line4.Should().BeEquivalentTo(addressRecord.line4);
-            returnedRecord.Town.Should().BeEquivalentTo(addressRecord.town);
-            returnedRecord.Postcode.Should().BeEquivalentTo(addressRecord.postcode);
+            returnedRecord.USRN.Should().Be(addressRecord.Usrn);
+            returnedRecord.UPRN.Should().Be(addressRecord.Uprn);
+            returnedRecord.Line1.Should().BeEquivalentTo(addressRecord.Line1);
+            returnedRecord.Line2.Should().BeEquivalentTo(addressRecord.Line2);
+            returnedRecord.Line3.Should().BeEquivalentTo(addressRecord.Line3);
+            returnedRecord.Line4.Should().BeEquivalentTo(addressRecord.Line4);
+            returnedRecord.Town.Should().BeEquivalentTo(addressRecord.Town);
+            returnedRecord.Postcode.Should().BeEquivalentTo(addressRecord.Postcode);
         }
 
         //TODO: We would want this to return 400 rather than 500

@@ -68,7 +68,10 @@ namespace AddressesAPI.Tests.V1.UseCase
             {
                 new AddressCrossReference
                 {
-                    UPRN = 10024389298, code = "", crossRefKey ="" , name ="" , value ="", endDate = DateTime.Today
+                    UPRN = 10024389298,
+                    Code = "", CrossRefKey ="" ,
+                    Name ="" , Value ="",
+                    EndDate = DateTime.Today
                 }
             };
 
@@ -93,15 +96,15 @@ namespace AddressesAPI.Tests.V1.UseCase
             {
                 new AddressCrossReference
                 {
-                    UPRN = 10024389298, code = "", crossRefKey ="" , name ="" , value ="", endDate = DateTime.Today
+                    UPRN = 10024389298, Code = "", CrossRefKey ="" , Name ="" , Value ="", EndDate = DateTime.Today
                 },
                 new AddressCrossReference
                 {
-                    UPRN = 10024389298, code = "", crossRefKey ="" , name ="" , value ="", endDate = DateTime.Today
+                    UPRN = 10024389298, Code = "", CrossRefKey ="" , Name ="" , Value ="", EndDate = DateTime.Today
                 },
                 new AddressCrossReference
                 {
-                    UPRN = 10024389291, code = "", crossRefKey ="" , name ="" , value ="", endDate = DateTime.Today
+                    UPRN = 10024389291, Code = "", CrossRefKey ="" , Name ="" , Value ="", EndDate = DateTime.Today
                 }
             };
 

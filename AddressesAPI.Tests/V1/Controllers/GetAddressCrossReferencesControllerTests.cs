@@ -32,7 +32,7 @@ namespace AddressesAPI.Tests.V1.Controllers
             _mock.Setup(s => s.ExecuteAsync(It.IsAny<GetAddressCrossReferenceRequest>()))
                 .ReturnsAsync(new GetAddressCrossReferenceResponse
                 {
-                    AddressCrossReferences = new List<AddressCrossReference>()
+                    AddressCrossReferences = new List<AddressCrossReferenceResponse>()
                 });
             long uprn = 12345;
 

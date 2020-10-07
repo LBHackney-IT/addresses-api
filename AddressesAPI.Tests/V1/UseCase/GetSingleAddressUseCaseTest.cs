@@ -137,7 +137,7 @@ namespace AddressesAPI.Tests.V1.UseCase
 
             response.Should().NotBeNull();
 
-            response.Addresses[0].ShouldEqual(address);
+            response.Addresses[0].AddressShouldEqual(address);
         }
     }
 }

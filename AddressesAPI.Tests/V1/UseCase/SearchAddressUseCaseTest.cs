@@ -153,7 +153,7 @@ namespace AddressesAPI.Tests.V1.UseCase
             var response = await _classUnderTest.ExecuteAsync(request).ConfigureAwait(true);
 
             response.Should().NotBeNull();
-            response.Addresses[0].ShouldEqual(address);
+            response.Addresses[0].AddressShouldEqual(address);
         }
     }
 }

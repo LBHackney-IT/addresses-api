@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using AddressesAPI.V1.Boundary.Requests;
 using AddressesAPI.V1.Boundary.Responses;
 using AddressesAPI.V1.Boundary.Responses.Metadata;
+using AddressesAPI.V1.Domain;
 using AddressesAPI.V1.UseCase.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,8 +16,6 @@ namespace AddressesAPI.V1.Controllers
     public class GetAddressCrossReferenceController : BaseController
     {
         private readonly IGetAddressCrossReferenceUseCase _getAddressCrossReferenceUseCase;
-
-
         public GetAddressCrossReferenceController(IGetAddressCrossReferenceUseCase getAddressCrossReferenceUseCase)
         {
             _getAddressCrossReferenceUseCase = getAddressCrossReferenceUseCase;
