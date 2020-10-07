@@ -68,7 +68,7 @@ namespace AddressesAPI.Tests.V1.E2ETests
             var response = await Client.GetAsync(url).ConfigureAwait(true);
             response.StatusCode.Should().Be(404);
         }
-        
+
         [Ignore("This needs to be implemented")]
         [Test]
         public async Task Get404WhenAddressCannotBeFound()
