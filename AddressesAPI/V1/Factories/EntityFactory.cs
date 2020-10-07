@@ -1,4 +1,6 @@
 using AddressesAPI.V1.Domain;
+using AddressesAPI.V1.Infrastructure;
+using Address = AddressesAPI.V1.Domain.Address;
 
 namespace AddressesAPI.V1.Factories
 {
@@ -44,6 +46,19 @@ namespace AddressesAPI.V1.Factories
                 Town = addressEntity.Town,
                 UPRN = addressEntity.UPRN,
                 Postcode = addressEntity.Postcode,
+            };
+        }
+
+        public static AddressCrossReference ToDomain(this CrossReference crossReference)
+        {
+            return new AddressCrossReference
+            {
+                CrossRefKey = crossReference.CrossRefKey,
+                UPRN = crossReference.UPRN,
+                Code = crossReference.Code,
+                Name = crossReference.Name,
+                Value = crossReference.Value,
+                EndDate = crossReference?.EndDate
             };
         }
     }

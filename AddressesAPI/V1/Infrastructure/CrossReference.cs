@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AddressesAPI.V1.Infrastructure
 {
-    [Table("hackney_xref")]
+    [Table("hackney_xref", Schema = "dbo")]
     public class CrossReference
     {
         [Column("xref_key")]

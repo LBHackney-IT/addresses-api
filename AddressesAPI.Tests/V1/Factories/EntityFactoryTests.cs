@@ -10,6 +10,7 @@ namespace AddressesAPI.Tests.V1.Factories
     public class EntityFactoryTests
     {
         private readonly Fixture _fixture = new Fixture();
+
         [Test]
         public void CanMapAnAddressEntityToDomain()
         {
@@ -23,6 +24,15 @@ namespace AddressesAPI.Tests.V1.Factories
                 {"HackneyGazetteerOutOfBoroughAddress", addressEntity.NeverExport }
             };
             address.ShouldBeEquivalentToExpectedObjectWithExceptions(addressEntity, exceptions);
+        }
+
+        [Test]
+        public void CanMapACrossReferenceEntityToDomain()
+        {
+            var crossReferenceEntity = _fixture.Create<CrossReference>();
+            var crossReference = crossReferenceEntity.ToDomain();
+
+            crossReference.ShouldBeEquivalentToExpectedObjectWithExceptions(crossReferenceEntity);
         }
     }
 }
