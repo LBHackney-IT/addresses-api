@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace AddressesAPI.V1.Infrastructure
 {
     [Table("hackney_xref")]
-    public class GetAddressCrossReference
+    public class CrossReference
     {
         [Column("xref_key")]
         [Key]

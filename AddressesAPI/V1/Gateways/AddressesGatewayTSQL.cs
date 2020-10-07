@@ -5,6 +5,7 @@ using AddressesAPI.V1.Domain;
 using AddressesAPI.V1.Infrastructure;
 using Dapper;
 using Microsoft.Data.SqlClient;
+using Address = AddressesAPI.V1.Domain.Address;
 using AddressCrossReference = AddressesAPI.V1.Domain.AddressCrossReference;
 
 namespace AddressesAPI.V1.Gateways

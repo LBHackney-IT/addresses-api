@@ -3,8 +3,6 @@ using AddressesAPI.V1.Boundary.Responses;
 using AddressesAPI.V1.Boundary.Responses.Data;
 using AddressesAPI.V1.Domain;
 using FluentAssertions;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 namespace AddressesAPI.Tests.V1.Helper
 {
@@ -47,6 +45,29 @@ namespace AddressesAPI.Tests.V1.Helper
 
             received.Longitude.Should().Be(expected.Longitude);
             received.Latitude.Should().Be(expected.Latitude);
+        }
+
+        public static void ShouldBeEquivalentToExpectedObjectWithExceptions<T, TS>(this T received, TS expected,
+            Dictionary<string, object> exceptions = null)
+        {
+            foreach (var prop in received.GetType().GetProperties())
+            {
+                if (exceptions != null)
+                {
+                    foreach (var (propertyName, expectedResult) in exceptions)
+                    {
+                        if (prop.Name != propertyName) continue;
+                        prop.GetValue(received).Should().Be(expectedResult,
+                            $"field {prop.Name} should be match value given in exceptions");
+                        return;
+                    }
+                }
+
+                prop.GetValue(received).Should()
+                    .Be(expected.GetType().GetProperty(prop.Name)?.GetValue(expected),
+                        $"field {prop.Name} should be equivalent to expected object");
+
+            }
         }
     }
 }

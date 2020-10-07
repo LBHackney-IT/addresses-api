@@ -8,10 +8,8 @@ namespace AddressesAPI.V1.Gateways
     {
         Task<Address> GetSingleAddressAsync(string addressId);
 
-        Task<(List<Address>, int)> SearchAddressesAsync(SearchParameters request);
+        (List<Address>, int) SearchAddresses(SearchParameters request);
 
         Task<(List<SimpleAddress>, int)> SearchSimpleAddressesAsync(SearchParameters request);
-
-        Task<List<AddressCrossReference>> GetAddressCrossReferenceAsync(long uprn);
     }
 }

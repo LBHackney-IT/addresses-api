@@ -9,9 +9,7 @@ namespace AddressesAPI.V1.Infrastructure
         {
         }
 
-        public DbSet<GetAddressCrossReference> AddressCrossReferences { get; set; }
-        public DbSet<SearchHackneyAddress> SearchHackneyAddresses { get; set; }
-        public DbSet<SearchNationalAddress> SearchNationalAddresses { get; set; }
-
+        public DbSet<CrossReference> AddressCrossReferences { get; set; }
+        public DbSet<Address> Addresses { get; set; }
     }
 }

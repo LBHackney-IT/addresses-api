@@ -1,10 +1,14 @@
 using System;
 using System.IO;
 using System.Net.Http;
+using System.Threading.Tasks;
+using AddressesAPI.V1.Boundary.Responses;
+using AddressesAPI.V1.Boundary.Responses.Metadata;
 using AddressesAPI.V1.Infrastructure;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Newtonsoft.Json;
 using Npgsql;
 using NUnit.Framework;
 
@@ -102,6 +106,12 @@ namespace AddressesAPI.Tests
 
             Db = new SqlConnection(_connectionString);
             Db.Open();
+        }
+
+        protected static async Task<APIResponse<SearchAddressResponse>> ConvertToResponseObject(HttpResponseMessage response)
+        {
+            var data = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
+            return JsonConvert.DeserializeObject<APIResponse<SearchAddressResponse>>(data);
         }
     }
 

@@ -214,11 +214,5 @@ namespace AddressesAPI.Tests.V1.E2ETests
             var url = new Uri($"api/v1/addresses?{query}", UriKind.Relative);
             return await Client.GetAsync(url).ConfigureAwait(true);
         }
-
-        private static async Task<APIResponse<SearchAddressResponse>> ConvertToResponseObject(HttpResponseMessage response)
-        {
-            var data = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
-            return JsonConvert.DeserializeObject<APIResponse<SearchAddressResponse>>(data);
-        }
     }
 }
