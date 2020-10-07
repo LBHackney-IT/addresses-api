@@ -80,7 +80,7 @@ namespace AddressesAPI.Tests.V1.E2ETests
 
         }
 
-        private static async Task<APIResponse<GetAddressCrossReferenceResponse>> ConvertToResponseObject(HttpResponseMessage response)
+        private static new async Task<APIResponse<GetAddressCrossReferenceResponse>> ConvertToResponseObject(HttpResponseMessage response)
         {
             var data = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
             return JsonConvert.DeserializeObject<APIResponse<GetAddressCrossReferenceResponse>>(data);
