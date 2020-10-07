@@ -736,5 +736,21 @@ namespace AddressesAPI.Tests.V1.Gateways
         //TODO
         #endregion
         #endregion
+
+        #region GetSingleAddress
+
+        [Test]
+        public void ItWillReturnADetailedRecordForASingleAddressRetrievedUsingTheAddressKey()
+        {
+            var addressKey = _faker.Random.String2(14);
+            var savedAddress = TestEfDataHelper.InsertAddress(DatabaseContext, addressKey);
+
+            var retrievedRecord = _classUnderTest.GetSingleAddress(addressKey);
+
+            retrievedRecord.Should().NotBeNull();
+            retrievedRecord.Should().BeEquivalentTo(savedAddress.ToDomain());
+        }
+
+        #endregion
     }
 }

@@ -73,6 +73,11 @@ namespace AddressesAPI.V1.Gateways
             return (addresses, 0);
         }
 
+        public Address GetSingleAddress(string addressKey)
+        {
+            return _addressesContext.Addresses.FirstOrDefault(add => add.AddressKey.Equals(addressKey)).ToDomain();
+        }
+
         public async Task<(List<SimpleAddress>, int)> SearchSimpleAddressesAsync(SearchParameters request)
         {
             return (new List<SimpleAddress>(), 0);
