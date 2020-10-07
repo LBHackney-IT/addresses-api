@@ -75,7 +75,8 @@ namespace AddressesAPI.V1.Gateways
 
         public Address GetSingleAddress(string addressKey)
         {
-            return _addressesContext.Addresses.FirstOrDefault(add => add.AddressKey.Equals(addressKey)).ToDomain();
+            var addressRecord = _addressesContext.Addresses.FirstOrDefault(add => add.AddressKey.Equals(addressKey));
+            return addressRecord?.ToDomain();
         }
 
         public async Task<(List<SimpleAddress>, int)> SearchSimpleAddressesAsync(SearchParameters request)

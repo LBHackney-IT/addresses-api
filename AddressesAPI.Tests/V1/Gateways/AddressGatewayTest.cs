@@ -751,6 +751,14 @@ namespace AddressesAPI.Tests.V1.Gateways
             retrievedRecord.Should().BeEquivalentTo(savedAddress.ToDomain());
         }
 
+        [Test]
+        public void ItWillReturnNullIfAddressWithAMatchingKeyDoesNotExistInTheDatabase()
+        {
+            var addressKey = _faker.Random.String2(14);
+
+            _classUnderTest.GetSingleAddress(addressKey).Should().BeNull();
+        }
+
         #endregion
     }
 }
