@@ -733,7 +733,43 @@ namespace AddressesAPI.Tests.V1.Gateways
         #endregion
 
         #region totalCount
-        //TODO
+
+        [TestCase(20)]
+        [TestCase(7)]
+        public void ItWillReturnTheTotalCountIfThereIsOnlyOnePageOfRecords(int count)
+        {
+            AddOrderedRecordsToDatabase(count);
+            var request = new SearchParameters
+            {
+                Page = 1,
+                PageSize = count + 1,
+                Format = GlobalConstants.Format.Detailed,
+                Gazetteer = GlobalConstants.Gazetteer.Both
+            };
+            var (addresses, totalCount) = _classUnderTest.SearchAddresses(request);
+
+            addresses.Count.Should().Be(count);
+            totalCount.Should().Be(count);
+        }
+
+        [TestCase(20)]
+        [TestCase(7)]
+        public void ItWillReturnTheTotalCountIfThereAreMultiplePagesOfRecords(int count)
+        {
+            AddOrderedRecordsToDatabase(count);
+            var request = new SearchParameters
+            {
+                Page = 1,
+                PageSize = count - 5,
+                Format = GlobalConstants.Format.Detailed,
+                Gazetteer = GlobalConstants.Gazetteer.Both
+            };
+            var (addresses, totalCount) = _classUnderTest.SearchAddresses(request);
+
+            addresses.Count.Should().Be(count - 5);
+            totalCount.Should().Be(count);
+        }
+
         #endregion
         #endregion
 

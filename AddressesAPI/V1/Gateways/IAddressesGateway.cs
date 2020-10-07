@@ -6,10 +6,10 @@ namespace AddressesAPI.V1.Gateways
 {
     public interface IAddressesGateway
     {
-        Task<Address> GetSingleAddressAsync(string addressId);
+        Address GetSingleAddress(string addressKey);
 
         (List<Address>, int) SearchAddresses(SearchParameters request);
 
-        Task<(List<SimpleAddress>, int)> SearchSimpleAddressesAsync(SearchParameters request);
+        (List<SimpleAddress>, int) SearchSimpleAddressesAsync(SearchParameters request);
     }
 }
