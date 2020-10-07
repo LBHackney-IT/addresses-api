@@ -73,8 +73,8 @@ namespace AddressesAPI.Tests.V1.E2ETests
         public async Task Get404WhenAddressCannotBeFound()
         {
             var uprn = _faker.Random.Int();
-
-            var url = new Uri($"api/v1/properties/{uprn}", UriKind.Relative);
+            var uprnempty = "";
+            var url = new Uri($"api/v1/properties/{uprnempty}/crossreferences", UriKind.Relative);
             var response = await Client.GetAsync(url).ConfigureAwait(true);
             response.StatusCode.Should().Be(404);
 
