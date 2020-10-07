@@ -68,7 +68,10 @@ namespace AddressesAPI.Tests.V1.UseCase
             {
                 new AddressCrossReference
                 {
-                    UPRN = 10024389298, Code = "", CrossRefKey ="" , Name ="" , Value ="", EndDate = DateTime.Today
+                    UPRN = 10024389298,
+                    Code = "", CrossRefKey ="" ,
+                    Name ="" , Value ="",
+                    EndDate = DateTime.Today
                 }
             };
 
