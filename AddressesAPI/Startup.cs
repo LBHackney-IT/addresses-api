@@ -130,6 +130,7 @@ namespace AddressesAPI
             var llpgConnectionString = Environment.GetEnvironmentVariable("LLPGConnectionString");
 
             services.AddScoped<IAddressesGatewayTSQL>(s => new AddressesGatewayTSQL(llpgConnectionString));
+            services.AddScoped<IAddressesGateway, AddressesGateway>();
         }
 
         private static void RegisterUseCases(IServiceCollection services)

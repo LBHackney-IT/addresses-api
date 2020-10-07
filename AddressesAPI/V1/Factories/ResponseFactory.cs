@@ -55,12 +55,12 @@ namespace AddressesAPI.V1.Factories
                 Northing = domain.Northing,
                 Longitude = domain.Longitude,
                 Latitude = domain.Latitude,
-                addressStartDate = domain.addressStartDate,
-                addressEndDate = domain.addressEndDate,
-                addressChangeDate = domain.addressChangeDate,
-                propertyStartDate = domain.propertyStartDate,
-                propertyEndDate = domain.propertyEndDate,
-                propertyChangeDate = domain.propertyChangeDate,
+                AddressStartDate = domain.AddressStartDate,
+                AddressEndDate = domain.AddressEndDate,
+                AddressChangeDate = domain.AddressChangeDate,
+                PropertyStartDate = domain.PropertyStartDate,
+                PropertyEndDate = domain.PropertyEndDate,
+                PropertyChangeDate = domain.PropertyChangeDate,
             };
         }
 
