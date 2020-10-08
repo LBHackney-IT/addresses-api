@@ -24,7 +24,7 @@ namespace AddressesAPI.Tests.V1.Gateways
         {
             var uprn = _faker.Random.Long();
 
-            var savedCrossRef = TestEfDataHelper.insertCrossReference(DatabaseContext, uprn);
+            var savedCrossRef = TestEfDataHelper.InsertCrossReference(DatabaseContext, uprn);
 
             var response = _classUnderTest.GetAddressCrossReference(uprn);
 

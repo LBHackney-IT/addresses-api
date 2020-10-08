@@ -37,7 +37,7 @@ namespace AddressesAPI.Tests.V1.Helper
             return randomAddressRecord;
         }
 
-        public static CrossReference insertCrossReference(AddressesContext context, long uprn)
+        public static CrossReference InsertCrossReference(AddressesContext context, long uprn)
         {
             var fixture = new Fixture();
             var crossRefRecord = fixture.Build<CrossReference>()
