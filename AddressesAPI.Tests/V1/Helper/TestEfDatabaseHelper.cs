@@ -37,6 +37,19 @@ namespace AddressesAPI.Tests.V1.Helper
             return randomAddressRecord;
         }
 
+        public static CrossReference InsertCrossReference(AddressesContext context, long uprn)
+        {
+            var fixture = new Fixture();
+            var crossRefRecord = fixture.Build<CrossReference>()
+                .With(cr => cr.UPRN, uprn)
+                .Create();
+
+            context.AddressCrossReferences.Add(crossRefRecord);
+            context.SaveChanges();
+
+            return crossRefRecord;
+        }
+
         private static string ReplaceEmptyStringWithNull(string request)
         {
             return request.Length == 0 ? null : request;
