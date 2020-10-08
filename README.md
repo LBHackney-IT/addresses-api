@@ -72,6 +72,23 @@ To help with making changes to code easier to understand when being reviewed, we
 When a new PR is created on a repo that uses this API template, the PR template will automatically fill in the `Open a pull request` description textbox.
 The PR author can edit and change the PR description using the template as a guide.
 
+## Adding a Migration
+
+For this API's Postgres database in RDS, we are using EF Core Code first migrations to manage its schema.
+To make changes to the database structure e.g add columns, etc. Follow these steps:
+
+1. If you haven't done so previously, you need to install the [dotnet ef cli tool](https://docs.microsoft.com/en-us/ef/core/miscellaneous/cli/dotnet) by running `dotnet tool install --global dotnet-ef` in your terminal.
+2. Make the changes you want to the database model in the code, namely in `AddressesContext` or any of the DbSet's listed within the file.
+3. In your terminal, navigate to the project root folder and run `dotnet ef migrations add -o ./V1/Infrastructure/Migrations -p AddressesAPI NameOfThisMigration` to create the migration files. NameOfThisMigration should be replaced with your migration name e.g. AddColumnNameToCrossReferencesTable.
+4. Go to the folder /AddressesAPI/V1/Infrastructure/Migrations and you should see two new files for the migration. In the one which doesn't end in `.Designer` you can check through the migration script to make sure everything is being created as you expect.
+5. If the migration file looks wrong or you have missed something, you can either:
+
+- Make sure the test/localhost database is running and then run `CONNECTION_STRING="Host=127.0.0.1;Database=testdb;Username=postgres;Password=mypassword;" dotnet ef migrations remove -p AddressesAPI`
+- Or you can delete the migration files and then revert the changes to `AddressesContextModelSnapshot.cs`.
+After which make the necessary changes to the context, then create the migration files again.
+
+> Note: You must not commit any changes to any DbSet that is listed in `AddressesContext` without creating a migration file for the change. If not the change won't be reflected in the database and will cause errors.
+
 ## Static Code Analysis
 
 ### Using [FxCop Analysers](https://www.nuget.org/packages/Microsoft.CodeAnalysis.FxCopAnalyzers)
