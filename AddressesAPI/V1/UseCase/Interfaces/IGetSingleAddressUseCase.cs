@@ -6,6 +6,6 @@ namespace AddressesAPI.V1.UseCase.Interfaces
 {
     public interface IGetSingleAddressUseCase
     {
-        Task<SearchAddressResponse> ExecuteAsync(GetAddressRequest request);
+        SearchAddressResponse ExecuteAsync(GetAddressRequest request);
     }
 }

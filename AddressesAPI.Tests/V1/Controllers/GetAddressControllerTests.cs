@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using AddressesAPI.V1.Boundary.Requests;
 using AddressesAPI.V1.Boundary.Responses;
 using AddressesAPI.V1.Controllers;
@@ -23,16 +22,16 @@ namespace AddressesAPI.Tests.V1.Controllers
         }
 
         [Test]
-        public async Task GivenValidSearchAddressRequest_WhenCallingGet_ThenShouldReturn200()
+        public void GivenValidSearchAddressRequest_WhenCallingGet_ThenShouldReturn200()
         {
             _mock.Setup(s => s.ExecuteAsync(It.IsAny<GetAddressRequest>()))
-                .ReturnsAsync(new SearchAddressResponse
+                .Returns(new SearchAddressResponse
                 {
                     Addresses = new List<AddressResponse>()
                 });
             var lpi_key = "ABCDEFGHIJKLMN";
 
-            var response = await _classUnderTest.GetAddress(lpi_key).ConfigureAwait(false);
+            var response = _classUnderTest.GetAddress(lpi_key);
 
             response.Should().NotBeNull();
             response.Should().BeOfType<ObjectResult>();

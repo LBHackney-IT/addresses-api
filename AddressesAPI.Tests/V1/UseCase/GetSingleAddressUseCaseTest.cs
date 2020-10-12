@@ -16,29 +16,29 @@ namespace AddressesAPI.Tests.V1.UseCase
     public class GetSingleAddressUseCaseTest
     {
         private readonly IGetSingleAddressUseCase _classUnderTest;
-        private readonly Mock<IAddressesGatewayTSQL> _fakeGateway;
+        private readonly Mock<IAddressesGateway> _fakeGateway;
 
 
         public GetSingleAddressUseCaseTest()
         {
-            _fakeGateway = new Mock<IAddressesGatewayTSQL>();
+            _fakeGateway = new Mock<IAddressesGateway>();
 
             _classUnderTest = new GetSingleAddressUseCase(_fakeGateway.Object);
         }
 
         [Test]
-        public async Task GivenValidInput_WhenExecuteAsync_GatewayReceivesCorrectInputLength()
+        public void GivenValidInput_WhenExecuteAsync_GatewayReceivesCorrectInputLength()
         {
 
             var lpi_key = "ABCDEFGHIJKLMN"; //14 characters
-            _fakeGateway.Setup(s => s.GetSingleAddressAsync("ABCDEFGHIJKLMN")).ReturnsAsync(new Address()).Verifiable();
+            _fakeGateway.Setup(s => s.GetSingleAddress("ABCDEFGHIJKLMN")).Returns(new Address()).Verifiable();
 
             var request = new GetAddressRequest
             {
                 addressID = lpi_key
             };
 
-            await _classUnderTest.ExecuteAsync(request).ConfigureAwait(true);
+            _classUnderTest.ExecuteAsync(request);
 
             _fakeGateway.Verify();
         }
@@ -77,26 +77,26 @@ namespace AddressesAPI.Tests.V1.UseCase
         }
 
         [Test]
-        public async Task GivenValidInput_WhenGatewayRespondsWithNull_ThenResponseShouldBeNull()
+        public void GivenValidInput_WhenGatewayRespondsWithNull_ThenResponseShouldBeNull()
         {
             //arrange
             var lpi_key = "ABCDEFGHIJKLMN";
 
-            _fakeGateway.Setup(s => s.GetSingleAddressAsync("ABCDEFGHIJKLMN"))
-                .ReturnsAsync((Address) null);
+            _fakeGateway.Setup(s => s.GetSingleAddress("ABCDEFGHIJKLMN"))
+                .Returns((Address) null);
 
             var request = new GetAddressRequest
             {
                 addressID = lpi_key
             };
             //act
-            var response = await _classUnderTest.ExecuteAsync(request).ConfigureAwait(true);
+            var response = _classUnderTest.ExecuteAsync(request);
             //assert
             response.Addresses.Should().BeNull();
         }
 
         [Test]
-        public async Task GivenValidLPIKey_WhenExecuteAsync_ThenAddressShouldBeReturned()
+        public void GivenValidLPIKey_WhenExecuteAsync_ThenAddressShouldBeReturned()
         {
             var address = new Address
             {
@@ -130,10 +130,10 @@ namespace AddressesAPI.Tests.V1.UseCase
             {
                 addressID = lpi_key
             };
-            _fakeGateway.Setup(s => s.GetSingleAddressAsync(lpi_key))
-                .ReturnsAsync(address);
+            _fakeGateway.Setup(s => s.GetSingleAddress(lpi_key))
+                .Returns(address);
 
-            var response = await _classUnderTest.ExecuteAsync(request).ConfigureAwait(true);
+            var response = _classUnderTest.ExecuteAsync(request);
 
             response.Should().NotBeNull();
 

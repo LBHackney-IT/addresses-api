@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using AddressesAPI.V1.Boundary.Requests;
 using AddressesAPI.V1.Boundary.Responses;
 using AddressesAPI.V1.Boundary.Responses.Data;
@@ -26,18 +24,18 @@ namespace AddressesAPI.Tests.V1.Controllers
         }
 
         [Test]
-        public async Task GivenValidAddressRequest_WhenCallingGet_ThenShouldReturnAPIResponseListOfAddresses()
+        public void GivenValidAddressRequest_WhenCallingGet_ThenShouldReturnAPIResponseListOfAddresses()
         {
             //arrange
             _mock.Setup(s => s.ExecuteAsync(It.IsAny<GetAddressCrossReferenceRequest>()))
-                .ReturnsAsync(new GetAddressCrossReferenceResponse
+                .Returns(new GetAddressCrossReferenceResponse
                 {
                     AddressCrossReferences = new List<AddressCrossReferenceResponse>()
                 });
             long uprn = 12345;
 
             //act
-            var response = await _classUnderTest.GetAddressCrossReference(uprn).ConfigureAwait(false);
+            var response = _classUnderTest.GetAddressCrossReference(uprn);
             //assert
             response.Should().NotBeNull();
             response.Should().BeOfType<ObjectResult>();

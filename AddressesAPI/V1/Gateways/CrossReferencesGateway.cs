@@ -16,6 +16,7 @@ namespace AddressesAPI.V1.Gateways
 
         public List<AddressCrossReference> GetAddressCrossReference(long uprn)
         {
+            var allAddresses = _addressesContext.AddressCrossReferences.ToList();
             return _addressesContext.AddressCrossReferences
                 .Where(x => x.UPRN.Equals(uprn))
                 .Select(cr => cr.ToDomain()).ToList();

@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
+using System.Reflection;
 using AddressesAPI.V1.Domain;
 using AddressesAPI.V1.Factories;
 using AddressesAPI.V1.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Address = AddressesAPI.V1.Domain.Address;
 
 namespace AddressesAPI.V1.Gateways

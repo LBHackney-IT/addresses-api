@@ -27,10 +27,10 @@ namespace AddressesAPI.V1.Controllers
         [HttpGet, MapToApiVersion("1")]
         [Route("{addressID}")]
         [ProducesResponseType(typeof(APIResponse<SearchAddressResponse>), 200)]
-        public async Task<IActionResult> GetAddress(string addressId)
+        public IActionResult GetAddress(string addressId)
         {
             var request = new GetAddressRequest { addressID = addressId };
-            var response = await _getAddressUseCase.ExecuteAsync(request).ConfigureAwait(false);
+            var response = _getAddressUseCase.ExecuteAsync(request);
 
             return HandleResponse(response);
         }

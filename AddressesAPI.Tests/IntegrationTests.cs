@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using AddressesAPI.V1.Boundary.Responses;
@@ -18,28 +17,27 @@ namespace AddressesAPI.Tests
     {
         protected HttpClient Client { get; private set; }
         protected AddressesContext DatabaseContext { get; private set; }
-        protected SqlConnection Db { get; private set; }
 
         private MockWebApplicationFactory<TStartup> _factory;
         private NpgsqlConnection _connection;
         private IDbContextTransaction _transaction;
         private DbContextOptionsBuilder _builder;
-        private string _connectionString;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            // ConnectToPostgresDbUsingEf();
+            ConnectToPostgresDbUsingEf();
         }
 
         [SetUp]
         public void BaseSetup()
         {
-            ConnectToDbUsingSqlClient();
-            ClearDatabase();
+            Environment.SetEnvironmentVariable("CONNECTION_STRING", ConnectionString.TestDatabase());
             _factory = new MockWebApplicationFactory<TStartup>(_connection);
             Client = _factory.CreateClient();
-            //StartTransactionWithEf();
+            DatabaseContext = new AddressesContext(_builder.Options);
+            DatabaseContext.Database.Migrate();
+            _transaction = DatabaseContext.Database.BeginTransaction();
         }
 
         [TearDown]
@@ -47,23 +45,7 @@ namespace AddressesAPI.Tests
         {
             Client.Dispose();
             _factory.Dispose();
-            //RollbackEfTransaction();
-        }
-
-
-
-        [OneTimeTearDown]
-        public void AfterAllTests()
-        {
-            Db.Close();
-            Db.Dispose();
-        }
-
-        private void StartTransactionWithEf()
-        {
-            DatabaseContext = new AddressesContext(_builder.Options);
-            DatabaseContext.Database.EnsureCreated();
-            _transaction = DatabaseContext.Database.BeginTransaction();
+            RollbackEfTransaction();
         }
 
         private void RollbackEfTransaction()
@@ -82,30 +64,6 @@ namespace AddressesAPI.Tests
 
             _builder = new DbContextOptionsBuilder();
             _builder.UseNpgsql(_connection);
-        }
-
-        private void ClearDatabase()
-        {
-            var commandText = "DELETE FROM [dbo].[hackney_address]; DELETE FROM [dbo].[national_address]; DELETE FROM [dbo].[hackney_xref];";
-
-            var command = new SqlCommand(commandText, Db);
-            command.ExecuteNonQuery();
-            command.Dispose();
-        }
-
-        private void ConnectToDbUsingSqlClient()
-        {
-            _connectionString = Environment.GetEnvironmentVariable("LLPGConnectionString");
-            if (_connectionString == null)
-            {
-                var dotenv = Path.GetRelativePath(Directory.GetCurrentDirectory(), "../../../../database.env");
-                DotNetEnv.Env.Load(dotenv);
-                _connectionString = DotNetEnv.Env.GetString("LLPGConnectionString");
-            }
-            Environment.SetEnvironmentVariable("LLPGConnectionString", _connectionString);
-
-            Db = new SqlConnection(_connectionString);
-            Db.Open();
         }
 
         protected static async Task<APIResponse<SearchAddressResponse>> ConvertToResponseObject(HttpResponseMessage response)

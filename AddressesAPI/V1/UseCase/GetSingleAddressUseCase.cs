@@ -10,14 +10,14 @@ namespace AddressesAPI.V1.UseCase
 {
     public class GetSingleAddressUseCase : IGetSingleAddressUseCase
     {
-        private readonly IAddressesGatewayTSQL _addressGatewayTsql;
+        private readonly IAddressesGateway _addressGateway;
 
-        public GetSingleAddressUseCase(IAddressesGatewayTSQL addressesGatewayTsql)
+        public GetSingleAddressUseCase(IAddressesGateway addressesGateway)
         {
-            _addressGatewayTsql = addressesGatewayTsql;
+            _addressGateway = addressesGateway;
         }
 
-        public async Task<SearchAddressResponse> ExecuteAsync(GetAddressRequest request)
+        public SearchAddressResponse ExecuteAsync(GetAddressRequest request)
         {
             //validate
             if (request == null)
@@ -28,7 +28,7 @@ namespace AddressesAPI.V1.UseCase
             if (!validationResponse.IsValid)
                 throw new BadRequestException(validationResponse);
 
-            var response = await _addressGatewayTsql.GetSingleAddressAsync(request.addressID).ConfigureAwait(false);
+            var response = _addressGateway.GetSingleAddress(request.addressID);
 
             if (response == null)
                 return new SearchAddressResponse();
@@ -37,8 +37,6 @@ namespace AddressesAPI.V1.UseCase
                 Addresses = new List<AddressResponse> { response.ToResponse() }
             };
             return useCaseResponse;
-
-
         }
     }
 }

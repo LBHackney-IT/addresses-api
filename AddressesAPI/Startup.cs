@@ -127,6 +127,7 @@ namespace AddressesAPI
 
             services.AddScoped<IAddressesGatewayTSQL>(s => new AddressesGatewayTSQL(llpgConnectionString));
             services.AddScoped<IAddressesGateway, AddressesGateway>();
+            services.AddScoped<ICrossReferencesGateway, CrossReferencesGateway>();
         }
 
         private static void RegisterUseCases(IServiceCollection services)

@@ -5,10 +5,10 @@ namespace AddressesAPI.Tests.V1.Helper
 {
     public static class TestEfDataHelper
     {
-        public static Address InsertAddress(AddressesContext context, string key = null, Address request = null)
+        public static NationalAddress InsertAddress(AddressesContext context, string key = null, NationalAddress request = null)
         {
             var fixture = new Fixture();
-            var randomAddressRecord = fixture.Build<Address>()
+            var randomAddressRecord = fixture.Build<NationalAddress>()
                 .With(a => a.AddressStatus, request?.AddressStatus ?? "Approved Preferred")
                 .Create();
             if (key != null) randomAddressRecord.AddressKey = key;
@@ -31,23 +31,31 @@ namespace AddressesAPI.Tests.V1.Helper
             if (request?.BuildingNumber != null) randomAddressRecord.BuildingNumber = ReplaceEmptyStringWithNull(request.BuildingNumber);
             if (request?.UnitNumber != null) randomAddressRecord.UnitNumber = ReplaceEmptyStringWithNull(request.UnitNumber);
             if (request?.UnitName != null) randomAddressRecord.UnitName = ReplaceEmptyStringWithNull(request.UnitName);
+            if (request?.Line1 != null) randomAddressRecord.Line1 = request.Line1;
+            if (request?.Line2 != null) randomAddressRecord.Line2 = request.Line2;
+            if (request?.Line3 != null) randomAddressRecord.Line3 = request.Line3;
+            if (request?.Line4 != null) randomAddressRecord.Line4 = request.Line4;
 
-            context.Addresses.Add(randomAddressRecord);
+            context.NationalAddresses.Add(randomAddressRecord);
             context.SaveChanges();
             return randomAddressRecord;
         }
 
-        public static CrossReference InsertCrossReference(AddressesContext context, long uprn)
+        public static CrossReference InsertCrossReference(AddressesContext context, long uprn, CrossReference record = null)
         {
-            var fixture = new Fixture();
-            var crossRefRecord = fixture.Build<CrossReference>()
-                .With(cr => cr.UPRN, uprn)
-                .Create();
+            if (record == null)
+            {
+                var fixture = new Fixture();
+                record = fixture.Build<CrossReference>()
+                    .With(cr => cr.UPRN, uprn)
+                    .Create();
+            }
 
-            context.AddressCrossReferences.Add(crossRefRecord);
+            record.UPRN = uprn;
+            context.AddressCrossReferences.Add(record);
             context.SaveChanges();
 
-            return crossRefRecord;
+            return record;
         }
 
         private static string ReplaceEmptyStringWithNull(string request)

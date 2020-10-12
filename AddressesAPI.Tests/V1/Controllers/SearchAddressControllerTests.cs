@@ -37,11 +37,11 @@ namespace AddressesAPI.Tests.V1.Controllers
 
         [TestCase("RM3 0FS", GlobalConstants.Gazetteer.Local)]
         [TestCase("IG11 7QD", GlobalConstants.Gazetteer.Both)]
-        public async Task GivenValidSearchAddressRequest_WhenCallingGet_ThenShouldReturnAPIResponseListOfAddresses(string postcode, GlobalConstants.Gazetteer gazetteer)
+        public void GivenValidSearchAddressRequest_WhenCallingGet_ThenShouldReturnAPIResponseListOfAddresses(string postcode, GlobalConstants.Gazetteer gazetteer)
         {
             //arrange
             _mock.Setup(s => s.ExecuteAsync(It.IsAny<SearchAddressRequest>()))
-                .ReturnsAsync(new SearchAddressResponse
+                .Returns(new SearchAddressResponse
                 {
                     Addresses = new List<AddressResponse>()
                 });
@@ -52,7 +52,7 @@ namespace AddressesAPI.Tests.V1.Controllers
                 Gazetteer = gazetteer
             };
             //act
-            var response = await _classUnderTest.GetAddresses(request).ConfigureAwait(false);
+            var response = _classUnderTest.GetAddresses(request);
             //assert
             response.Should().NotBeNull();
             response.Should().BeOfType<ObjectResult>();
@@ -62,13 +62,13 @@ namespace AddressesAPI.Tests.V1.Controllers
         }
 
         [Test]
-        public async Task GivenInvalidSearchAddressRequest_WhenCallingGet_ThenShouldReturnBadRequestObjectResponse()
+        public void GivenInvalidSearchAddressRequest_WhenCallingGet_ThenShouldReturnBadRequestObjectResponse()
         {
             //arrange
             var request = new SearchAddressRequest { AddressStatus = null };
 
             //act
-            var response = await _classUnderTest.GetAddresses(request).ConfigureAwait(true);
+            var response = _classUnderTest.GetAddresses(request);
 
             //assert
             response.Should().NotBeNull();
