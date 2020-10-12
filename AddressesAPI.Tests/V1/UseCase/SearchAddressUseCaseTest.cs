@@ -17,18 +17,18 @@ namespace AddressesAPI.Tests.V1.UseCase
     public class SearchAddressUseCaseTest
     {
         private readonly ISearchAddressUseCase _classUnderTest;
-        private readonly Mock<IAddressesGatewayTSQL> _fakeGateway;
+        private readonly Mock<IAddressesGateway> _fakeGateway;
 
 
         public SearchAddressUseCaseTest()
         {
-            _fakeGateway = new Mock<IAddressesGatewayTSQL>();
+            _fakeGateway = new Mock<IAddressesGateway>();
 
             _classUnderTest = new SearchAddressUseCase(_fakeGateway.Object);
         }
 
         [Test]
-        public async Task GivenLocalGazetteer_WhenExecuteAsync_ThenOnlyLocalAddressesShouldBeReturned()
+        public void GivenLocalGazetteer_WhenExecuteAsync_ThenOnlyLocalAddressesShouldBeReturned()
         {
             var addresses = new List<Address>
             {
@@ -49,11 +49,11 @@ namespace AddressesAPI.Tests.V1.UseCase
                 PostCode = postcode,
                 Gazetteer = GlobalConstants.Gazetteer.Local
             };
-            _fakeGateway.Setup(s => s.SearchAddressesAsync(It.Is<SearchParameters>(i =>
+            _fakeGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(i =>
                     i.Postcode.Equals("RM3 0FS") && i.Gazetteer == GlobalConstants.Gazetteer.Local)))
-                .ReturnsAsync((addresses, 1));
+                .Returns((addresses, 1));
 
-            var response = await _classUnderTest.ExecuteAsync(request).ConfigureAwait(true);
+            var response = _classUnderTest.ExecuteAsync(request);
             response.Should().NotBeNull();
             response.Addresses.Count.Should().Equals(1);
             response.TotalCount.Should().Equals(1);
@@ -61,26 +61,26 @@ namespace AddressesAPI.Tests.V1.UseCase
         }
 
         [Test]
-        public async Task GivenValidInput_WhenGatewayRespondsWithNull_ThenResponseShouldBeNull()
+        public void GivenValidInput_WhenGatewayRespondsWithNull_ThenResponseShouldBeNull()
         {
             //arrange
             var postcode = "RM3 0FS";
 
-            _fakeGateway.Setup(s => s.SearchAddressesAsync(It.Is<SearchParameters>(i => i.Postcode.Equals("ABCDEFGHIJKLMN"))))
-                .ReturnsAsync((null, 0));
+            _fakeGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(i => i.Postcode.Equals("ABCDEFGHIJKLMN"))))
+                .Returns((null, 0));
 
             var request = new SearchAddressRequest
             {
                 PostCode = postcode
             };
             //act
-            var response = await _classUnderTest.ExecuteAsync(request).ConfigureAwait(true);
+            var response = _classUnderTest.ExecuteAsync(request);
             //assert
             response.Addresses.Should().BeNull();
         }
 
         [Test]
-        public async Task GivenValidPostCode_WhenExecuteAsync_ThenMultipleAddressesShouldBeReturned()
+        public void GivenValidPostCode_WhenExecuteAsync_ThenMultipleAddressesShouldBeReturned()
         {
             var addresses = new List<Address>
             {
@@ -100,17 +100,17 @@ namespace AddressesAPI.Tests.V1.UseCase
                 PostCode = postcode
             };
             _fakeGateway.Setup(s =>
-                    s.SearchAddressesAsync(It.Is<SearchParameters>(i => i.Postcode.Equals("RM3 0FS"))))
-                .ReturnsAsync((addresses, 2));
+                    s.SearchAddresses(It.Is<SearchParameters>(i => i.Postcode.Equals("RM3 0FS"))))
+                .Returns((addresses, 2));
 
-            var response = await _classUnderTest.ExecuteAsync(request).ConfigureAwait(true);
+            var response = _classUnderTest.ExecuteAsync(request);
             response.Should().NotBeNull();
             response.Addresses.Count.Should().Equals(2);
             response.TotalCount.Should().Equals(2);
         }
 
         [Test]
-        public async Task GivenValidPostCode_WhenExecuteAsync_ThenAddressShouldBeReturned()
+        public void GivenValidPostCode_WhenExecuteAsync_ThenAddressShouldBeReturned()
         {
             var addresses = new List<Address>();
             var address = new Address
@@ -147,10 +147,10 @@ namespace AddressesAPI.Tests.V1.UseCase
                 PostCode = postcode
             };
             _fakeGateway.Setup(s =>
-                    s.SearchAddressesAsync(It.Is<SearchParameters>(i => i.Postcode.Equals("RM3 0FS"))))
-                .ReturnsAsync((addresses, 1));
+                    s.SearchAddresses(It.Is<SearchParameters>(i => i.Postcode.Equals("RM3 0FS"))))
+                .Returns((addresses, 1));
 
-            var response = await _classUnderTest.ExecuteAsync(request).ConfigureAwait(true);
+            var response = _classUnderTest.ExecuteAsync(request);
 
             response.Should().NotBeNull();
             response.Addresses[0].AddressShouldEqual(address);

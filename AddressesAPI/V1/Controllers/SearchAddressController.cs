@@ -38,7 +38,7 @@ namespace AddressesAPI.V1.Controllers
         [ProducesResponseType(typeof(APIResponse<SearchAddressResponse>), 200)]
         [ProducesResponseType(typeof(APIResponse<BadRequestException>), 400)]
         [HttpGet, MapToApiVersion("1")]
-        public async Task<IActionResult> GetAddresses([FromQuery] SearchAddressRequest request)
+        public IActionResult GetAddresses([FromQuery] SearchAddressRequest request)
         {
 
             request.RequestFields = Request.Query.Keys.ToList();
@@ -62,7 +62,7 @@ namespace AddressesAPI.V1.Controllers
                     request.Errors = errors;
                 }
 
-                var response = await _searchAddressUseCase.ExecuteAsync(request).ConfigureAwait(false);
+                var response = _searchAddressUseCase.ExecuteAsync(request);
                 return HandleResponse(response);
             }
 

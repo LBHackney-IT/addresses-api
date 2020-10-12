@@ -6,6 +6,6 @@ namespace AddressesAPI.V1.UseCase.Interfaces
 {
     public interface ISearchAddressUseCase
     {
-        Task<SearchAddressResponse> ExecuteAsync(SearchAddressRequest request);
+        SearchAddressResponse ExecuteAsync(SearchAddressRequest request);
     }
 }

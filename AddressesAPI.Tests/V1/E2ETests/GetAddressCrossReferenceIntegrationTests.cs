@@ -7,10 +7,10 @@ using FluentAssertions;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using AddressesAPI.V1.Infrastructure;
 
 namespace AddressesAPI.Tests.V1.E2ETests
 {
@@ -22,7 +22,7 @@ namespace AddressesAPI.Tests.V1.E2ETests
         public async Task GetCrossReferenceAddressReturns200()
         {
             var uprn = _faker.Random.Int();
-            TestDataHelper.InsertCrossRef(uprn, Db);
+            TestEfDataHelper.InsertCrossReference(DatabaseContext, uprn);
 
             var url = new Uri($"api/v1/properties/{uprn}/crossreferences", UriKind.Relative);
             var response = await Client.GetAsync(url).ConfigureAwait(true);
@@ -37,10 +37,10 @@ namespace AddressesAPI.Tests.V1.E2ETests
         public async Task GetDetailedCrossReferenceAddressRecord()
         {
             var uprn = _faker.Random.Int();
-            var record = _fixture.Build<DatabaseCrossRefAddressRecord>()
+            var record = _fixture.Build<CrossReference>()
                                                .With(add => add.UPRN, uprn)
                                                .Create();
-            TestDataHelper.InsertCrossRef(uprn, Db, record);
+            TestEfDataHelper.InsertCrossReference(DatabaseContext, uprn, record);
 
             var url = new Uri($"api/v1/properties/{uprn}/crossreferences", UriKind.Relative);
             var response = await Client.GetAsync(url).ConfigureAwait(true);
@@ -56,13 +56,13 @@ namespace AddressesAPI.Tests.V1.E2ETests
             recordReturned.Value.Should().Be(record.Value);
             recordReturned.Code.Should().Be(record.Code);
             recordReturned.CrossRefKey.Should().Be(record.CrossRefKey);
-            recordReturned.EndDate.Should().Be(record.EndDate.Value.Date);
+            recordReturned.EndDate.Value.Date.Should().Be(record.EndDate.Value.Date);
         }
         [Test]
         public async Task Get404WhenUPRNIsNotProvided()
         {
             var uprn = _faker.Random.Int();
-            TestDataHelper.InsertCrossRef(uprn, Db);
+            TestEfDataHelper.InsertCrossReference(DatabaseContext, uprn);
 
             var url = new Uri($"api/v1/properties/crossreferences", UriKind.Relative);
             var response = await Client.GetAsync(url).ConfigureAwait(true);

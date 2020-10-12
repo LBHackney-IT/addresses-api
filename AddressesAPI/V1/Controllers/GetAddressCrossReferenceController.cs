@@ -33,13 +33,12 @@ namespace AddressesAPI.V1.Controllers
         [ProducesResponseType(typeof(APIResponse<GetAddressCrossReferenceResponse>), 200)]
         [HttpGet]
         [Route("{uprn}/crossreferences")]
-        public async Task<IActionResult> GetAddressCrossReference(long uprn)
+        public IActionResult GetAddressCrossReference(long uprn)
         {
             var request = new GetAddressCrossReferenceRequest { uprn = uprn };
-            var response = await _getAddressCrossReferenceUseCase.ExecuteAsync(request).ConfigureAwait(false);
+            var response = _getAddressCrossReferenceUseCase.ExecuteAsync(request);
             //We convert the result to an APIResponse via extensions on BaseController
             return HandleResponse(response);
         }
-
     }
 }

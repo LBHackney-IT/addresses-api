@@ -18,7 +18,7 @@ namespace AddressesAPI.Tests
             builder.UseNpgsql(ConnectionString.TestDatabase());
             DatabaseContext = new AddressesContext(builder.Options);
 
-            DatabaseContext.Database.EnsureCreated();
+            DatabaseContext.Database.Migrate();
             _transaction = DatabaseContext.Database.BeginTransaction();
         }
 

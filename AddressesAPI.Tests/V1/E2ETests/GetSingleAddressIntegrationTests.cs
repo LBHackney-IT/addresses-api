@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AddressesAPI.Tests.V1.Helper;
 using AddressesAPI.V1.Boundary.Responses;
 using AddressesAPI.V1.Boundary.Responses.Metadata;
+using AddressesAPI.V1.Infrastructure;
 using AutoFixture;
 using Bogus;
 using FluentAssertions;
@@ -22,7 +23,7 @@ namespace AddressesAPI.Tests.V1.E2ETests
         public async Task GetAddressReturns200WithValidAddressIdParameter()
         {
             var addressId = _faker.Random.String2(14);
-            TestDataHelper.InsertAddress(addressId, Db);
+            TestEfDataHelper.InsertAddress(DatabaseContext, addressId);
 
             var url = new Uri($"api/v1/addresses/{addressId}", UriKind.Relative);
 
@@ -35,11 +36,11 @@ namespace AddressesAPI.Tests.V1.E2ETests
         public async Task GetAddressReturnsADetailedAddressRecordInTheResponse()
         {
             var addressId = _faker.Random.String2(14);
-            var addressRecord = _fixture.Build<DatabaseAddressRecord>()
-                .With(add => add.Lpi_key, addressId)
+            var addressRecord = _fixture.Build<NationalAddress>()
+                .With(add => add.AddressKey, addressId)
                 .Create();
 
-            TestDataHelper.InsertAddress(addressId, Db, addressRecord);
+            TestEfDataHelper.InsertAddress(DatabaseContext, addressId, addressRecord);
 
             var url = new Uri($"api/v1/addresses/{addressId}", UriKind.Relative);
 
@@ -54,8 +55,8 @@ namespace AddressesAPI.Tests.V1.E2ETests
             var returnedRecord = apiResponse.Data.Addresses.FirstOrDefault();
 
             returnedRecord.AddressKey.Should().Be(addressId);
-            returnedRecord.USRN.Should().Be(addressRecord.Usrn);
-            returnedRecord.UPRN.Should().Be(addressRecord.Uprn);
+            returnedRecord.USRN.Should().Be(addressRecord.USRN);
+            returnedRecord.UPRN.Should().Be(addressRecord.UPRN);
             returnedRecord.Line1.Should().BeEquivalentTo(addressRecord.Line1);
             returnedRecord.Line2.Should().BeEquivalentTo(addressRecord.Line2);
             returnedRecord.Line3.Should().BeEquivalentTo(addressRecord.Line3);
@@ -71,7 +72,7 @@ namespace AddressesAPI.Tests.V1.E2ETests
         {
 
             var addressId = _faker.Random.String2(14);
-            TestDataHelper.InsertAddress(addressId, Db);
+            TestEfDataHelper.InsertAddress(DatabaseContext, addressId);
 
             var incorrectLength = addressId.Substring(0, 10);
 
@@ -88,7 +89,7 @@ namespace AddressesAPI.Tests.V1.E2ETests
         {
 
             var addressId = _faker.Random.String2(14);
-            TestDataHelper.InsertAddress(addressId, Db);
+            TestEfDataHelper.InsertAddress(DatabaseContext, addressId);
 
             const string emptyId = "";
             var url = new Uri($"api/v1/addresses/{emptyId}", UriKind.Relative);
@@ -106,7 +107,7 @@ namespace AddressesAPI.Tests.V1.E2ETests
         {
 
             var addressId = _faker.Random.String2(14);
-            TestDataHelper.InsertAddress(addressId, Db);
+            TestEfDataHelper.InsertAddress(DatabaseContext, addressId);
 
             var differentId = _faker.Random.String2(14);
 
