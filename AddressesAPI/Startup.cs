@@ -115,14 +115,10 @@ namespace AddressesAPI
 
         private static void ConfigureDbContext(IServiceCollection services)
         {
-            var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+            var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING") ?? "Host=;Database=;";
 
-
-            if (connectionString != null)
-            {
-                services.AddDbContext<AddressesContext>(
-                    opt => opt.UseNpgsql(connectionString));
-            }
+            services.AddDbContext<AddressesContext>(
+                opt => opt.UseNpgsql(connectionString));
         }
 
         private static void RegisterGateways(IServiceCollection services)
