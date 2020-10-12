@@ -42,7 +42,6 @@ namespace AddressesAPI.Tests.V1.E2ETests
                                                .Create();
             TestEfDataHelper.InsertCrossReference(DatabaseContext, uprn, record);
 
-            var all = DatabaseContext.AddressCrossReferences.ToList();
             var url = new Uri($"api/v1/properties/{uprn}/crossreferences", UriKind.Relative);
             var response = await Client.GetAsync(url).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);
