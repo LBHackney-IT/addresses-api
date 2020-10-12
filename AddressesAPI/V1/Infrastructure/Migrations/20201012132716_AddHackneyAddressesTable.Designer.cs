@@ -3,15 +3,17 @@ using System;
 using AddressesAPI.V1.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace AddressesAPI.V1.Infrastructure.Migrations
 {
     [DbContext(typeof(AddressesContext))]
-    partial class AddressesContextModelSnapshot : ModelSnapshot
+    [Migration("20201012132716_AddHackneyAddressesTable")]
+    partial class AddHackneyAddressesTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -5,7 +5,8 @@ namespace AddressesAPI.V1.Infrastructure
 {
     //BLPU: Basic Land and Property Unit
     //LPI: Local Property Identifier
-    public class Address
+    [Table("hackney_address", Schema = "dbo")]
+    public class HackneyAddress
     {
         [Column("lpi_key")]
         [MaxLength(14)]
