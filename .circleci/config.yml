@@ -122,8 +122,7 @@ commands:
             ssh -4 -i ./private-key.pem -Nf -M -L 5432:${HOST//\"}:${PORT//\"} -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" -o ProxyCommand="aws ssm start-session --target %h --document AWS-StartSSHSession --parameters portNumber=%p --region=eu-west-2" ec2-user@${INSTANCE_NAME//\"}
             PASSWORD=$(aws ssm get-parameter --name /addresses-api/<<parameters.stage>>/postgres-password --query Parameter.Value)
             USERNAME=$(aws ssm get-parameter --name /addresses-api/<<parameters.stage>>/postgres-username --query Parameter.Value)
-            DATABASE=$(aws ssm get-parameter --name /addresses-api/<<parameters.stage>>/postgres-database --query Parameter.Value)
-            CONN_STR="Host=localhost;Password=${PASSWORD};Port=5432;Username=${USERNAME};Database=${DATABASE}"
+            CONN_STR="Host=localhost;Password=${PASSWORD};Port=5432;Username=${USERNAME};Database=addresses_api;CommandTimeout=120;"
             cd ./AddressesAPI/
             CONNECTION_STRING=${CONN_STR} ./../dotnet-ef-local/dotnet-ef database update
 
