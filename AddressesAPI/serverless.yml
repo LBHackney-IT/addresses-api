@@ -15,7 +15,6 @@ provider:
           rateLimit: 100
 
 package:
-# TODO: Rename zipfile in build.sh and build.cmd to match this
   artifact: ./bin/release/netcoreapp3.1/addresses-api.zip
 
 functions:
@@ -88,10 +87,14 @@ custom:
         - subnet-0deabb5d8fb9c3446
         - subnet-000b89c249f12a8ad
     staging:
+      securityGroupIds:
+        - sg-0721d1d066b247b8f
       subnetIds:
         - subnet-06d3de1bd9181b0d7
         - subnet-0ed7d7713d1127656
     production:
+      securityGroupIds:
+        - sg-0559e24a4d1ee0ddc
       subnetIds:
         - subnet-01d3657f97a243261
         - subnet-0b7b8fea07efabf34
