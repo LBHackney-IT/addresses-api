@@ -13,7 +13,7 @@ namespace AddressesAPI.V1.Infrastructure
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Address>().ToView("dbo.combined_address");
+            modelBuilder.Entity<Address>().ToView("combined_address", "dbo");
         }
 
         public DbSet<Address> Addresses { get; set; }

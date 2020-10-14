@@ -18,10 +18,10 @@ shell:
 test:
 	docker-compose up test-database & docker-compose build addresses-api-test && docker-compose up addresses-api-test
 
-.PHONY: migrate-local-test-database
-migrate-test-database:
+.PHONY: migrate-dev-database
+migrate-dev-database:
 	-dotnet tool install -g dotnet-ef
-	cd AddressesAPI && CONNECTION_STRING="Host=127.0.0.1;Port=5432;Username=postgres;Password=mypassword;Database=testdb" dotnet ef database update
+	cd AddressesAPI && CONNECTION_STRING="Host=127.0.0.1;Port=5433;Database=devdb;Username=postgres;Password=mypassword" dotnet ef database update
 
 .PHONY: lint
 lint:
