@@ -71,7 +71,8 @@ namespace AddressesAPI.V1.Gateways
             var postcodeSearchTerm = GenerateSearchTerm(request.Postcode);
             var buildingNumberSearchTerm = GenerateSearchTerm(request.BuildingNumber);
             var streetSearchTerm = GenerateSearchTerm(request.Street);
-            var addressStatusSearchTerms = request.AddressStatus?.Split(',') ?? new[] { "Approved Preferred" };
+            var addressStatusSearchTerms = request.AddressStatus?.Split(',').Select(a => a.ToLower())
+                                           ?? new[] { "approved preferred" };
             var usageSearchTerms = request.UsagePrimary?.Split(',').Where(u => u != "Parent Shell").ToList();
             var usageCodeSearchTerms = request.UsageCode?.Split(',').ToList();
             var queryBase = _addressesContext.Addresses
@@ -81,7 +82,7 @@ namespace AddressesAPI.V1.Gateways
                             || EF.Functions.ILike(a.BuildingNumber, buildingNumberSearchTerm))
                 .Where(a => string.IsNullOrWhiteSpace(request.Street) ||
                             EF.Functions.ILike(a.Street.Replace(" ", ""), streetSearchTerm))
-                .Where(a => addressStatusSearchTerms == null || addressStatusSearchTerms.Contains(a.AddressStatus))
+                .Where(a => addressStatusSearchTerms == null || addressStatusSearchTerms.Contains(a.AddressStatus.ToLower()))
                 .Where(a => request.Uprn == null || a.UPRN == request.Uprn)
                 .Where(a => request.Usrn == null
                             || a.USRN == request.Usrn)
