@@ -40,14 +40,8 @@ namespace AddressesAPI.V1.Gateways
 
         public (List<SimpleAddress>, int) SearchSimpleAddresses(SearchParameters request)
         {
-            var baseQuery = CompileBaseSearchQuery(request);
-            var totalCount = baseQuery.Count();
-
-            var addresses = PageAddresses(OrderAddresses(baseQuery), request.PageSize, request.Page)
-                .Select(a => (SimpleAddress) a.ToDomain())
-                .ToList();
-
-            return (addresses, totalCount);
+            var (addresses, totalCount) = SearchAddresses(request);
+            return (addresses.Select(add => (SimpleAddress) add).ToList(), totalCount);
         }
 
         private static IQueryable<Infrastructure.Address> PageAddresses(IQueryable<Infrastructure.Address> query,
