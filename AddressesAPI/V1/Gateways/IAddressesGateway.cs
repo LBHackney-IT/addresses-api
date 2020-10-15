@@ -10,6 +10,6 @@ namespace AddressesAPI.V1.Gateways
 
         (List<Address>, int) SearchAddresses(SearchParameters request);
 
-        (List<SimpleAddress>, int) SearchSimpleAddressesAsync(SearchParameters request);
+        (List<SimpleAddress>, int) SearchSimpleAddresses(SearchParameters request);
     }
 }

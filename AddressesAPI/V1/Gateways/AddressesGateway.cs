@@ -38,12 +38,17 @@ namespace AddressesAPI.V1.Gateways
             return (addresses, totalCount);
         }
 
-        public (List<SimpleAddress>, int) SearchSimpleAddressesAsync(SearchParameters request)
+        public (List<SimpleAddress>, int) SearchSimpleAddresses(SearchParameters request)
         {
-            return (new List<SimpleAddress>(), 0);
+            var addresses = _addressesContext.Addresses
+                .Select(a => (SimpleAddress) a.ToDomain())
+                .ToList();
+
+            return (addresses, 0);
         }
 
-        private static IQueryable<Infrastructure.Address> PageAddresses(IQueryable<Infrastructure.Address> query, int pageSize, int page)
+        private static IQueryable<Infrastructure.Address> PageAddresses(IQueryable<Infrastructure.Address> query,
+            int pageSize, int page)
         {
             var pageOffset = pageSize * (page == 0 ? 0 : page - 1);
 

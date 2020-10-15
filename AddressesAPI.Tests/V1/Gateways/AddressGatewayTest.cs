@@ -796,5 +796,26 @@ namespace AddressesAPI.Tests.V1.Gateways
         }
 
         #endregion
+
+        #region SearchSimpleAddress
+
+        [Test]
+        public void ItWillReturnASimpleAddressFromTheDatabase()
+        {
+            var testAddress = new NationalAddress { UPRN = _faker.Random.Long() };
+            var savedAddress = TestEfDataHelper.InsertAddress(DatabaseContext, request: testAddress);
+            var request = new SearchParameters
+            {
+                Page = 1,
+                PageSize = 50,
+                Gazetteer = GlobalConstants.Gazetteer.Both
+            };
+            var (addresses, _) = _classUnderTest.SearchSimpleAddresses(request);
+
+            addresses.Count.Should().Be(1);
+            addresses.First().UPRN.Should().Be(testAddress.UPRN);
+            addresses.First().Should().BeEquivalentTo((SimpleAddress) savedAddress.ToDomain());
+        }
+        #endregion
     }
 }
