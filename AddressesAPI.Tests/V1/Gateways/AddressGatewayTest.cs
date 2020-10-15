@@ -149,8 +149,10 @@ namespace AddressesAPI.Tests.V1.Gateways
         [TestCase("Historical", "Historical")]
         [TestCase("Provisional", "Provisional")]
         [TestCase("Alternative", "Alternative,Approved Preferred")]
+        [TestCase("alternative", "Alternative,Approved Preferred")]
         [TestCase("Historical", "Alternative,Approved Preferred,Historical")]
         [TestCase("Provisional", "Historical,Provisional")]
+        [TestCase("Provisional", "Historical,provisional")]
         public void WillSearchForAddressesWithStatus(string savedStatus, string statusSearchTerm)
         {
             var savedAddress = TestEfDataHelper.InsertAddress(DatabaseContext,
