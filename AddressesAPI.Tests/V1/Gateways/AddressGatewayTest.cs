@@ -59,16 +59,7 @@ namespace AddressesAPI.Tests.V1.Gateways
             var (addresses, _) = _classUnderTest.SearchAddresses(request);
 
             addresses.Count.Should().Be(1);
-            addresses.First().Should().BeEquivalentTo(new SimpleAddress
-            {
-                Line1 = savedAddress.Line1,
-                Line2 = savedAddress.Line2,
-                Line3 = savedAddress.Line3,
-                Line4 = savedAddress.Line4,
-                Postcode = savedAddress.Postcode,
-                Town = savedAddress.Town,
-                UPRN = savedAddress.UPRN
-            });
+            addresses.First().Should().BeEquivalentTo((SimpleAddress) savedAddress.ToDomain());
         }
 
         #region querying
@@ -802,8 +793,7 @@ namespace AddressesAPI.Tests.V1.Gateways
         [Test]
         public void ItWillReturnASimpleAddressFromTheDatabase()
         {
-            var testAddress = new NationalAddress { UPRN = _faker.Random.Long() };
-            var savedAddress = TestEfDataHelper.InsertAddress(DatabaseContext, request: testAddress);
+            var savedAddress = TestEfDataHelper.InsertAddress(DatabaseContext);
             var request = new SearchParameters
             {
                 Page = 1,
@@ -813,9 +803,158 @@ namespace AddressesAPI.Tests.V1.Gateways
             var (addresses, _) = _classUnderTest.SearchSimpleAddresses(request);
 
             addresses.Count.Should().Be(1);
-            addresses.First().UPRN.Should().Be(testAddress.UPRN);
             addresses.First().Should().BeEquivalentTo((SimpleAddress) savedAddress.ToDomain());
         }
+
+        [Test]
+        public void ItWillReturnASimpleAddressFromTheDatabaseMatchingGivenSearchParameters()
+        {
+            var testAddress = new NationalAddress
+            {
+                Town = "Test town",
+                Postcode = "TR23 6DT",
+                Street = "C sharp Street",
+                BuildingNumber = "1234",
+                AddressStatus = "Alternative",
+                UPRN = _faker.Random.Long(),
+                USRN = _faker.Random.Int(),
+                UsagePrimary = "Unclassified",
+                NeverExport = true,
+                Gazetteer = _faker.Random.String2(8)
+            };
+
+            var savedAddress = TestEfDataHelper.InsertAddress(DatabaseContext, request: testAddress);
+            TestEfDataHelper.InsertAddress(DatabaseContext);
+            TestEfDataHelper.InsertAddress(DatabaseContext);
+
+            var request = new SearchParameters
+            {
+                Page = 1,
+                PageSize = 50,
+                Gazetteer = GlobalConstants.Gazetteer.Both,
+                Postcode = testAddress.Postcode,
+                Street = testAddress.Street,
+                BuildingNumber = testAddress.BuildingNumber,
+                Uprn = testAddress.UPRN,
+                Usrn = testAddress.USRN,
+                UsagePrimary = testAddress.UsagePrimary,
+                UsageCode = testAddress.UsageCode,
+                AddressStatus = testAddress.AddressStatus,
+                HackneyGazetteerOutOfBoroughAddress = testAddress.NeverExport
+            };
+
+            var (addresses, totalCount) = _classUnderTest.SearchSimpleAddresses(request);
+
+            totalCount.Should().Be(1);
+            addresses.First().Should().BeEquivalentTo((SimpleAddress) savedAddress.ToDomain());
+        }
+
+        #region Ordering
+        [Test]
+        public void ItWillReturnAddressesInOrder()
+        {
+            var addressOne = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress
+            {
+                Town = "Town A",
+                Postcode = "A",
+                Street = "B Street",
+                PaonStartNumber = 1,
+                BuildingNumber = "78",
+                UnitNumber = "43",
+                UnitName = "J name"
+            });
+
+            var addressTwo = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress
+            {
+                Town = "Town A",
+                Postcode = "B",
+                Street = "B Street",
+                PaonStartNumber = 1,
+                BuildingNumber = "78",
+                UnitNumber = "43",
+                UnitName = "B name"
+            });
+
+            var addressThree = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress
+            {
+                Town = "Town A",
+                Postcode = "B",
+                Street = "B Street",
+                PaonStartNumber = 1,
+                BuildingNumber = "78",
+                UnitNumber = "43",
+                UnitName = "A name"
+            });
+
+            var addressFour = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress
+            {
+                Town = "Town A",
+                Postcode = "",
+                Street = "B Street",
+                PaonStartNumber = 1,
+                BuildingNumber = "78",
+                UnitNumber = "43",
+                UnitName = "A name"
+            });
+
+            var request = new SearchParameters
+            {
+                Page = 1,
+                PageSize = 50,
+                Gazetteer = GlobalConstants.Gazetteer.Both
+            };
+
+            var (addresses, _) = _classUnderTest.SearchSimpleAddresses(request);
+
+            addresses.Count.Should().Be(4);
+            addresses.ElementAt(0).Should().BeEquivalentTo((SimpleAddress) addressOne.ToDomain());
+            addresses.ElementAt(1).Should().BeEquivalentTo((SimpleAddress) addressThree.ToDomain());
+            addresses.ElementAt(2).Should().BeEquivalentTo((SimpleAddress) addressTwo.ToDomain());
+            addresses.ElementAt(3).Should().BeEquivalentTo((SimpleAddress) addressFour.ToDomain());
+        }
+        #endregion
+
+        #region Pagination
+
+        [Test]
+        public void ItWillReturnTheNumberOfSimpleAddressesRequestedInPageSize()
+        {
+            AddOrderedRecordsToDatabase(3);
+
+            var request = new SearchParameters
+            {
+                Page = 1,
+                PageSize = 2,
+                Gazetteer = GlobalConstants.Gazetteer.Both
+            };
+
+            var (addresses, _) = _classUnderTest.SearchSimpleAddresses(request);
+
+            addresses.Count.Should().Be(2);
+        }
+
+        [Test]
+        public void ItWillReturnASecondPageOfSimpleAddressResults()
+        {
+            var records = AddOrderedRecordsToDatabase(10);
+
+            var request = new SearchParameters
+            {
+                Page = 2,
+                PageSize = 3,
+                Gazetteer = GlobalConstants.Gazetteer.Both
+            };
+
+            var (addresses, _) = _classUnderTest.SearchSimpleAddresses(request);
+
+            addresses.Count.Should().Be(3);
+            addresses.Should().ContainEquivalentOf((SimpleAddress) records.ElementAt(3).ToDomain());
+            addresses.Should().ContainEquivalentOf((SimpleAddress) records.ElementAt(4).ToDomain());
+            addresses.Should().ContainEquivalentOf((SimpleAddress) records.ElementAt(5).ToDomain());
+        }
+
+        #endregion
+
         #endregion
     }
 }

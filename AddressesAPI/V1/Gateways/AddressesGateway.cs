@@ -40,11 +40,14 @@ namespace AddressesAPI.V1.Gateways
 
         public (List<SimpleAddress>, int) SearchSimpleAddresses(SearchParameters request)
         {
-            var addresses = _addressesContext.Addresses
+            var baseQuery = CompileBaseSearchQuery(request);
+            var totalCount = baseQuery.Count();
+
+            var addresses = PageAddresses(OrderAddresses(baseQuery), request.PageSize, request.Page)
                 .Select(a => (SimpleAddress) a.ToDomain())
                 .ToList();
 
-            return (addresses, 0);
+            return (addresses, totalCount);
         }
 
         private static IQueryable<Infrastructure.Address> PageAddresses(IQueryable<Infrastructure.Address> query,
@@ -60,6 +63,7 @@ namespace AddressesAPI.V1.Gateways
         {
             return query.OrderBy(a => a.Town)
                 .ThenBy(a => a.Postcode == null ? 1 : 0)
+                .ThenBy(a => a.Postcode)
                 .ThenBy(a => a.Street)
                 .ThenBy(a => a.PaonStartNumber == null || a.PaonStartNumber == 0 ? 1 : 0)
                 .ThenBy(a => a.PaonStartNumber)
