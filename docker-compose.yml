@@ -9,15 +9,18 @@ services:
     ports:
       - 3000:3000
     environment:
-      - CONNECTION_STRING=Host=dev-database;Port=5432;Database=testdb;Username=postgres;Password=mypassword
+      - CONNECTION_STRING=Host=dev-database;Port=5433;Database=devdb;Username=postgres;Password=mypassword
     links:
       - dev-database
   dev-database:
     env_file:
       - database.env
     image: postgres:12
-    volumes:
-      - ./database:/docker-entrypoint-initdb.d
+    build:
+      context: .
+      dockerfile: database/Dockerfile
+    ports:
+      - 5433:5432
 
   addresses-api-test:
     image: addresses-api-test
