@@ -10,6 +10,7 @@ using AddressesAPI.V1.Infrastructure;
 using Bogus;
 using FluentAssertions;
 using NUnit.Framework;
+using Address = AddressesAPI.V1.Domain.Address;
 
 namespace AddressesAPI.Tests.V1.Gateways
 {
@@ -58,17 +59,19 @@ namespace AddressesAPI.Tests.V1.Gateways
             };
             var (addresses, _) = _classUnderTest.SearchAddresses(request);
 
-            addresses.Count.Should().Be(1);
-            addresses.First().Should().BeEquivalentTo(new SimpleAddress
+            var expectedAddress = new Address
             {
                 Line1 = savedAddress.Line1,
                 Line2 = savedAddress.Line2,
                 Line3 = savedAddress.Line3,
                 Line4 = savedAddress.Line4,
-                Postcode = savedAddress.Postcode,
                 Town = savedAddress.Town,
-                UPRN = savedAddress.UPRN
-            });
+                UPRN = savedAddress.UPRN,
+                Postcode = savedAddress.Postcode
+            };
+
+            addresses.Count.Should().Be(1);
+            addresses.First().Should().BeEquivalentTo(expectedAddress);
         }
 
         #region querying
@@ -87,7 +90,7 @@ namespace AddressesAPI.Tests.V1.Gateways
             {
                 Page = 1,
                 PageSize = 50,
-                Format = GlobalConstants.Format.Simple,
+                Format = GlobalConstants.Format.Detailed,
                 Gazetteer = GlobalConstants.Gazetteer.Both,
                 Postcode = postcodeSearch
             };
@@ -109,7 +112,7 @@ namespace AddressesAPI.Tests.V1.Gateways
             {
                 Page = 1,
                 PageSize = 50,
-                Format = GlobalConstants.Format.Simple,
+                Format = GlobalConstants.Format.Detailed,
                 Gazetteer = GlobalConstants.Gazetteer.Both,
                 BuildingNumber = buildingNumberSearch
             };
@@ -134,7 +137,7 @@ namespace AddressesAPI.Tests.V1.Gateways
             {
                 Page = 1,
                 PageSize = 50,
-                Format = GlobalConstants.Format.Simple,
+                Format = GlobalConstants.Format.Detailed,
                 Gazetteer = GlobalConstants.Gazetteer.Both,
                 Street = streetSearch
             };
@@ -167,7 +170,7 @@ namespace AddressesAPI.Tests.V1.Gateways
             {
                 Page = 1,
                 PageSize = 50,
-                Format = GlobalConstants.Format.Simple,
+                Format = GlobalConstants.Format.Detailed,
                 Gazetteer = GlobalConstants.Gazetteer.Both,
                 AddressStatus = statusSearchTerm
             };
@@ -187,7 +190,7 @@ namespace AddressesAPI.Tests.V1.Gateways
             {
                 Page = 1,
                 PageSize = 50,
-                Format = GlobalConstants.Format.Simple,
+                Format = GlobalConstants.Format.Detailed,
                 Gazetteer = GlobalConstants.Gazetteer.Both,
             };
             var (addresses, _) = _classUnderTest.SearchAddresses(request);
@@ -208,7 +211,7 @@ namespace AddressesAPI.Tests.V1.Gateways
             {
                 Page = 1,
                 PageSize = 50,
-                Format = GlobalConstants.Format.Simple,
+                Format = GlobalConstants.Format.Detailed,
                 Gazetteer = GlobalConstants.Gazetteer.Both,
                 Uprn = uprn
             };
@@ -230,7 +233,7 @@ namespace AddressesAPI.Tests.V1.Gateways
             {
                 Page = 1,
                 PageSize = 50,
-                Format = GlobalConstants.Format.Simple,
+                Format = GlobalConstants.Format.Detailed,
                 Gazetteer = GlobalConstants.Gazetteer.Both,
                 Usrn = uprn
             };
@@ -264,7 +267,7 @@ namespace AddressesAPI.Tests.V1.Gateways
             {
                 Page = 1,
                 PageSize = 50,
-                Format = GlobalConstants.Format.Simple,
+                Format = GlobalConstants.Format.Detailed,
                 Gazetteer = GlobalConstants.Gazetteer.Both,
                 UsagePrimary = usageSearchTerm
             };
@@ -288,7 +291,7 @@ namespace AddressesAPI.Tests.V1.Gateways
             {
                 Page = 1,
                 PageSize = 50,
-                Format = GlobalConstants.Format.Simple,
+                Format = GlobalConstants.Format.Detailed,
                 Gazetteer = GlobalConstants.Gazetteer.Both,
                 UsagePrimary = "Parent Shell"
             };
@@ -315,7 +318,7 @@ namespace AddressesAPI.Tests.V1.Gateways
             {
                 Page = 1,
                 PageSize = 50,
-                Format = GlobalConstants.Format.Simple,
+                Format = GlobalConstants.Format.Detailed,
                 Gazetteer = GlobalConstants.Gazetteer.Both,
                 UsageCode = usageSearchTerm
             };

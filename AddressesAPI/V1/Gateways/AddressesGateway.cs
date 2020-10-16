@@ -31,19 +31,18 @@ namespace AddressesAPI.V1.Gateways
         {
             var baseQuery = CompileBaseSearchQuery(request);
             var totalCount = baseQuery.Count();
+
             var addresses = PageAddresses(OrderAddresses(baseQuery), request.PageSize, request.Page)
-                .Select(a => a.ToDomain())
+                .Select(
+                    a => request.Format == GlobalConstants.Format.Simple ? a.ToSimpleDomain() : a.ToDomain()
+                    )
                 .ToList();
 
             return (addresses, totalCount);
         }
 
-        public (List<SimpleAddress>, int) SearchSimpleAddressesAsync(SearchParameters request)
-        {
-            return (new List<SimpleAddress>(), 0);
-        }
-
-        private static IQueryable<Infrastructure.Address> PageAddresses(IQueryable<Infrastructure.Address> query, int pageSize, int page)
+        private static IQueryable<Infrastructure.Address> PageAddresses(IQueryable<Infrastructure.Address> query,
+            int pageSize, int page)
         {
             var pageOffset = pageSize * (page == 0 ? 0 : page - 1);
 
@@ -55,6 +54,7 @@ namespace AddressesAPI.V1.Gateways
         {
             return query.OrderBy(a => a.Town)
                 .ThenBy(a => a.Postcode == null ? 1 : 0)
+                .ThenBy(a => a.Postcode)
                 .ThenBy(a => a.Street)
                 .ThenBy(a => a.PaonStartNumber == null || a.PaonStartNumber == 0 ? 1 : 0)
                 .ThenBy(a => a.PaonStartNumber)
