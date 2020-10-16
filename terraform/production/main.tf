@@ -63,7 +63,7 @@ module "postgres_db_production" {
   db_engine            = "postgres"
   db_engine_version    = "11.1"
   db_instance_class    = "db.t2.micro"
-  db_allocated_storage = 20
+  db_allocated_storage = 40
   maintenance_window   = "sun:10:00-sun:10:30"
   db_username          = data.aws_ssm_parameter.addresses_postgres_username.value
   db_password          = data.aws_ssm_parameter.addresses_postgres_db_password.value
