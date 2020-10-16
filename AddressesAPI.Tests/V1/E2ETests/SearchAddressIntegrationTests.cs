@@ -115,19 +115,15 @@ namespace AddressesAPI.Tests.V1.E2ETests
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);
 
-            var returnedAddress = await ConvertToResponseObject(response).ConfigureAwait(true);
-            returnedAddress.Data.Addresses.Count.Should().Be(1);
-            var receivedAddress = returnedAddress.Data.Addresses.First();
-            receivedAddress.Should().BeEquivalentTo(new AddressResponse
-            {
-                Line1 = addressDetails.Line1,
-                Line2 = addressDetails.Line2,
-                Line3 = addressDetails.Line3,
-                Line4 = addressDetails.Line4,
-                Town = addressDetails.Town,
-                Postcode = addressDetails.Postcode,
-                UPRN = addressDetails.UPRN
-            });
+            var data = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
+            data.Should().BeEquivalentTo(
+                "{\"data\":" +
+                "{\"address\":[" +
+                    $"{{\"line1\":\"{addressDetails.Line1}\",\"line2\":\"{addressDetails.Line2}\"," +
+                    $"\"line3\":\"{addressDetails.Line3}\",\"line4\":\"{addressDetails.Line4}\"," +
+                    $"\"town\":\"{addressDetails.Town}\",\"postcode\":\"{addressDetails.Postcode}\"," +
+                    $"\"UPRN\":{addressDetails.UPRN}}}" +
+                "],\"page_count\":1,\"total_count\":1},\"statusCode\":200}");
         }
 
         [Test]
