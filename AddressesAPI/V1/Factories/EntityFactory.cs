@@ -93,6 +93,20 @@ namespace AddressesAPI.V1.Factories
             };
         }
 
+        public static Address ToSimpleDomain(this Infrastructure.Address addressEntity)
+        {
+            return new Address
+            {
+                Line1 = addressEntity.Line1,
+                Line2 = addressEntity.Line2,
+                Line3 = addressEntity.Line3,
+                Line4 = addressEntity.Line4,
+                Town = addressEntity.Town,
+                UPRN = addressEntity.UPRN,
+                Postcode = addressEntity.Postcode,
+            };
+        }
+
         public static AddressCrossReference ToDomain(this CrossReference crossReference)
         {
             return new AddressCrossReference

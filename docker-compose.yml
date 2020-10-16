@@ -15,7 +15,7 @@ services:
   dev-database:
     env_file:
       - database.env
-    image: postgres:12
+    image: dev-database
     build:
       context: .
       dockerfile: database/Dockerfile
@@ -28,7 +28,6 @@ services:
       context: .
       dockerfile: AddressesAPI.Tests/Dockerfile
     environment:
-      - LLPGConnectionString=Data Source=test-database-tsql;Initial Catalog=StubAdd;Integrated Security=False;User ID=sa;Password=Rooty-Tooty
       - DB_HOST=test-database
       - DB_PORT=5432
       - DB_USERNAME=postgres
@@ -36,16 +35,6 @@ services:
       - DB_DATABASE=testdb
     links:
       - test-database
-      - test-database-tsql
-  test-database-tsql:
-    image: test-database-tsql
-    build:
-      context: .
-      dockerfile: databaseTSQL/Dockerfile
-    ports:
-      - 6666:1433
-    env_file:
-      - database.env
   test-database:
     image: test-database
     build:

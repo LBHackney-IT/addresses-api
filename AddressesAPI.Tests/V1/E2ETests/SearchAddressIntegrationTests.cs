@@ -93,7 +93,6 @@ namespace AddressesAPI.Tests.V1.E2ETests
             returnedAddress.Data.Addresses.First().AddressKey.Should().Be(addressKey);
         }
 
-        [Ignore("Not yet implemented for postgres")]
         [Test]
         public async Task UsingTheSimpleFlagOnlyReturnsBasicAddressInformation()
         {

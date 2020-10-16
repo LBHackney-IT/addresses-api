@@ -1,6 +1,6 @@
 namespace AddressesAPI.V1.Domain
 {
-    public class Address : SimpleAddress
+    public class Address
     {
         //address detailed fields
         public string AddressKey { get; set; }
@@ -32,5 +32,14 @@ namespace AddressesAPI.V1.Domain
         public int PropertyStartDate { get; set; }
         public int PropertyEndDate { get; set; }
         public int PropertyChangeDate { get; set; }
+
+        // address simple fields
+        public string Line1 { get; set; }
+        public string Line2 { get; set; }
+        public string Line3 { get; set; }
+        public string Line4 { get; set; }
+        public string Town { get; set; }
+        public string Postcode { get; set; }
+        public long UPRN { get; set; }
     }
 }
