@@ -1,3 +1,6 @@
+using System.Text.Json.Serialization;
+using Newtonsoft.Json;
+
 namespace AddressesAPI.V1.Boundary.Responses
 {
     public class AddressResponse
@@ -9,6 +12,7 @@ namespace AddressesAPI.V1.Boundary.Responses
         public string Line4 { get; set; }
         public string Town { get; set; }
         public string Postcode { get; set; }
+        [JsonProperty("UPRN")]
         public long UPRN { get; set; }
 
         //Extra fields for Address detailed
@@ -83,7 +87,7 @@ namespace AddressesAPI.V1.Boundary.Responses
         /// <summary>
         /// Only included if format query parameter is set to detailed.
         /// </summary>
-        public bool PropertyShell { get; set; }
+        public bool? PropertyShell { get; set; }
         /// <summary>
         /// Only included if format query parameter is set to detailed.
         /// </summary>
@@ -91,42 +95,42 @@ namespace AddressesAPI.V1.Boundary.Responses
         /// <summary>
         /// Only included if format query parameter is set to detailed.
         /// </summary>
-        public double Easting { get; set; }
+        public double? Easting { get; set; }
         /// <summary>
         /// Only included if format query parameter is set to detailed.
         /// </summary>
-        public double Northing { get; set; }
+        public double? Northing { get; set; }
         /// <summary>
         /// Only included if format query parameter is set to detailed.
         /// </summary>
-        public double Longitude { get; set; }
+        public double? Longitude { get; set; }
         /// <summary>
         /// Only included if format query parameter is set to detailed.
         /// </summary>
-        public double Latitude { get; set; }
+        public double? Latitude { get; set; }
         /// <summary>
         /// Only included if format query parameter is set to detailed.
         /// </summary>
-        public int AddressStartDate { get; set; }
+        public int? AddressStartDate { get; set; }
         /// <summary>
         /// Only included if format query parameter is set to detailed.
         /// </summary>
-        public int AddressEndDate { get; set; }
+        public int? AddressEndDate { get; set; }
         /// <summary>
         /// Only included if format query parameter is set to detailed.
         /// </summary>
-        public int AddressChangeDate { get; set; }
+        public int? AddressChangeDate { get; set; }
         /// <summary>
         /// Only included if format query parameter is set to detailed.
         /// </summary>
-        public int PropertyStartDate { get; set; }
+        public int? PropertyStartDate { get; set; }
         /// <summary>
         /// Only included if format query parameter is set to detailed.
         /// </summary>
-        public int PropertyEndDate { get; set; }
+        public int? PropertyEndDate { get; set; }
         /// <summary>
         /// Only included if format query parameter is set to detailed.
         /// </summary>
-        public int PropertyChangeDate { get; set; }
+        public int? PropertyChangeDate { get; set; }
     }
 }
