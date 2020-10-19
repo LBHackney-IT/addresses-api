@@ -23,6 +23,11 @@ migrate-dev-database:
 	-dotnet tool install -g dotnet-ef
 	cd AddressesAPI && CONNECTION_STRING="Host=127.0.0.1;Port=5433;Database=devdb;Username=postgres;Password=mypassword" dotnet ef database update
 
+.PHONY: seed-dev-database
+seed-dev-database:
+	docker exec $$(docker ps -q --filter ancestor=dev-database) psql -d devdb -U postgres -f /var/seed-dev-data.sql
+
+
 .PHONY: lint
 lint:
 	-dotnet tool install -g dotnet-format
