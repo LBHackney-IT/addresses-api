@@ -85,7 +85,11 @@ namespace AddressesAPI.Tests.V1.Gateways
             var savedAddress = TestEfDataHelper.InsertAddress(DatabaseContext,
                 request: new NationalAddress { Postcode = savedPostcode }
                 );
-            TestEfDataHelper.InsertAddress(DatabaseContext);
+            var randomPostcode = $"NW{_faker.Random.Int(1, 9)} {_faker.Random.Int(1, 9)}TY";
+            TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress
+            {
+                Postcode = randomPostcode
+            });
             var request = new SearchParameters
             {
                 Page = 1,
