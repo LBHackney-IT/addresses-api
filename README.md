@@ -21,33 +21,47 @@ This API is based on the [HackneyAddressesAPI](https://github.com/LBHackney-IT/H
 
 ### Development
 
+#### Running the application
+
 To serve the application, run it using your IDE of choice, we use Visual Studio CE and JetBrains Rider on Mac.
 
 The application can also be served locally using Docker. It will be available on port 3000.
+
 ```sh
-$ make build && make serve
+make build && make serve
 ```
+
+#### Setting up the development database
+
+On a separate terminal run:
+
+```sh
+make migrate-dev-database && make seed-dev-database
+```
+
+This will run migrations on the development database and then seed it with data. This data can then be retrieved by calling the endpoints locally.
+
 ### Running the tests
 
 You can run the tests in a container:
 
-$ make test
+```sh
+make test
+```
 
 Or locally if you prefer:
 
-$ dotnet test
+```sh
+dotnet test
+```
 
 In order to configure the local test database you should first run:
-$ docker-compose up -d test-database
-$ make migrate-local-test-database
 
-To run database tests locally (e.g. via Visual Studio) the `CONNECTION_STRING` environment variable will need to be populated with:
+```sh
+docker-compose up -d test-database
+```
 
-`Host=localhost;Database=entitycore;Username=postgres;Password=mypassword"`
-
-Note: The Host name needs to be the name of the stub database docker-compose service, in order to run tests via Docker.
-
-If changes to the database schema are made then the docker image for the database will have to be removed and recreated. The restart-db make command will do this for you.
+The migrations for the test database are run as part of the initial test setup.
 
 ### Release process
 
@@ -79,11 +93,16 @@ To make changes to the database structure e.g add columns, etc. Follow these ste
 
 1. If you haven't done so previously, you need to install the [dotnet ef cli tool](https://docs.microsoft.com/en-us/ef/core/miscellaneous/cli/dotnet) by running `dotnet tool install --global dotnet-ef` in your terminal.
 2. Make the changes you want to the database model in the code, namely in `AddressesContext` or any of the DbSet's listed within the file.
-3. In your terminal, navigate to the project root folder and run `dotnet ef migrations add -o ./V1/Infrastructure/Migrations -p AddressesAPI NameOfThisMigration` to create the migration files. NameOfThisMigration should be replaced with your migration name e.g. AddColumnNameToCrossReferencesTable.
-4. Go to the folder /AddressesAPI/V1/Infrastructure/Migrations and you should see two new files for the migration. In the one which doesn't end in `.Designer` you can check through the migration script to make sure everything is being created as you expect.
+3. In your terminal, navigate to the project root folder and run `dotnet ef migrations add -o ./V1/Infrastructure/Migrations -p AddressesAPI NameOfThisMigration` to create the migration files. `NameOfThisMigration` should be replaced with your migration name e.g. `AddColumnNameToCrossReferencesTable`.
+4. Go to the folder `/AddressesAPI/V1/Infrastructure/Migrations` and you should see two new files for the migration. In the one which doesn't end in `.Designer` you can check through the migration script to make sure everything is being created as you expect.
 5. If the migration file looks wrong or you have missed something, you can either:
 
-- Make sure the test/localhost database is running and then run `CONNECTION_STRING="Host=127.0.0.1;Database=testdb;Username=postgres;Password=mypassword;" dotnet ef migrations remove -p AddressesAPI`
+- Make sure the test database is running and then run:
+
+```sh
+CONNECTION_STRING="Host=127.0.0.1;Database=testdb;Username=postgres;Password=mypassword;" dotnet ef migrations remove -p AddressesAPI
+```
+
 - Or you can delete the migration files and then revert the changes to `AddressesContextModelSnapshot.cs`.
 After which make the necessary changes to the context, then create the migration files again.
 
@@ -101,6 +120,7 @@ However, we can select which errors to suppress by setting the severity of the r
 Documentation on how to do this can be found [here](https://docs.microsoft.com/en-us/visualstudio/code-quality/use-roslyn-analyzers?view=vs-2019).
 
 ## Agreed Testing Approach
+
 - Use nUnit, FluentAssertions and Moq
 - Always follow a TDD approach
 - Tests should be independent of each other
@@ -113,7 +133,9 @@ Documentation on how to do this can be found [here](https://docs.microsoft.com/e
 - Have integration tests which test from the PostgreSQL database to API Gateway
 
 ## Data Migrations
+
 ### A good data migration
+
 - Record failure logs
 - Automated
 - Reliable
