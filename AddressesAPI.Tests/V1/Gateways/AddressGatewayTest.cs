@@ -100,6 +100,26 @@ namespace AddressesAPI.Tests.V1.Gateways
             addresses.First().Should().BeEquivalentTo(savedAddress.ToDomain());
         }
 
+        [TestCase("LE1 3TT", "E1")]
+        [TestCase("SW1 7YU", "W1 7")]
+        public void WillOnlyGetPostcodesWhichMatchAtTheStart(string savedPostcode, string postcodeSearch)
+        {
+            var savedAddress = TestEfDataHelper.InsertAddress(DatabaseContext,
+                request: new NationalAddress { Postcode = savedPostcode }
+            );
+            var request = new SearchParameters
+            {
+                Page = 1,
+                PageSize = 50,
+                Format = GlobalConstants.Format.Detailed,
+                Gazetteer = GlobalConstants.Gazetteer.Both,
+                Postcode = postcodeSearch
+            };
+            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+
+            addresses.Count.Should().Be(0);
+        }
+
         [TestCase("123", "123")]
         [TestCase("123383833", "383")]
         public void WillSearchBuildingsNumbersForAMatch(string savedBuildingNumber, string buildingNumberSearch)
