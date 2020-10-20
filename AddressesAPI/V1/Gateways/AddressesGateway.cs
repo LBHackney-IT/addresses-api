@@ -77,7 +77,7 @@ namespace AddressesAPI.V1.Gateways
             var usageCodeSearchTerms = request.UsageCode?.Split(',').ToList();
             var queryBase = _addressesContext.Addresses
                 .Where(a => string.IsNullOrWhiteSpace(request.Postcode)
-                            || EF.Functions.ILike(a.PostcodeNoSpace, postcodeSearchTerm))
+                            || EF.Functions.ILike(a.Postcode.Replace(" ", ""), postcodeSearchTerm))
                 .Where(a => string.IsNullOrWhiteSpace(request.BuildingNumber)
                             || EF.Functions.ILike(a.BuildingNumber, buildingNumberSearchTerm))
                 .Where(a => string.IsNullOrWhiteSpace(request.Street) ||
