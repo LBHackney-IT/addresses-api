@@ -50,16 +50,16 @@ namespace AddressesAPI.V1.Gateways
         private static IQueryable<Infrastructure.Address> OrderAddresses(IQueryable<Infrastructure.Address> query)
         {
             return query.OrderBy(a => a.Town)
-                .ThenBy(a => a.Postcode == null ? 1 : 0)
+                .ThenBy(a => a.Postcode == null)
                 .ThenBy(a => a.Postcode)
                 .ThenBy(a => a.Street)
-                .ThenBy(a => a.PaonStartNumber == null || a.PaonStartNumber == 0 ? 1 : 0)
+                .ThenBy(a => a.PaonStartNumber == null || a.PaonStartNumber == 0)
                 .ThenBy(a => a.PaonStartNumber)
-                .ThenBy(a => a.BuildingNumber == null ? 1 : 0)
+                .ThenBy(a => a.BuildingNumber == null)
                 .ThenBy(a => a.BuildingNumber)
-                .ThenBy(a => a.UnitNumber == null ? 1 : 0)
+                .ThenBy(a => a.UnitNumber == null)
                 .ThenBy(a => a.UnitNumber)
-                .ThenBy(a => a.UnitName == null ? 1 : 0)
+                .ThenBy(a => a.UnitName == null)
                 .ThenBy(a => a.UnitName);
         }
 
