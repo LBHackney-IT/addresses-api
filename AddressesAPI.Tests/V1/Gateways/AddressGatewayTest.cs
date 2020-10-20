@@ -85,7 +85,11 @@ namespace AddressesAPI.Tests.V1.Gateways
             var savedAddress = TestEfDataHelper.InsertAddress(DatabaseContext,
                 request: new NationalAddress { Postcode = savedPostcode }
                 );
-            TestEfDataHelper.InsertAddress(DatabaseContext);
+            var randomPostcode = $"NW{_faker.Random.Int(1, 9)} {_faker.Random.Int(1, 9)}TY";
+            TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress
+            {
+                Postcode = randomPostcode
+            });
             var request = new SearchParameters
             {
                 Page = 1,
@@ -98,6 +102,26 @@ namespace AddressesAPI.Tests.V1.Gateways
 
             addresses.Count.Should().Be(1);
             addresses.First().Should().BeEquivalentTo(savedAddress.ToDomain());
+        }
+
+        [TestCase("LE1 3TT", "E1")]
+        [TestCase("SW1 7YU", "W1 7")]
+        public void WillOnlyGetPostcodesWhichMatchAtTheStart(string savedPostcode, string postcodeSearch)
+        {
+            var savedAddress = TestEfDataHelper.InsertAddress(DatabaseContext,
+                request: new NationalAddress { Postcode = savedPostcode }
+            );
+            var request = new SearchParameters
+            {
+                Page = 1,
+                PageSize = 50,
+                Format = GlobalConstants.Format.Detailed,
+                Gazetteer = GlobalConstants.Gazetteer.Both,
+                Postcode = postcodeSearch
+            };
+            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+
+            addresses.Count.Should().Be(0);
         }
 
         [TestCase("123", "123")]
