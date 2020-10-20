@@ -20,6 +20,8 @@ SET row_security = off;
 -- Data for Name: hackney_address; Type: TABLE DATA; Schema: dbo; Owner: postgres
 --
 
+DELETE FROM dbo.hackney_address;
+
 COPY dbo.hackney_address (lpi_key, lpi_logical_status, lpi_start_date, lpi_end_date, lpi_last_update_date, usrn, uprn, parent_uprn, blpu_start_date, blpu_end_date, blpu_class, blpu_last_update_date, usage_description, usage_primary, property_shell, easting, northing, unit_number, sao_text, building_number, pao_text, paon_start_num, street_description, locality, ward, town, postcode, postcode_nospace, planning_use_class, neverexport, longitude, latitude, gazetteer, organisation, line1, line2, line3, line4) FROM stdin;
 5360L000118868	Historical	20060214	20060713	20080722	20900102	10008241429	10008286575	20060214	20090821	C	0	Commercial	Commercial	f	532860	183933	\N	GROUND FLOOR	24	TEXRYTE HOUSE	\N	BALMES ROAD	HACKNEY	DE BEAUVOIR WARD	LONDON	N1 3JE	N13JE	\N	f	-0.08566354365823435	51.538671769720914	LOCAL	\N	GROUND FLOOR	TEXRYTE HOUSE	24 BALMES ROAD	LONDON
 5360L000118869	Historical	20060214	20060713	20080722	20900102	10008241430	10008286575	20060214	20090821	C	0	Commercial	Commercial	f	532860	183933	\N	BASEMENT FRONT	24	TEXRYTE HOUSE	\N	BALMES ROAD	HACKNEY	DE BEAUVOIR WARD	LONDON	N1 3JE	N13JE	\N	f	-0.08566354365823435	51.538671769720914	LOCAL	\N	BASEMENT FRONT	TEXRYTE HOUSE	24 BALMES ROAD	LONDON
@@ -117,6 +119,7 @@ COPY dbo.hackney_address (lpi_key, lpi_logical_status, lpi_start_date, lpi_end_d
 --
 -- Data for Name: hackney_xref; Type: TABLE DATA; Schema: dbo; Owner: postgres
 --
+DELETE FROM dbo.hackney_xref;
 
 COPY dbo.hackney_xref (xref_key, uprn, xref_code, xref_name, xref_value, xref_end_date) FROM stdin;
 5360X000983934	10008227619	CPZ	Controlled Parking Zone	4	2015-10-29 00:00:00
@@ -211,6 +214,7 @@ COPY dbo.hackney_xref (xref_key, uprn, xref_code, xref_name, xref_value, xref_en
 --
 -- Data for Name: national_address; Type: TABLE DATA; Schema: dbo; Owner: postgres
 --
+DELETE FROM dbo.national_address;
 
 COPY dbo.national_address (lpi_key, lpi_logical_status, lpi_start_date, lpi_end_date, lpi_last_update_date, usrn, uprn, parent_uprn, blpu_start_date, blpu_end_date, blpu_class, blpu_last_update_date, usage_description, usage_primary, property_shell, easting, northing, unit_number, sao_text, building_number, pao_text, paon_start_num, street_description, locality, ward, town, postcode, postcode_nospace, planning_use_class, neverexport, longitude, latitude, gazetteer, organisation, line1, line2, line3, line4) FROM stdin;
 1230L000030493	Approved Preferred	20010404	0	20160210	43200653	100041120433	100041239726	20011017	0	CI03	20160210	Commercial, Industrial Applicable to manufacturing, engineering, maintenance, storage / wholesale distribution and extraction sites, Workshop / Light Industrial	Commercial	f	365729	79816	\N	UNIT 15	\N	LINKS ESTATE	\N	SURREY CLOSE	GRANBY INDUSTRIAL ESTATE	\N	CHICKERELL	DT4 9TY	DT49TY	B1 / B2	f	-2.4857705	50.6170277	NATIONAL	\N	UNIT 15	LINKS ESTATE	SURREY CLOSE	CHICKERELL
