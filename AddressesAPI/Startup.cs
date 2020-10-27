@@ -116,6 +116,7 @@ namespace AddressesAPI
             ConfigureDbContext(services);
             RegisterGateways(services);
             RegisterUseCases(services);
+            services.AddElasticsearch();
         }
 
         private static void ConfigureDbContext(IServiceCollection services)
