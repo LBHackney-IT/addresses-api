@@ -13,14 +13,16 @@ services:
     links:
       - dev-database
   dev-database:
-    env_file:
-      - database.env
-    image: dev-database
-    build:
-      context: .
-      dockerfile: database/Dockerfile
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=mypassword
+      - POSTGRES_DB=devdb
+    image: postgres:12
+    container_name: dev-database
     ports:
       - 5433:5432
+    volumes:
+      - ./database/seed-dev-data.sql:/var/seed-dev-data.sql
 
   addresses-api-test:
     image: addresses-api-test
@@ -36,11 +38,11 @@ services:
     links:
       - test-database
   test-database:
-    image: test-database
-    build:
-      context: .
-      dockerfile: database/Dockerfile
+    image: postgres:12
+    container_name: test-database
     ports:
       - 5432:5432
-    env_file:
-      - database.env
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=mypassword
+      - POSTGRES_DB=testdb
