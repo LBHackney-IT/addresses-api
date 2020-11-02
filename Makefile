@@ -25,7 +25,7 @@ migrate-dev-database:
 
 .PHONY: seed-dev-database
 seed-dev-database:
-	docker exec $$(docker ps -q --filter ancestor=dev-database) psql -d devdb -U postgres -f /var/seed-dev-data.sql
+	docker exec dev-database psql -d devdb -U postgres -f /var/seed-dev-data.sql
 
 
 .PHONY: lint
