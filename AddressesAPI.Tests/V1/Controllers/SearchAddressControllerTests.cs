@@ -21,9 +21,9 @@ namespace AddressesAPI.Tests.V1.Controllers
         private SearchAddressController _classUnderTest;
         private Mock<ISearchAddressUseCase> _mock;
 
-        public SearchAddressControllerTests()
+        [SetUp]
+        public void SetUp()
         {
-            Environment.SetEnvironmentVariable("ALLOWED_ADDRESSSTATUS_VALUES", "historical;alternative;approved preferred;provisional");
             _mock = new Mock<ISearchAddressUseCase>();
             var validator = new SearchAddressValidator();
             _classUnderTest = new SearchAddressController(_mock.Object, validator);
@@ -55,24 +55,11 @@ namespace AddressesAPI.Tests.V1.Controllers
             var response = _classUnderTest.GetAddresses(request);
             //assert
             response.Should().NotBeNull();
-            response.Should().BeOfType<ObjectResult>();
-            var objectResult = response as ObjectResult;
+            response.Should().BeOfType<OkObjectResult>();
+            var objectResult = response as OkObjectResult;
             var getAddresses = objectResult?.Value as APIResponse<SearchAddressResponse>;
             getAddresses.Should().NotBeNull();
         }
 
-        [Test]
-        public void GivenInvalidSearchAddressRequest_WhenCallingGet_ThenShouldReturnBadRequestObjectResponse()
-        {
-            //arrange
-            var request = new SearchAddressRequest { AddressStatus = null };
-
-            //act
-            var response = _classUnderTest.GetAddresses(request);
-
-            //assert
-            response.Should().NotBeNull();
-            response.Should().BeOfType<BadRequestObjectResult>();
-        }
     }
 }

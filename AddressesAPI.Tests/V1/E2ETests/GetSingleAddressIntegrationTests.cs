@@ -48,9 +48,7 @@ namespace AddressesAPI.Tests.V1.E2ETests
 
             response.StatusCode.Should().Be(200);
 
-            var apiResponse = await ConvertToResponseObject(response).ConfigureAwait(true);
-
-            apiResponse.Error.Should().BeNull();
+            var apiResponse = await ConvertToSearchAddressResponseObject(response).ConfigureAwait(true);
 
             var returnedRecord = apiResponse.Data.Addresses.FirstOrDefault();
 
@@ -101,7 +99,6 @@ namespace AddressesAPI.Tests.V1.E2ETests
         }
 
         //TODO: We would want this to return a 404 rather than 200
-
         [Test]
         public async Task GetAddressReturnsNoAddressesIfAddressIdParameterDoesNotMatchARecordInTheDatabase()
         {
@@ -117,9 +114,8 @@ namespace AddressesAPI.Tests.V1.E2ETests
 
             response.StatusCode.Should().Be(200);
 
-            var convertedResponse = await ConvertToResponseObject(response).ConfigureAwait(true);
+            var convertedResponse = await ConvertToSearchAddressResponseObject(response).ConfigureAwait(true);
 
-            convertedResponse.Error.Should().BeNull();
             convertedResponse.Data.Addresses.Should().BeNull();
         }
     }

@@ -12,12 +12,19 @@ namespace AddressesAPI.V1.UseCase
     {
         public SearchAddressValidator()
         {
+            RuleFor(x => x).NotNull();
             RuleFor(r => r.AddressStatus).NotNull().NotEmpty();
-            RuleFor(r => r.AddressStatus).Must(CanBeAnyCombinationOfAllowedValues).WithMessage("Value for the parameter is not valid.");
+            RuleFor(r => r.AddressStatus).Must(CanBeAnyCombinationOfAllowedValues)
+                .WithMessage("Value for the parameter is not valid.");
+            RuleFor(x => x.PageSize).LessThan(51).WithMessage("PageSize cannot exceed 50");
 
-            RuleFor(r => r.PostCode).Matches(new Regex("^((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]))))( )?(([0-9][A-Za-z]?[A-Za-z]?)?))$")).WithMessage("Must provide at least the first part of the postcode.");
+            RuleFor(r => r.PostCode)
+                .Matches(new Regex("^((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]))))( )?(([0-9][A-Za-z]?[A-Za-z]?)?))$"))
+                .WithMessage("Must provide at least the first part of the postcode.");
 
-            RuleFor(r => r).Must(CheckForAtLeastOneMandatoryFilterPropertyWithGazetteerLocal).WithMessage("You must provide at least one of (uprn, usrn, postcode, street, usagePrimary, usageCode), when gazeteer is 'local'.");
+            RuleFor(r => r)
+                .Must(CheckForAtLeastOneMandatoryFilterPropertyWithGazetteerLocal)
+                .WithMessage("You must provide at least one of (uprn, usrn, postcode, street, usagePrimary, usageCode), when gazeteer is 'local'.");
             RuleFor(r => r).Must(CheckForAtLeastOneMandatoryFilterPropertyWithGazetteerBoth).WithMessage("You must provide at least one of (uprn, usrn, postcode), when gazetteer is 'both'.");
 
             RuleFor(r => r.RequestFields).Must(CheckForInvalidProperties).WithMessage("Invalid properties have been provided.");

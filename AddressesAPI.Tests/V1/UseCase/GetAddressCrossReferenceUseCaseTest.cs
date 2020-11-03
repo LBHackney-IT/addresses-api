@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AddressesAPI.V1.Boundary.Requests;
+using AddressesAPI.V1.Boundary.Responses;
+using AddressesAPI.V1.Boundary.Responses.Metadata;
 using AddressesAPI.V1.Domain;
 using AddressesAPI.V1.Gateways;
 using AddressesAPI.V1.Infrastructure;
@@ -121,6 +123,13 @@ namespace AddressesAPI.Tests.V1.UseCase
             response.Should().NotBeNull();
             response.AddressCrossReferences.Count.Should().Be(3);
             response.AddressCrossReferences.First().UPRN.Should().Be(uprn);
+        }
+
+        [Test]
+        public void GivenNullRequest_ExecuteAsyncShouldThrowAValidationError()
+        {
+            Func<GetAddressCrossReferenceResponse> testDelegate = () => _classUnderTest.ExecuteAsync(null);
+            testDelegate.Should().Throw<BadRequestException>().WithMessage("request is null");
         }
     }
 }

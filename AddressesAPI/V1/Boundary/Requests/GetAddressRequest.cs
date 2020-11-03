@@ -1,5 +1,6 @@
 using AddressesAPI.V1.Boundary.Requests.RequestValidators;
 using AddressesAPI.V1.Boundary.Responses;
+using AddressesAPI.V1.Boundary.Responses.Metadata;
 
 namespace AddressesAPI.V1.Boundary.Requests
 {

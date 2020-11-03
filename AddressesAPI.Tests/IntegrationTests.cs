@@ -66,10 +66,16 @@ namespace AddressesAPI.Tests
             _builder.UseNpgsql(_connection);
         }
 
-        protected static async Task<APIResponse<SearchAddressResponse>> ConvertToResponseObject(HttpResponseMessage response)
+        protected static async Task<APIResponse<SearchAddressResponse>> ConvertToSearchAddressResponseObject(HttpResponseMessage response)
         {
             var data = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
             return JsonConvert.DeserializeObject<APIResponse<SearchAddressResponse>>(data);
+        }
+
+        protected static async Task<ErrorResponse> ConvertToErrorResponseObject(HttpResponseMessage response)
+        {
+            var data = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
+            return JsonConvert.DeserializeObject<ErrorResponse>(data);
         }
     }
 

@@ -1,5 +1,6 @@
 using System;
 using System.Net;
+using AddressesAPI.V1.Infrastructure;
 using Newtonsoft.Json;
 
 namespace AddressesAPI.V1.Boundary.Responses.Metadata
@@ -20,33 +21,31 @@ namespace AddressesAPI.V1.Boundary.Responses.Metadata
         [JsonProperty("statusCode")]
         public int StatusCode { get; set; }
 
-        [JsonProperty("error")]
-        public APIError Error { get; set; }
-
         public APIResponse() { }
-
-        public APIResponse(BadRequestException ex)
-        {
-            StatusCode = (int) ex.StatusCode;
-            Error = new APIError(ex?.ValidationResponse);
-        }
-
-        public APIResponse(ApiException ex)
-        {
-            StatusCode = (int) ex.StatusCode;
-            Error = new APIError(ex);
-        }
-
-        public APIResponse(Exception ex)
-        {
-            StatusCode = (int) HttpStatusCode.InternalServerError;
-            Error = new APIError(ex);
-        }
 
         public APIResponse(T result)
         {
             StatusCode = (int) HttpStatusCode.OK;
             Data = result;
+        }
+    }
+
+    public class ErrorResponse
+    {
+        [JsonProperty("statusCode")]
+        public int StatusCode { get; set; }
+
+        [JsonProperty("error")]
+        public APIError Error { get; set; }
+        public ErrorResponse () {}
+        public ErrorResponse(RequestValidationResponse ex)
+        {
+            StatusCode = (int) HttpStatusCode.BadRequest;
+            Error = new APIError
+            {
+                IsValid = ex?.IsValid ?? false,
+                ValidationErrors = ex?.ValidationErrors
+            };
         }
     }
 }

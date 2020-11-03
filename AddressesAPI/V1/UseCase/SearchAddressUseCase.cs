@@ -1,5 +1,6 @@
 using AddressesAPI.V1.Boundary.Requests;
 using AddressesAPI.V1.Boundary.Responses;
+using AddressesAPI.V1.Boundary.Responses.Metadata;
 using AddressesAPI.V1.Domain;
 using AddressesAPI.V1.Factories;
 using AddressesAPI.V1.Gateways;
@@ -11,17 +12,21 @@ namespace AddressesAPI.V1.UseCase
     public class SearchAddressUseCase : ISearchAddressUseCase
     {
         private readonly IAddressesGateway _addressGateway;
+        private ISearchAddressValidator _requestValidator;
 
-        public SearchAddressUseCase(IAddressesGateway addressesGateway)
+        public SearchAddressUseCase(IAddressesGateway addressesGateway, ISearchAddressValidator requestValidator)
         {
             _addressGateway = addressesGateway;
+            _requestValidator = requestValidator;
         }
 
         public SearchAddressResponse ExecuteAsync(SearchAddressRequest request)
         {
-            var validationResponse = SearchAddressRequest.Validate(request);
-            if (!validationResponse.IsValid) throw new BadRequestException(validationResponse);
-
+            var validation = _requestValidator.Validate(request);
+            if (!validation.IsValid)
+            {
+                throw new BadRequestException(new RequestValidationResponse(validation));
+            }
             var searchParameters = MapRequestToSearchParameters(request);
             var (results, totalCount) = _addressGateway.SearchAddresses(searchParameters);
 
@@ -43,7 +48,7 @@ namespace AddressesAPI.V1.UseCase
             {
                 Format = request.Format,
                 Gazetteer = request.Gazetteer,
-                Page = request.Page,
+                Page = request.Page == 0 ? 1 : request.Page,
                 Postcode = request.PostCode,
                 Street = request.Street,
                 Uprn = request.UPRN,

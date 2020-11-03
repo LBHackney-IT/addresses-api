@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using FluentValidation.Results;
 using LBHAddressesAPI.Infrastructure.V1.Validation;
 
-namespace AddressesAPI.V1.Boundary.Responses
+namespace AddressesAPI.V1.Boundary.Responses.Metadata
 {
     /// <summary>
     /// Encapsulates a valid response using some sort of validation extensions
@@ -45,6 +45,12 @@ namespace AddressesAPI.V1.Boundary.Responses
                 var apiError = new ValidationError(validationResultError);
                 ValidationErrors.Add(apiError);
             }
+        }
+
+        public RequestValidationResponse(List<ValidationError> errors)
+        {
+            IsValid = false;
+            ValidationErrors = errors;
         }
     }
 }

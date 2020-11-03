@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using AddressesAPI.V1.Boundary.Requests;
 using AddressesAPI.V1.Boundary.Responses;
@@ -7,21 +9,21 @@ using AddressesAPI.V1.Boundary.Responses.Metadata;
 using AddressesAPI.V1.UseCase.Interfaces;
 using LBHAddressesAPI.Infrastructure.V1.Validation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 
 namespace AddressesAPI.V1.Controllers
 {
     [ApiVersion("1")]
     [Produces("application/json")]
     [Route("api/v1/addresses")]
-    [ProducesResponseType(typeof(APIResponse<object>), 400)]
-    [ProducesResponseType(typeof(APIResponse<object>), 500)]
     public class SearchAddressController : BaseController
     {
         private readonly ISearchAddressUseCase _searchAddressUseCase;
         private readonly ISearchAddressValidator _searchAddressValidator;
 
 
-        public SearchAddressController(ISearchAddressUseCase searchAddressUseCase, ISearchAddressValidator searchAddressValidator)
+        public SearchAddressController(ISearchAddressUseCase searchAddressUseCase,
+            ISearchAddressValidator searchAddressValidator)
         {
             _searchAddressUseCase = searchAddressUseCase;
             _searchAddressValidator = searchAddressValidator;
@@ -40,34 +42,37 @@ namespace AddressesAPI.V1.Controllers
         [HttpGet, MapToApiVersion("1")]
         public IActionResult GetAddresses([FromQuery] SearchAddressRequest request)
         {
-
-            request.RequestFields = Request.Query.Keys.ToList();
-            var validationResults = _searchAddressValidator.Validate(request);
-
-            if (validationResults.IsValid)
+            foreach (var modelStateKey in ModelState.Keys)
             {
-                if (!ModelState.IsValid)
+                Console.Write(modelStateKey);
+                Console.Write(ModelState.GetValueOrDefault(modelStateKey));
+            }
+            if (!ModelState.IsValid)
+            {
+                var errors = new List<ValidationError>();
+                foreach (var (key, value) in ModelState)
                 {
-                    var errors = new List<ValidationError>();
-                    foreach (var state in ModelState)
+                    var err = new ValidationError();
+                    foreach (var error in value.Errors)
                     {
-                        ValidationError err = new ValidationError();
-                        foreach (var error in state.Value.Errors)
-                        {
-                            err.FieldName = state.Key;
-                            err.Message = error.ErrorMessage;
-                            errors.Add(err);
-                        }
+                        err.FieldName = key;
+                        err.Message = error.ErrorMessage;
+                        errors.Add(err);
                     }
-                    request.Errors = errors;
                 }
 
-                var response = _searchAddressUseCase.ExecuteAsync(request);
-                return HandleResponse(response);
+                return new BadRequestObjectResult(new ErrorResponse(new RequestValidationResponse(errors)));
             }
 
-            return new BadRequestObjectResult(new APIResponse<BadRequestException>(new BadRequestException(new RequestValidationResponse(validationResults))));
+            try
+            {
+                var response = _searchAddressUseCase.ExecuteAsync(request);
+                return new OkObjectResult(new APIResponse<SearchAddressResponse>(response));
+            }
+            catch (BadRequestException e)
+            {
+                return new BadRequestObjectResult(new ErrorResponse(e.ValidationResponse));
+            }
         }
-
     }
 }

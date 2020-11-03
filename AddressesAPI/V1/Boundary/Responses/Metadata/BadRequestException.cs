@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace AddressesAPI.V1.Boundary.Responses
+namespace AddressesAPI.V1.Boundary.Responses.Metadata
 {
     public class BadRequestException : ApiException
     {

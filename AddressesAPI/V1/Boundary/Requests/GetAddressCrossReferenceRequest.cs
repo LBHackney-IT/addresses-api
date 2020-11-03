@@ -1,4 +1,5 @@
 using AddressesAPI.V1.Boundary.Responses;
+using AddressesAPI.V1.Boundary.Responses.Metadata;
 
 namespace AddressesAPI.V1.Boundary.Requests
 {
@@ -9,6 +10,7 @@ namespace AddressesAPI.V1.Boundary.Requests
         /// Exact match
         /// </summary>
         public long uprn { get; set; }
+
         /// <summary>
         /// Responsible for validating itself.
         /// </summary>

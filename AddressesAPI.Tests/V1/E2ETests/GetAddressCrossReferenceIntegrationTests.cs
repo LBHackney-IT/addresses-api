@@ -28,9 +28,9 @@ namespace AddressesAPI.Tests.V1.E2ETests
             var response = await Client.GetAsync(url).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);
 
-            var convertedResponse = await ConvertToResponseObject(response).ConfigureAwait(true);
+            var convertedResponse = await ConvertToCrossReferenceResponseObject(response).ConfigureAwait(true);
 
-            convertedResponse.Error.Should().BeNull();
+            convertedResponse.StatusCode.Should().Be(200);
         }
 
         [Test]
@@ -44,11 +44,7 @@ namespace AddressesAPI.Tests.V1.E2ETests
 
             var url = new Uri($"api/v1/properties/{uprn}/crossreferences", UriKind.Relative);
             var response = await Client.GetAsync(url).ConfigureAwait(true);
-            response.StatusCode.Should().Be(200);
-
-            var apiResponse = await ConvertToResponseObject(response).ConfigureAwait(true);
-
-            apiResponse.Error.Should().BeNull();
+            var apiResponse = await ConvertToCrossReferenceResponseObject(response).ConfigureAwait(true);
 
             var recordReturned = apiResponse.Data.AddressCrossReferences.FirstOrDefault();
             recordReturned.UPRN.Should().Be(uprn);
@@ -77,16 +73,12 @@ namespace AddressesAPI.Tests.V1.E2ETests
             var url = new Uri($"api/v1/properties/{uprn}/crossreferences", UriKind.Relative);
             var response = await Client.GetAsync(url).ConfigureAwait(true);
             response.StatusCode.Should().Be(404);
-
         }
 
-        private static new async Task<APIResponse<GetAddressCrossReferenceResponse>> ConvertToResponseObject(HttpResponseMessage response)
+        private static async Task<APIResponse<GetAddressCrossReferenceResponse>> ConvertToCrossReferenceResponseObject(HttpResponseMessage response)
         {
             var data = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
             return JsonConvert.DeserializeObject<APIResponse<GetAddressCrossReferenceResponse>>(data);
         }
-
-
-
     }
 }
