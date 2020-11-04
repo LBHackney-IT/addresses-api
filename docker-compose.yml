@@ -9,7 +9,7 @@ services:
     ports:
       - 3000:3000
     environment:
-      - CONNECTION_STRING=Host=dev-database;Port=5433;Database=devdb;Username=postgres;Password=mypassword
+      - CONNECTION_STRING=Host=dev-database;Port=5432;Database=devdb;Username=postgres;Password=mypassword
     links:
       - dev-database
   dev-database:
