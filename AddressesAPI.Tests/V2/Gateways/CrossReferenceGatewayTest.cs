@@ -1,12 +1,12 @@
 using System.Linq;
-using AddressesAPI.Tests.V1.Helper;
-using AddressesAPI.V1.Factories;
-using AddressesAPI.V1.Gateways;
+using AddressesAPI.Tests.V2.Helper;
+using AddressesAPI.V2.Factories;
+using AddressesAPI.V2.Gateways;
 using Bogus;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace AddressesAPI.Tests.V1.Gateways
+namespace AddressesAPI.Tests.V2.Gateways
 {
     public class CrossReferenceGatewayTest : DatabaseTests
     {

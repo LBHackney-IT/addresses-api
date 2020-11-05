@@ -1,9 +1,9 @@
-using AddressesAPI.V1;
-using AddressesAPI.V1.Boundary.Requests;
+using AddressesAPI.V2;
+using AddressesAPI.V2.Boundary.Requests;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace AddressesAPI.Tests.V1
+namespace AddressesAPI.Tests.V2
 {
     [TestFixture]
     public class SearchAddressRequestTests

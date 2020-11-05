@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace AddressesAPI.V1.Boundary.Requests
+namespace AddressesAPI.V2.Boundary.Requests
 {
     /// <summary>
     /// SearchAddressRequest V1

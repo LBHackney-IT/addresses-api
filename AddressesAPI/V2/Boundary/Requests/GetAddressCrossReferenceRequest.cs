@@ -1,4 +1,4 @@
-namespace AddressesAPI.V1.Boundary.Requests
+namespace AddressesAPI.V2.Boundary.Requests
 {
     public class GetAddressCrossReferenceRequest
     {

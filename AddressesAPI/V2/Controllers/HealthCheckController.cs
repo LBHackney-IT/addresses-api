@@ -1,14 +1,14 @@
 using System.Collections.Generic;
-using AddressesAPI.V1.UseCase;
+using AddressesAPI.V2.UseCase;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AddressesAPI.V1.Controllers
+namespace AddressesAPI.V2.Controllers
 {
     [ApiVersion("1")]
     [Produces("application/json")]
     [Route("api/v1/healthcheck")]
     [ApiController]
-    public class HealthCheckController : BaseController
+    public class HealthCheckController : V1.Controllers.BaseController
     {
         [HttpGet]
         [Route("ping")]

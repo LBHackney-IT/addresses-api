@@ -1,8 +1,8 @@
-using AddressesAPI.V1.UseCase;
+using AddressesAPI.V2.UseCase;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace AddressesAPI.Tests.V1.UseCase
+namespace AddressesAPI.Tests.V2.UseCase
 {
     [TestFixture]
     public class ThrowOpsErrorUsecaseTests

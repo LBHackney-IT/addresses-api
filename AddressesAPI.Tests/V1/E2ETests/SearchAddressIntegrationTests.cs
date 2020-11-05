@@ -2,15 +2,12 @@ using System;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using AddressesAPI.Infrastructure;
 using AddressesAPI.Tests.V1.Helper;
-using AddressesAPI.V1.Boundary.Requests;
-using AddressesAPI.V1.Boundary.Responses;
 using AddressesAPI.V1.Boundary.Responses.Metadata;
-using AddressesAPI.V1.Infrastructure;
 using AutoFixture;
 using Bogus;
 using FluentAssertions;
-using Newtonsoft.Json;
 using NUnit.Framework;
 
 namespace AddressesAPI.Tests.V1.E2ETests

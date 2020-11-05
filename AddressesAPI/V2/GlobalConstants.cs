@@ -1,4 +1,4 @@
-namespace AddressesAPI.V1
+namespace AddressesAPI.V2
 {
     public static class GlobalConstants
     {

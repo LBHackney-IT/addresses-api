@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Data;
 using Microsoft.Data.SqlClient;
 
-namespace AddressesAPI.Tests.V1.Helper
+namespace AddressesAPI.Tests.V2.Helper
 {
     public static class TestDataHelper
     {

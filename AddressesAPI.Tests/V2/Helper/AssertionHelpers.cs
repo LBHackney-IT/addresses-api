@@ -1,10 +1,9 @@
 using System.Collections.Generic;
-using AddressesAPI.V1.Boundary.Responses;
-using AddressesAPI.V1.Boundary.Responses.Data;
-using AddressesAPI.V1.Domain;
+using AddressesAPI.V2.Boundary.Responses.Data;
+using AddressesAPI.V2.Domain;
 using FluentAssertions;
 
-namespace AddressesAPI.Tests.V1.Helper
+namespace AddressesAPI.Tests.V2.Helper
 {
     public static class AssertionHelpers
     {

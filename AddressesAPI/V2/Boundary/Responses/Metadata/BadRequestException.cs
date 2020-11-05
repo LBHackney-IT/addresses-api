@@ -1,8 +1,7 @@
 using System;
-using System.Net;
 using FluentValidation.Results;
 
-namespace AddressesAPI.V1.Boundary.Responses.Metadata
+namespace AddressesAPI.V2.Boundary.Responses.Metadata
 {
     public class BadRequestException : Exception
     {

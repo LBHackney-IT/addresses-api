@@ -1,18 +1,14 @@
 using System;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
-using AddressesAPI.Tests.V1.Helper;
-using AddressesAPI.V1.Boundary.Responses;
-using AddressesAPI.V1.Boundary.Responses.Metadata;
-using AddressesAPI.V1.Infrastructure;
+using AddressesAPI.Infrastructure;
+using AddressesAPI.Tests.V2.Helper;
 using AutoFixture;
 using Bogus;
 using FluentAssertions;
-using Newtonsoft.Json;
 using NUnit.Framework;
 
-namespace AddressesAPI.Tests.V1.E2ETests
+namespace AddressesAPI.Tests.V2.E2ETests
 {
     public class GetSingleAddressIntegrationTests : IntegrationTests<Startup>
     {

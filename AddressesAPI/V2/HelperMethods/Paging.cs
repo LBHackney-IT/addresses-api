@@ -1,4 +1,4 @@
-namespace AddressesAPI.V1.HelperMethods
+namespace AddressesAPI.V2.HelperMethods
 {
     public static class Paging
     {

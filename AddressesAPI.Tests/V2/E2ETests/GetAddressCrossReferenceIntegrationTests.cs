@@ -1,4 +1,9 @@
-using AddressesAPI.Tests.V1.Helper;
+using System;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
+using AddressesAPI.Infrastructure;
+using AddressesAPI.Tests.V2.Helper;
 using AddressesAPI.V1.Boundary.Responses;
 using AddressesAPI.V1.Boundary.Responses.Metadata;
 using AutoFixture;
@@ -6,13 +11,8 @@ using Bogus;
 using FluentAssertions;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using System;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using AddressesAPI.V1.Infrastructure;
 
-namespace AddressesAPI.Tests.V1.E2ETests
+namespace AddressesAPI.Tests.V2.E2ETests
 {
     public class GetAddressCrossReferenceIntegrationTests : IntegrationTests<Startup>
     {

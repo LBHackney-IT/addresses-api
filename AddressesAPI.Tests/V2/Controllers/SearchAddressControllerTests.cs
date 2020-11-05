@@ -1,21 +1,19 @@
-using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using AddressesAPI.V1;
-using AddressesAPI.V1.Boundary.Requests;
-using AddressesAPI.V1.Boundary.Responses;
-using AddressesAPI.V1.Boundary.Responses.Data;
-using AddressesAPI.V1.Boundary.Responses.Metadata;
-using AddressesAPI.V1.Controllers;
-using AddressesAPI.V1.UseCase;
-using AddressesAPI.V1.UseCase.Interfaces;
+using AddressesAPI.V2;
+using AddressesAPI.V2.Boundary.Requests;
+using AddressesAPI.V2.Boundary.Responses;
+using AddressesAPI.V2.Boundary.Responses.Data;
+using AddressesAPI.V2.Boundary.Responses.Metadata;
+using AddressesAPI.V2.Controllers;
+using AddressesAPI.V2.UseCase;
+using AddressesAPI.V2.UseCase.Interfaces;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 
-namespace AddressesAPI.Tests.V1.Controllers
+namespace AddressesAPI.Tests.V2.Controllers
 {
     public class SearchAddressControllerTests
     {
@@ -27,7 +25,7 @@ namespace AddressesAPI.Tests.V1.Controllers
         {
             _mock = new Mock<ISearchAddressUseCase>();
             var validator = new SearchAddressValidator();
-            _classUnderTest = new SearchAddressController(_mock.Object, validator);
+            _classUnderTest = new SearchAddressController(_mock.Object);
 
             _classUnderTest.ControllerContext = new ControllerContext();
             _classUnderTest.ControllerContext.HttpContext = new DefaultHttpContext();

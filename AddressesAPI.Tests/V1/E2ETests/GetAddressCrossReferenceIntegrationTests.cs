@@ -10,7 +10,7 @@ using System;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using AddressesAPI.V1.Infrastructure;
+using AddressesAPI.Infrastructure;
 
 namespace AddressesAPI.Tests.V1.E2ETests
 {

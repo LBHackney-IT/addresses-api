@@ -1,6 +1,6 @@
 using System;
 
-namespace AddressesAPI.V1.Domain
+namespace AddressesAPI.V2.Domain
 {
     public class MissingEnvironmentVariableException : Exception
     {

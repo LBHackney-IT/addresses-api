@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
-using AddressesAPI.V1.Domain;
-using AddressesAPI.V1.Factories;
-using AddressesAPI.V1.Infrastructure;
+using AddressesAPI.Infrastructure;
+using AddressesAPI.V2.Domain;
+using AddressesAPI.V2.Factories;
 
-namespace AddressesAPI.V1.Gateways
+namespace AddressesAPI.V2.Gateways
 {
     public class CrossReferencesGateway : ICrossReferencesGateway
     {

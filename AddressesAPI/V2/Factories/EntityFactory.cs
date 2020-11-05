@@ -1,8 +1,9 @@
-using AddressesAPI.V1.Domain;
-using AddressesAPI.V1.Infrastructure;
-using Address = AddressesAPI.V1.Domain.Address;
 
-namespace AddressesAPI.V1.Factories
+using AddressesAPI.Infrastructure;
+using AddressesAPI.V2.Domain;
+using Address = AddressesAPI.V2.Domain.Address;
+
+namespace AddressesAPI.V2.Factories
 {
     public static class EntityFactory
     {

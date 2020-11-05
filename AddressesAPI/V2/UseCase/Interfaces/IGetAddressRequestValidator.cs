@@ -1,7 +1,7 @@
-using AddressesAPI.V1.Boundary.Requests;
+using AddressesAPI.V2.Boundary.Requests;
 using FluentValidation.Results;
 
-namespace AddressesAPI.V1.UseCase.Interfaces
+namespace AddressesAPI.V2.UseCase.Interfaces
 {
     public interface IGetAddressRequestValidator
     {

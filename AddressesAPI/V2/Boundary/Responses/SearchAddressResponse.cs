@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using AddressesAPI.V1.Boundary.Responses.Data;
+using AddressesAPI.V2.Boundary.Responses.Data;
 using Newtonsoft.Json;
 
-namespace AddressesAPI.V1.Boundary.Responses
+namespace AddressesAPI.V2.Boundary.Responses
 {
     public class SearchAddressResponse
     {

@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using AddressesAPI.V1.Domain;
-using AddressesAPI.V1.Factories;
-using AddressesAPI.V1.Infrastructure;
+using AddressesAPI.Infrastructure;
+using AddressesAPI.V2.Domain;
+using AddressesAPI.V2.Factories;
 using Microsoft.EntityFrameworkCore;
-using Address = AddressesAPI.V1.Domain.Address;
+using Address = AddressesAPI.Infrastructure.Address;
 
-namespace AddressesAPI.V1.Gateways
+namespace AddressesAPI.V2.Gateways
 {
     public class AddressesGateway : IAddressesGateway
     {
@@ -18,13 +18,13 @@ namespace AddressesAPI.V1.Gateways
             _addressesContext = addressesContext;
         }
 
-        public Address GetSingleAddress(string addressKey)
+        public V2.Domain.Address GetSingleAddress(string addressKey)
         {
             var addressRecord = _addressesContext.Addresses.FirstOrDefault(add => add.AddressKey.Equals(addressKey));
             return addressRecord?.ToDomain();
         }
 
-        public (List<Address>, int) SearchAddresses(SearchParameters request)
+        public (List<V2.Domain.Address>, int) SearchAddresses(SearchParameters request)
         {
             var baseQuery = CompileBaseSearchQuery(request);
             var totalCount = baseQuery.Count();
@@ -38,7 +38,7 @@ namespace AddressesAPI.V1.Gateways
             return (addresses, totalCount);
         }
 
-        private static IQueryable<Infrastructure.Address> PageAddresses(IQueryable<Infrastructure.Address> query,
+        private static IQueryable<Address> PageAddresses(IQueryable<Address> query,
             int pageSize, int page)
         {
             var pageOffset = pageSize * (page == 0 ? 0 : page - 1);
@@ -47,7 +47,7 @@ namespace AddressesAPI.V1.Gateways
                 .Take(pageSize);
         }
 
-        private static IQueryable<Infrastructure.Address> OrderAddresses(IQueryable<Infrastructure.Address> query)
+        private static IQueryable<Address> OrderAddresses(IQueryable<Address> query)
         {
             return query.OrderBy(a => a.Town)
                 .ThenBy(a => a.Postcode == null)
@@ -64,7 +64,7 @@ namespace AddressesAPI.V1.Gateways
                 .ThenBy(a => a.UnitName);
         }
 
-        private IQueryable<Infrastructure.Address> CompileBaseSearchQuery(SearchParameters request)
+        private IQueryable<Address> CompileBaseSearchQuery(SearchParameters request)
         {
             var postcodeSearchTerm = request.Postcode == null ? null : $"{request.Postcode.Replace(" ", "")}%";
             var buildingNumberSearchTerm = GenerateSearchTerm(request.BuildingNumber);

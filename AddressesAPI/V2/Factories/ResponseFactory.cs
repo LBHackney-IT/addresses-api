@@ -1,12 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
-using AddressesAPI.V1.Boundary.Responses;
-using AddressesAPI.V1.Boundary.Responses.Data;
-using AddressesAPI.V1.Domain;
-using AddressCrossReferenceResponse = AddressesAPI.V1.Boundary.Responses.Data.AddressCrossReferenceResponse;
-using AddressCrossReferenceDomain = AddressesAPI.V1.Domain.AddressCrossReference;
-
-namespace AddressesAPI.V1.Factories
+using AddressesAPI.V2.Boundary.Responses.Data;
+using AddressesAPI.V2.Domain;
+using AddressCrossReferenceDomain = AddressesAPI.V2.Domain.AddressCrossReference;
+namespace AddressesAPI.V2.Factories
 {
     public static class ResponseFactory
     {

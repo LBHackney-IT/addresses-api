@@ -1,15 +1,15 @@
 using System.Collections.Generic;
-using AddressesAPI.V1.Boundary.Requests;
-using AddressesAPI.V1.Boundary.Responses;
-using AddressesAPI.V1.Boundary.Responses.Data;
-using AddressesAPI.V1.Controllers;
-using AddressesAPI.V1.UseCase.Interfaces;
+using AddressesAPI.V2.Boundary.Requests;
+using AddressesAPI.V2.Boundary.Responses;
+using AddressesAPI.V2.Boundary.Responses.Data;
+using AddressesAPI.V2.Controllers;
+using AddressesAPI.V2.UseCase.Interfaces;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 
-namespace AddressesAPI.Tests.V1.Controllers
+namespace AddressesAPI.Tests.V2.Controllers
 {
     public class GetAddressControllerTests
     {

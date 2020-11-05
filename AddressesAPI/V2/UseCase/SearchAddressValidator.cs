@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using AddressesAPI.V1.Boundary.Requests;
-using AddressesAPI.V1.UseCase.Interfaces;
+using AddressesAPI.V2.Boundary.Requests;
+using AddressesAPI.V2.UseCase.Interfaces;
 using FluentValidation;
 
-namespace AddressesAPI.V1.UseCase
+namespace AddressesAPI.V2.UseCase
 {
     public class SearchAddressValidator : AbstractValidator<SearchAddressRequest>, ISearchAddressValidator
     {

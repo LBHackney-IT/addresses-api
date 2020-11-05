@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AddressesAPI.Infrastructure;
 using AddressesAPI.Tests.V1.Helper;
 using AddressesAPI.V1;
 using AddressesAPI.V1.Domain;
 using AddressesAPI.V1.Factories;
 using AddressesAPI.V1.Gateways;
-using AddressesAPI.V1.Infrastructure;
 using Bogus;
 using FluentAssertions;
 using NUnit.Framework;

@@ -1,12 +1,12 @@
 using System.Threading;
-using AddressesAPI.V1.UseCase;
+using AddressesAPI.V2.UseCase;
 using Bogus;
 using FluentAssertions;
 using Microsoft.Extensions.HealthChecks;
 using Moq;
 using NUnit.Framework;
 
-namespace AddressesAPI.Tests.V1.UseCase
+namespace AddressesAPI.Tests.V2.UseCase
 {
     [TestFixture]
     public class DbHealthCheckUseCaseTests

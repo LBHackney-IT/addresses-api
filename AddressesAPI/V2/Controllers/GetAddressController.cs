@@ -1,16 +1,15 @@
-using System.Threading.Tasks;
-using AddressesAPI.V1.Boundary.Requests;
-using AddressesAPI.V1.Boundary.Responses;
-using AddressesAPI.V1.Boundary.Responses.Metadata;
-using AddressesAPI.V1.UseCase.Interfaces;
+using AddressesAPI.V2.Boundary.Requests;
+using AddressesAPI.V2.Boundary.Responses;
+using AddressesAPI.V2.Boundary.Responses.Metadata;
+using AddressesAPI.V2.UseCase.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AddressesAPI.V1.Controllers
+namespace AddressesAPI.V2.Controllers
 {
     [ApiVersion("1")]
     [Produces("application/json")]
-    [Route("api/v1/addresses")]
-    public class GetAddressController : BaseController
+    [Route("api/v2/addresses")]
+    public class GetAddressController : V1.Controllers.BaseController
     {
         private readonly IGetSingleAddressUseCase _getAddressUseCase;
 

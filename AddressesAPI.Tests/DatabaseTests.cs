@@ -1,4 +1,4 @@
-using AddressesAPI.V1.Infrastructure;
+using AddressesAPI.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using NUnit.Framework;

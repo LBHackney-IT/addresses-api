@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace AddressesAPI.V1.Gateways
+namespace AddressesAPI.V2.Gateways
 {
     public static class EfExtensions
     {

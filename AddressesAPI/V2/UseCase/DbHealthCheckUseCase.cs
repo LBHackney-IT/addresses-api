@@ -1,7 +1,7 @@
 using AddressesAPI.V1.Boundary;
 using Microsoft.Extensions.HealthChecks;
 
-namespace AddressesAPI.V1.UseCase
+namespace AddressesAPI.V2.UseCase
 {
     public class DbHealthCheckUseCase
     {

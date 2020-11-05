@@ -1,21 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using AddressesAPI.V1.Boundary.Requests;
-using AddressesAPI.V1.Boundary.Responses;
-using AddressesAPI.V1.Boundary.Responses.Metadata;
-using AddressesAPI.V1.Domain;
-using AddressesAPI.V1.Gateways;
-using AddressesAPI.V1.Infrastructure;
-using AddressesAPI.V1.UseCase;
-using AddressesAPI.V1.UseCase.Interfaces;
+using AddressesAPI.V2.Boundary.Requests;
+using AddressesAPI.V2.Boundary.Responses;
+using AddressesAPI.V2.Boundary.Responses.Metadata;
+using AddressesAPI.V2.Domain;
+using AddressesAPI.V2.Gateways;
+using AddressesAPI.V2.UseCase;
+using AddressesAPI.V2.UseCase.Interfaces;
 using FluentAssertions;
 using FluentValidation.Results;
 using Moq;
 using NUnit.Framework;
 
-namespace AddressesAPI.Tests.V1.UseCase
+namespace AddressesAPI.Tests.V2.UseCase
 {
     public class GetAddressCrossReferenceUseCaseTest
     {

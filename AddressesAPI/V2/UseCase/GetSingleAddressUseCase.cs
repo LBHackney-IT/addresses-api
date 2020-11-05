@@ -1,14 +1,13 @@
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using AddressesAPI.V1.Boundary.Requests;
-using AddressesAPI.V1.Boundary.Responses;
-using AddressesAPI.V1.Boundary.Responses.Data;
-using AddressesAPI.V1.Boundary.Responses.Metadata;
-using AddressesAPI.V1.Factories;
-using AddressesAPI.V1.Gateways;
-using AddressesAPI.V1.UseCase.Interfaces;
+using AddressesAPI.V2.Boundary.Requests;
+using AddressesAPI.V2.Boundary.Responses;
+using AddressesAPI.V2.Boundary.Responses.Data;
+using AddressesAPI.V2.Boundary.Responses.Metadata;
+using AddressesAPI.V2.Factories;
+using AddressesAPI.V2.Gateways;
+using AddressesAPI.V2.UseCase.Interfaces;
 
-namespace AddressesAPI.V1.UseCase
+namespace AddressesAPI.V2.UseCase
 {
     public class GetSingleAddressUseCase : IGetSingleAddressUseCase
     {

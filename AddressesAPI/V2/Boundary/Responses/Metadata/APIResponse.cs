@@ -1,7 +1,7 @@
 using System.Net;
 using Newtonsoft.Json;
 
-namespace AddressesAPI.V1.Boundary.Responses.Metadata
+namespace AddressesAPI.V2.Boundary.Responses.Metadata
 {
     /// <summary>
     /// API Response wrapper for all API responses

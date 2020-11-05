@@ -1,11 +1,10 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using AddressesAPI.V1.Boundary.Responses.Metadata;
+using AddressesAPI.V2.Boundary.Responses.Metadata;
 using FluentValidation.Results;
 using Newtonsoft.Json;
 
-namespace AddressesAPI.V1.Boundary.Responses
+namespace AddressesAPI.V2.Boundary.Responses
 {
     public class ErrorResponse
     {

@@ -1,9 +1,9 @@
-using AddressesAPI.V1.Boundary.Requests;
-using AddressesAPI.V1.UseCase;
+using AddressesAPI.V2.Boundary.Requests;
+using AddressesAPI.V2.UseCase;
 using FluentValidation.TestHelper;
 using NUnit.Framework;
 
-namespace AddressesAPI.Tests.V1.UseCase
+namespace AddressesAPI.Tests.V2.UseCase
 {
     public class GetCrossReferenceRequestValidatorTests
     {

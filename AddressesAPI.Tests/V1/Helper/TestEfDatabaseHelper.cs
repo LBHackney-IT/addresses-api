@@ -1,4 +1,4 @@
-using AddressesAPI.V1.Infrastructure;
+using AddressesAPI.Infrastructure;
 using AutoFixture;
 
 namespace AddressesAPI.Tests.V1.Helper

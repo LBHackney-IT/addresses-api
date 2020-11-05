@@ -1,11 +1,11 @@
 using System.Collections.Generic;
-using AddressesAPI.V1;
-using AddressesAPI.V1.Boundary.Requests;
-using AddressesAPI.V1.UseCase;
+using AddressesAPI.V2;
+using AddressesAPI.V2.Boundary.Requests;
+using AddressesAPI.V2.UseCase;
 using FluentValidation.TestHelper;
 using NUnit.Framework;
 
-namespace AddressesAPI.Tests.V1.UseCase
+namespace AddressesAPI.Tests.V2.UseCase
 {
     [TestFixture]
     public class SearchAddressValidatorTests

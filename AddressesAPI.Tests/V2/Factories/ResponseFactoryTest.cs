@@ -1,12 +1,12 @@
-using AddressesAPI.Tests.V1.Helper;
-using AddressCrossReferenceResponse = AddressesAPI.V1.Boundary.Responses.Data.AddressCrossReferenceResponse;
-using AddressesAPI.V1.Domain;
-using AddressesAPI.V1.Factories;
+using AddressesAPI.Tests.V2.Helper;
+using AddressesAPI.V2.Boundary.Responses.Data;
+using AddressesAPI.V2.Domain;
+using AddressesAPI.V2.Factories;
 using AutoFixture;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace AddressesAPI.Tests.V1.Factories
+namespace AddressesAPI.Tests.V2.Factories
 {
     public class ResponseFactoryTest
     {

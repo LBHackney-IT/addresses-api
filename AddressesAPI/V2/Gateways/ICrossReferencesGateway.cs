@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using AddressesAPI.V1.Domain;
+using AddressesAPI.V2.Domain;
 
-namespace AddressesAPI.V1.Gateways
+namespace AddressesAPI.V2.Gateways
 {
     public interface ICrossReferencesGateway
     {

@@ -1,5 +1,5 @@
 
-namespace AddressesAPI.V1.UseCase
+namespace AddressesAPI.V2.UseCase
 {
     public static class ThrowOpsErrorUsecase
     {

@@ -1,26 +1,23 @@
 using System.Collections.Generic;
-using AddressesAPI.V1.Boundary.Requests;
-using AddressesAPI.V1.Boundary.Responses;
-using AddressesAPI.V1.Boundary.Responses.Metadata;
-using AddressesAPI.V1.UseCase.Interfaces;
+using AddressesAPI.V2.Boundary.Requests;
+using AddressesAPI.V2.Boundary.Responses;
+using AddressesAPI.V2.Boundary.Responses.Metadata;
+using AddressesAPI.V2.UseCase.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AddressesAPI.V1.Controllers
+namespace AddressesAPI.V2.Controllers
 {
     [ApiVersion("1")]
     [Produces("application/json")]
-    [Route("api/v1/addresses")]
-    public class SearchAddressController : BaseController
+    [Route("api/v2/addresses")]
+    public class SearchAddressController : V1.Controllers.BaseController
     {
         private readonly ISearchAddressUseCase _searchAddressUseCase;
-        private readonly ISearchAddressValidator _searchAddressValidator;
 
 
-        public SearchAddressController(ISearchAddressUseCase searchAddressUseCase,
-            ISearchAddressValidator searchAddressValidator)
+        public SearchAddressController(ISearchAddressUseCase searchAddressUseCase)
         {
             _searchAddressUseCase = searchAddressUseCase;
-            _searchAddressValidator = searchAddressValidator;
         }
 
         /// <summary>

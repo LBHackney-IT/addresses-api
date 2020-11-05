@@ -1,7 +1,6 @@
 using System;
-using System.ComponentModel.DataAnnotations;
 
-namespace AddressesAPI.V1.Domain
+namespace AddressesAPI.V2.Domain
 {
     public class AddressCrossReference
     {

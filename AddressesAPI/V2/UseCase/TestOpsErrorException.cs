@@ -1,6 +1,6 @@
 using System;
 
-namespace AddressesAPI.V1.UseCase
+namespace AddressesAPI.V2.UseCase
 {
     public class TestOpsErrorException : Exception
     {

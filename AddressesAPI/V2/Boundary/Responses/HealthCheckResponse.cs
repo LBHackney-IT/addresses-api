@@ -1,4 +1,4 @@
-namespace AddressesAPI.V1.Boundary
+namespace AddressesAPI.V2.Boundary.Responses
 {
     public class HealthCheckResponse
     {

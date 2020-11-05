@@ -1,11 +1,11 @@
 using System.Collections.Generic;
-using AddressesAPI.Tests.V1.Helper;
-using AddressesAPI.V1.Factories;
-using AddressesAPI.V1.Infrastructure;
+using AddressesAPI.Infrastructure;
+using AddressesAPI.Tests.V2.Helper;
+using AddressesAPI.V2.Factories;
 using AutoFixture;
 using NUnit.Framework;
 
-namespace AddressesAPI.Tests.V1.Factories
+namespace AddressesAPI.Tests.V2.Factories
 {
     public class EntityFactoryTests
     {

@@ -1,16 +1,14 @@
-using System.Threading.Tasks;
-using AddressesAPI.V1.Boundary.Requests;
-using AddressesAPI.V1.Boundary.Responses;
-using AddressesAPI.V1.Boundary.Responses.Metadata;
-using AddressesAPI.V1.Domain;
-using AddressesAPI.V1.UseCase.Interfaces;
+using AddressesAPI.V2.Boundary.Requests;
+using AddressesAPI.V2.Boundary.Responses;
+using AddressesAPI.V2.Boundary.Responses.Metadata;
+using AddressesAPI.V2.UseCase.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AddressesAPI.V1.Controllers
+namespace AddressesAPI.V2.Controllers
 {
     [ApiVersion("1")]
     [Produces("application/json")]
-    [Route("api/v1/properties")]
+    [Route("api/v2/properties")]
     [ProducesResponseType(typeof(APIResponse<object>), 400)]
     [ProducesResponseType(typeof(APIResponse<object>), 500)]
     public class GetAddressCrossReferenceController : BaseController
@@ -20,7 +18,6 @@ namespace AddressesAPI.V1.Controllers
         {
             _getAddressCrossReferenceUseCase = getAddressCrossReferenceUseCase;
         }
-
 
         /// <summary>
         /// Search Controller V1 to search for addresses
