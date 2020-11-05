@@ -1,8 +1,8 @@
-using System.Linq;
-using System.Threading.Tasks;
+using System;
 using AddressesAPI.Tests.V1.Helper;
 using AddressesAPI.V1.Boundary.Requests;
 using AddressesAPI.V1.Boundary.Responses;
+using AddressesAPI.V1.Boundary.Responses.Metadata;
 using AddressesAPI.V1.Domain;
 using AddressesAPI.V1.Gateways;
 using AddressesAPI.V1.UseCase;
@@ -10,6 +10,7 @@ using AddressesAPI.V1.UseCase.Interfaces;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
+using FluentValidation.Results;
 
 namespace AddressesAPI.Tests.V1.UseCase
 {
@@ -17,13 +18,14 @@ namespace AddressesAPI.Tests.V1.UseCase
     {
         private readonly IGetSingleAddressUseCase _classUnderTest;
         private readonly Mock<IAddressesGateway> _fakeGateway;
-
+        private readonly Mock<IGetAddressRequestValidator> _fakeValidator;
 
         public GetSingleAddressUseCaseTest()
         {
             _fakeGateway = new Mock<IAddressesGateway>();
+            _fakeValidator = new Mock<IGetAddressRequestValidator>();
 
-            _classUnderTest = new GetSingleAddressUseCase(_fakeGateway.Object);
+            _classUnderTest = new GetSingleAddressUseCase(_fakeGateway.Object, _fakeValidator.Object);
         }
 
         [Test]
@@ -32,7 +34,7 @@ namespace AddressesAPI.Tests.V1.UseCase
 
             var lpi_key = "ABCDEFGHIJKLMN"; //14 characters
             _fakeGateway.Setup(s => s.GetSingleAddress("ABCDEFGHIJKLMN")).Returns(new Address()).Verifiable();
-
+            SetupValidatorToReturnValid();
             var request = new GetAddressRequest
             {
                 addressID = lpi_key
@@ -44,36 +46,11 @@ namespace AddressesAPI.Tests.V1.UseCase
         }
 
         [Test]
-        public void GivenBlankStringInput_WhenExecuteAsync_ThenShouldThrowException()
+        public void GivenInvalidInput_WhenExecuteAsync_ThrowsValidationError()
         {
-            //arrange
-            var request = new GetAddressRequest { addressID = string.Empty };
-            //act
-            _classUnderTest.Invoking(y => y.ExecuteAsync(request))
-                .Should().Throw<BadRequestException>()
-                .Where(ex => ex.ValidationResponse.ValidationErrors.First().Message == "addressID must be provided");
-        }
-
-        [Test]
-        public void GivenString13Characters_WhenExecuteAsync_TheShouldThrowException()
-        {
-            var request = new GetAddressRequest { addressID = "ABCDEFGHIJKLM" };
-            //act
-            //assert
-            _classUnderTest.Invoking(y => y.ExecuteAsync(request))
-                .Should().Throw<BadRequestException>()
-                .Where(ex => ex.ValidationResponse.ValidationErrors.First().Message == "addressID must be 14 characters"); ;
-        }
-
-        [Test]
-        public void GivenString15Characters_WhenExecuteAsync_TheShouldThrowException()
-        {
-            var request = new GetAddressRequest { addressID = "ABCDEFGHIJKLMNO" };
-            //act
-            //assert
-            _classUnderTest.Invoking(y => y.ExecuteAsync(request))
-                .Should().Throw<BadRequestException>()
-                .Where(ex => ex.ValidationResponse.ValidationErrors.First().Message == "addressID must be 14 characters"); ;
+            SetupValidatorToReturnValid(false);
+            Func<SearchAddressResponse> testDelegate = () => _classUnderTest.ExecuteAsync(new GetAddressRequest());
+            testDelegate.Should().Throw<BadRequestException>();
         }
 
         [Test]
@@ -81,7 +58,7 @@ namespace AddressesAPI.Tests.V1.UseCase
         {
             //arrange
             var lpi_key = "ABCDEFGHIJKLMN";
-
+            SetupValidatorToReturnValid();
             _fakeGateway.Setup(s => s.GetSingleAddress("ABCDEFGHIJKLMN"))
                 .Returns((Address) null);
 
@@ -98,6 +75,7 @@ namespace AddressesAPI.Tests.V1.UseCase
         [Test]
         public void GivenValidLPIKey_WhenExecuteAsync_ThenAddressShouldBeReturned()
         {
+            SetupValidatorToReturnValid();
             var address = new Address
             {
                 AddressKey = "ABCDEFGHIJKLMN",
@@ -138,6 +116,15 @@ namespace AddressesAPI.Tests.V1.UseCase
             response.Should().NotBeNull();
 
             response.Addresses[0].AddressShouldEqual(address);
+        }
+
+        private void SetupValidatorToReturnValid(bool valid = true)
+        {
+            var result = new Mock<ValidationResult>();
+
+            result.Setup(x => x.IsValid).Returns(valid);
+            _fakeValidator.Setup(x => x.Validate(It.IsAny<GetAddressRequest>()))
+                .Returns(result.Object);
         }
     }
 }

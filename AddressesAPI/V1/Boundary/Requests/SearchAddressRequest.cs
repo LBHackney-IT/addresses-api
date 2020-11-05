@@ -1,10 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using AddressesAPI.V1.Boundary.Requests.RequestValidators;
-using AddressesAPI.V1.Boundary.Responses;
-using FluentValidation.Results;
-using LBHAddressesAPI.Infrastructure.V1.Validation;
 
 namespace AddressesAPI.V1.Boundary.Requests
 {
@@ -14,12 +8,12 @@ namespace AddressesAPI.V1.Boundary.Requests
     /// </summary>
     public class SearchAddressRequest
     {
-        private GlobalConstants.Gazetteer _gazetteer;
+        private string _gazetteer;
 
         public SearchAddressRequest()
         {
             AddressStatus = "approved preferred";
-            Gazetteer = GlobalConstants.Gazetteer.Both;
+            Gazetteer = GlobalConstants.Gazetteer.Both.ToString();
         }
 
         /// <summary>
@@ -41,18 +35,19 @@ namespace AddressesAPI.V1.Boundary.Requests
         /// <summary>
         /// LOCAL/NATIONAL/BOTH (Defaults to LOCAL)
         /// </summary>
-        public GlobalConstants.Gazetteer Gazetteer
+        public string Gazetteer
         {
-            get { return _gazetteer; }
+            get => _gazetteer;
             set
             {
+                //This logic needs reworking
                 _gazetteer = value;
 
-                if (_gazetteer == GlobalConstants.Gazetteer.Local)
+                if (_gazetteer == GlobalConstants.Gazetteer.Local.ToString())
                 {
                     HackneyGazetteerOutOfBoroughAddress = false;
                 }
-                else if (_gazetteer == GlobalConstants.Gazetteer.Both)
+                else if (_gazetteer == GlobalConstants.Gazetteer.Both.ToString())
                 {
                     HackneyGazetteerOutOfBoroughAddress = null;
                 }
@@ -62,7 +57,7 @@ namespace AddressesAPI.V1.Boundary.Requests
         /// <summary>
         /// Filter by UPRN (unique property reference number - unique identifier of the BLPU (Basic Land and Property Unit); a UPRN can have more than one LPI/address. )
         /// </summary>
-        public Int64? UPRN { get; set; }
+        public long? UPRN { get; set; }
 
         /// <summary>
         /// Filter by USRN (unique street reference number - uniquely identifies streets)
@@ -92,13 +87,13 @@ namespace AddressesAPI.V1.Boundary.Requests
         /// <summary>
         /// Allows a switch between simple and detailed address
         /// </summary>
-        public GlobalConstants.Format Format { get; set; }
+        public string Format { get; set; } = "Simple";
 
         /// <summary>
         /// Allows switch between address statuses:
-        /// Alternative
-        /// Approved Preferred (Default)
-        /// Historical
+        /// Alternative,
+        /// Approved Preferred (Default),
+        /// Historical,
         /// Provisional
         /// </summary>
         public string AddressStatus { get; set; }
@@ -116,69 +111,16 @@ namespace AddressesAPI.V1.Boundary.Requests
         /// <summary>
         /// Page defaults to 1 as paging is 1 index based not 0 index based
         /// </summary>
-        public int Page { get; set; }
+        public int Page { get; set; } = 1;
+
         /// <summary>
         /// PageSize defaults to 50 if not provided
         /// </summary>
-        public int PageSize { get; set; }
+        public int PageSize { get; set; } = 50;
 
         /// <summary>
         /// List of fields passed in as part of the request
         /// </summary>
         public List<string> RequestFields { get; set; }
-
-        /// <summary>
-        /// List of errors that have been generated as part of ModeState
-        /// </summary>
-        internal List<ValidationError> Errors { get; set; }
-
-        /// <summary>
-        /// Responsible for validating itself.
-        /// Uses SearchAddressRequestValidator to do complex validation
-        /// Sets defaults for Page and PageSize
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="request"></param>
-        /// <returns>RequestValidationResponse</returns>
-        public static RequestValidationResponse Validate<T>(T request)
-        {
-            if (request == null)
-                return new RequestValidationResponse(false, "request is null");
-            var validator = new SearchAddressRequestValidator();
-            if (!(request is SearchAddressRequest castedRequest))
-                return new RequestValidationResponse(false);
-            var valRes = new ValidationResult();
-            if (castedRequest.Errors != null)
-            {
-                if (castedRequest.Errors.Count > 0)
-                {
-                    //ValidationResult valRes = new ValidationResult();
-                    foreach (var error in castedRequest.Errors)
-                    {
-                        valRes.Errors.Add(new ValidationFailure(error.FieldName, error.Message));
-                    }
-
-                    return new RequestValidationResponse(valRes);
-                }
-            }
-
-            var validationResult = validator.Validate(castedRequest);
-            //Using 1 based paging (to make it easier for Front Ends to page) so defaults to 1 instead of 0
-            //Later down the stack we revert to 0 based paging
-            if (castedRequest.Page == 0)
-                castedRequest.Page = 1;
-            //Sets default page size to 10
-            if (castedRequest.PageSize == 0)
-                castedRequest.PageSize = 50;
-            return new RequestValidationResponse(validationResult);
-        }
-
-        private List<string> InvalidFields(List<string> requestFields)
-        {
-            //possibly make this smarter and compare to the SearchAddressRequest fields??
-            List<string> classFields = new List<string>() { "postcode", "buildingnumber", "street", "gazetteer", "uprn", "usrn", "propertyclassprimary", "propertyclasscode", "format", "addressstatus" };
-
-            return requestFields.Except(classFields).ToList();
-        }
     }
 }

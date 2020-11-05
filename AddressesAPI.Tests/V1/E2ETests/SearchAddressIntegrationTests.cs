@@ -45,7 +45,7 @@ namespace AddressesAPI.Tests.V1.E2ETests
 
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);
-            var returnedAddress = await ConvertToResponseObject(response).ConfigureAwait(true);
+            var returnedAddress = await ConvertToSearchAddressResponseObject(response).ConfigureAwait(true);
             returnedAddress.Data.Addresses.Count.Should().Be(1);
             returnedAddress.Data.Addresses.First().AddressKey.Should().Be(addressKey);
         }
@@ -66,7 +66,7 @@ namespace AddressesAPI.Tests.V1.E2ETests
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);
 
-            var returnedAddress = await ConvertToResponseObject(response).ConfigureAwait(true);
+            var returnedAddress = await ConvertToSearchAddressResponseObject(response).ConfigureAwait(true);
             returnedAddress.Data.Addresses.Count.Should().Be(1);
             returnedAddress.Data.Addresses.First().AddressKey.Should().Be(addressKey);
         }
@@ -88,7 +88,7 @@ namespace AddressesAPI.Tests.V1.E2ETests
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);
 
-            var returnedAddress = await ConvertToResponseObject(response).ConfigureAwait(true);
+            var returnedAddress = await ConvertToSearchAddressResponseObject(response).ConfigureAwait(true);
             returnedAddress.Data.Addresses.Count.Should().Be(1);
             returnedAddress.Data.Addresses.First().AddressKey.Should().Be(addressKey);
         }
@@ -144,60 +144,32 @@ namespace AddressesAPI.Tests.V1.E2ETests
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);
 
-            var returnedAddress = await ConvertToResponseObject(response).ConfigureAwait(true);
+            var returnedAddress = await ConvertToSearchAddressResponseObject(response).ConfigureAwait(true);
             returnedAddress.Data.Addresses.Count.Should().Be(1);
             returnedAddress.Data.Addresses.First().AddressKey.Should().Be(addressKey);
         }
 
         [Test]
-        public async Task MustQueryTheEndpointBySomethingWhenSearchingLocalAddresses()
+        public async Task PassingAnIncorrectFormat()
         {
-            var addressKey = "eytshdnshsuahs";
-            TestEfDataHelper.InsertAddress(DatabaseContext, addressKey);
-
-            var queryString = "Gazetteer=Local";
-
+            var queryString = "street=hackneyroad&gazetteer=local&Format=yes";
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(400);
-
-            var data = await ConvertToResponseObject(response).ConfigureAwait(true);
-            data.Error.IsValid.Should().BeFalse();
-            data.Error.ValidationErrors.Should()
-                .Contain(x => x.Message == "You must provide at least one of (uprn, usrn, postcode, street, usagePrimary, usageCode), when gazeteer is 'local'.");
         }
 
-        [Test]
-        public async Task MustProvideAUprnUsrnOrPostcodeWhenSearchingNationalAddresses()
+        [TestCase("PageSize=100", "PageSize", "PageSize cannot exceed 50")]
+        [TestCase("PostCode=12376", "PostCode", "Must provide at least the first part of the postcode.")]
+        [TestCase("Gazetteer=Both&street=hackneyroad", "", "You must provide at least one of (uprn, usrn, postcode), when gazetteer is 'both'.")]
+        [TestCase("Gazetteer=Local", "", "You must provide at least one of (uprn, usrn, postcode, street, usagePrimary, usageCode), when gazeteer is 'local'.")]
+        public async Task ValidationErrors(string queryString, string fieldName, string message)
         {
-            var addressKey = "eytshdnshsuahs";
-            TestEfDataHelper.InsertAddress(DatabaseContext, addressKey);
-
-            var queryString = "Gazetteer=Both&street=hackneyroad";
-
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(400);
-
-            var data = await ConvertToResponseObject(response).ConfigureAwait(true);
-            data.Error.IsValid.Should().BeFalse();
-            data.Error.ValidationErrors.Should()
-                .Contain(x => x.Message == "You must provide at least one of (uprn, usrn, postcode), when gazetteer is 'both'.");
-        }
-
-        [Test]
-        public async Task WillReturnABadRequestForAnInvalidPostcode()
-        {
-            var addressKey = "eytshdnshsuahs";
-            TestEfDataHelper.InsertAddress(DatabaseContext, addressKey);
-
-            var queryString = "Gazetteer=Local&PostCode=12376";
-
-            var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
-            response.StatusCode.Should().Be(400);
-
-            var data = await ConvertToResponseObject(response).ConfigureAwait(true);
-            data.Error.IsValid.Should().BeFalse();
-            data.Error.ValidationErrors.Should()
-                .Contain(x => x.Message == "Must provide at least the first part of the postcode.");
+            var errors = await ConvertToErrorResponseObject(response).ConfigureAwait(true);
+            errors.Error.IsValid.Should().BeFalse();
+            errors.Error.ValidationErrors.Should().ContainEquivalentOf(
+                new ValidationError { Message = message, FieldName = fieldName }
+            );
         }
 
         private void AddSomeRandomAddressToTheDatabase(int? count = null, string gazetteer = "Local")

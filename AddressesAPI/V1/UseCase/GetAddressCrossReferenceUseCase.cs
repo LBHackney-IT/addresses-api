@@ -1,6 +1,6 @@
-using System.Threading.Tasks;
 using AddressesAPI.V1.Boundary.Requests;
 using AddressesAPI.V1.Boundary.Responses;
+using AddressesAPI.V1.Boundary.Responses.Metadata;
 using AddressesAPI.V1.Factories;
 using AddressesAPI.V1.Gateways;
 using AddressesAPI.V1.UseCase.Interfaces;
@@ -10,18 +10,18 @@ namespace AddressesAPI.V1.UseCase
     public class GetAddressCrossReferenceUseCase : IGetAddressCrossReferenceUseCase
     {
         private readonly ICrossReferencesGateway _crossReferenceGateway;
+        private readonly IGetCrossReferenceRequestValidator _getAddressCrossReferenceValidator;
 
-        public GetAddressCrossReferenceUseCase(ICrossReferencesGateway crossReferencesGateway)
+        public GetAddressCrossReferenceUseCase(ICrossReferencesGateway crossReferencesGateway,
+            IGetCrossReferenceRequestValidator getAddressCrossReferenceValidator)
         {
             _crossReferenceGateway = crossReferencesGateway;
+            _getAddressCrossReferenceValidator = getAddressCrossReferenceValidator;
         }
 
         public GetAddressCrossReferenceResponse ExecuteAsync(GetAddressCrossReferenceRequest request)
         {
-            if (request == null)
-                throw new BadRequestException();
-
-            var validationResponse = request.Validate(request);
+            var validationResponse = _getAddressCrossReferenceValidator.Validate(request);
             if (!validationResponse.IsValid)
                 throw new BadRequestException(validationResponse);
 

@@ -136,6 +136,8 @@ namespace AddressesAPI
         {
             services.AddScoped<ISearchAddressValidator, SearchAddressValidator>();
             services.AddScoped<ISearchAddressUseCase, SearchAddressUseCase>();
+            services.AddScoped<IGetAddressRequestValidator, GetAddressRequestValidator>();
+            services.AddScoped<IGetCrossReferenceRequestValidator, GetCrossReferenceRequestValidator>();
             services.AddScoped<IGetSingleAddressUseCase, GetSingleAddressUseCase>();
             services.AddScoped<IGetAddressCrossReferenceUseCase, GetAddressCrossReferenceUseCase>();
         }

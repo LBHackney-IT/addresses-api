@@ -1,6 +1,6 @@
 using FluentValidation.Results;
 
-namespace LBHAddressesAPI.Infrastructure.V1.Validation
+namespace AddressesAPI.V1.Boundary.Responses.Metadata
 {
     public class ValidationError
     {

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AddressesAPI.V1;
 using AddressesAPI.V1.Boundary.Requests;
 using AddressesAPI.V1.Boundary.Responses;
+using AddressesAPI.V1.Boundary.Responses.Data;
 using AddressesAPI.V1.Boundary.Responses.Metadata;
 using AddressesAPI.V1.Controllers;
 using AddressesAPI.V1.UseCase;
@@ -21,9 +22,9 @@ namespace AddressesAPI.Tests.V1.Controllers
         private SearchAddressController _classUnderTest;
         private Mock<ISearchAddressUseCase> _mock;
 
-        public SearchAddressControllerTests()
+        [SetUp]
+        public void SetUp()
         {
-            Environment.SetEnvironmentVariable("ALLOWED_ADDRESSSTATUS_VALUES", "historical;alternative;approved preferred;provisional");
             _mock = new Mock<ISearchAddressUseCase>();
             var validator = new SearchAddressValidator();
             _classUnderTest = new SearchAddressController(_mock.Object, validator);
@@ -49,30 +50,17 @@ namespace AddressesAPI.Tests.V1.Controllers
             var request = new SearchAddressRequest
             {
                 PostCode = postcode,
-                Gazetteer = gazetteer
+                Gazetteer = gazetteer.ToString()
             };
             //act
             var response = _classUnderTest.GetAddresses(request);
             //assert
             response.Should().NotBeNull();
-            response.Should().BeOfType<ObjectResult>();
-            var objectResult = response as ObjectResult;
+            response.Should().BeOfType<OkObjectResult>();
+            var objectResult = response as OkObjectResult;
             var getAddresses = objectResult?.Value as APIResponse<SearchAddressResponse>;
             getAddresses.Should().NotBeNull();
         }
 
-        [Test]
-        public void GivenInvalidSearchAddressRequest_WhenCallingGet_ThenShouldReturnBadRequestObjectResponse()
-        {
-            //arrange
-            var request = new SearchAddressRequest { AddressStatus = null };
-
-            //act
-            var response = _classUnderTest.GetAddresses(request);
-
-            //assert
-            response.Should().NotBeNull();
-            response.Should().BeOfType<BadRequestObjectResult>();
-        }
     }
 }

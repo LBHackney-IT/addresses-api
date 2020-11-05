@@ -12,15 +12,38 @@ namespace AddressesAPI.V1.UseCase
     {
         public SearchAddressValidator()
         {
+            RuleFor(x => x).NotNull();
             RuleFor(r => r.AddressStatus).NotNull().NotEmpty();
-            RuleFor(r => r.AddressStatus).Must(CanBeAnyCombinationOfAllowedValues).WithMessage("Value for the parameter is not valid.");
+            RuleFor(r => r.AddressStatus)
+                .Must(CanBeAnyCombinationOfAllowedAddressStatuses)
+                .WithMessage("Value for the parameter is not valid.");
 
-            RuleFor(r => r.PostCode).Matches(new Regex("^((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]))))( )?(([0-9][A-Za-z]?[A-Za-z]?)?))$")).WithMessage("Must provide at least the first part of the postcode.");
+            RuleFor(r => r.Gazetteer)
+                .Must(gazetteer => gazetteer.ToLower() == "local" || Enum.TryParse<GlobalConstants.Gazetteer>(gazetteer, true, out _))
+                .WithMessage("Value for the parameter is not valid. It should be either Hackney or Both.");
 
-            RuleFor(r => r).Must(CheckForAtLeastOneMandatoryFilterPropertyWithGazetteerLocal).WithMessage("You must provide at least one of (uprn, usrn, postcode, street, usagePrimary, usageCode), when gazeteer is 'local'.");
-            RuleFor(r => r).Must(CheckForAtLeastOneMandatoryFilterPropertyWithGazetteerBoth).WithMessage("You must provide at least one of (uprn, usrn, postcode), when gazetteer is 'both'.");
+            RuleFor(r => r.Format)
+                .Must(format => Enum.TryParse<GlobalConstants.Format>(format, true, out _))
+                .WithMessage("Value for Format is not valid. It should be either Simple or Detailed");
 
-            RuleFor(r => r.RequestFields).Must(CheckForInvalidProperties).WithMessage("Invalid properties have been provided.");
+            RuleFor(x => x.PageSize)
+                .LessThan(51).WithMessage("PageSize cannot exceed 50");
+
+            RuleFor(r => r.PostCode)
+                .Matches(new Regex("^((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]))))( )?(([0-9][A-Za-z]?[A-Za-z]?)?))$"))
+                .WithMessage("Must provide at least the first part of the postcode.");
+
+            RuleFor(r => r)
+                .Must(CheckForAtLeastOneMandatoryFilterPropertyWithGazetteerLocal)
+                .WithMessage("You must provide at least one of (uprn, usrn, postcode, street, usagePrimary, usageCode), when gazeteer is 'local'.");
+
+            RuleFor(r => r)
+                .Must(CheckForAtLeastOneMandatoryFilterPropertyWithGazetteerBoth)
+                .WithMessage("You must provide at least one of (uprn, usrn, postcode), when gazetteer is 'both'.");
+
+            RuleFor(r => r.RequestFields)
+                .Must(CheckForInvalidProperties)
+                .WithMessage("Invalid properties have been provided.");
         }
 
         private static bool CheckForInvalidProperties(List<string> requestFields)
@@ -39,7 +62,7 @@ namespace AddressesAPI.V1.UseCase
 
         private static bool CheckForAtLeastOneMandatoryFilterPropertyWithGazetteerLocal(SearchAddressRequest request)
         {
-            return request.Gazetteer != GlobalConstants.Gazetteer.Local
+            return request.Gazetteer == GlobalConstants.Gazetteer.Both.ToString()
                    || request.UPRN != null
                    || request.USRN != null
                    || request.PostCode != null
@@ -50,13 +73,13 @@ namespace AddressesAPI.V1.UseCase
 
         private static bool CheckForAtLeastOneMandatoryFilterPropertyWithGazetteerBoth(SearchAddressRequest request)
         {
-            return request.Gazetteer != GlobalConstants.Gazetteer.Both
+            return request.Gazetteer != GlobalConstants.Gazetteer.Both.ToString()
                    || request.UPRN != null
                    || request.USRN != null
                    || request.PostCode != null;
         }
 
-        private static bool CanBeAnyCombinationOfAllowedValues(string addressStatus)
+        private static bool CanBeAnyCombinationOfAllowedAddressStatuses(string addressStatus)
         {
             var allowedValues = new List<string> { "historical", "alternative", "approved preferred", "provisional" };
             if (string.IsNullOrEmpty(addressStatus))
