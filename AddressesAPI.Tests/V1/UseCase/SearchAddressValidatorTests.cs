@@ -1,10 +1,7 @@
-using System;
 using System.Collections.Generic;
 using AddressesAPI.V1;
 using AddressesAPI.V1.Boundary.Requests;
-using AddressesAPI.V1.Domain;
 using AddressesAPI.V1.UseCase;
-using FluentAssertions;
 using FluentValidation.TestHelper;
 using NUnit.Framework;
 
@@ -14,10 +11,12 @@ namespace AddressesAPI.Tests.V1.UseCase
     public class SearchAddressValidatorTests
     {
         private SearchAddressValidator _classUnderTest;
+        private string _localGazetteer;
 
         [SetUp]
         public void SetUp()
         {
+            _localGazetteer = GlobalConstants.Gazetteer.Hackney.ToString();
             _classUnderTest = new SearchAddressValidator();
         }
 
@@ -254,7 +253,7 @@ namespace AddressesAPI.Tests.V1.UseCase
         [TestCase(12345)]
         public void GivenARequestWithOnlyUPRN_IfGazetteerIsLocal_WhenCallingValidation_ItReturnsNoError(int uprn)
         {
-            var request = new SearchAddressRequest() { UPRN = uprn, Gazetteer = GlobalConstants.Gazetteer.Local };
+            var request = new SearchAddressRequest() { UPRN = uprn, Gazetteer = _localGazetteer };
             _classUnderTest.TestValidate(request).ShouldNotHaveError();
         }
 
@@ -268,7 +267,7 @@ namespace AddressesAPI.Tests.V1.UseCase
         [TestCase(12345)]
         public void GivenARequestWithOnlyUSRN_IfGazetteerIsLocal_WhenCallingValidation_ItReturnsNoError(int usrn)
         {
-            var request = new SearchAddressRequest() { USRN = usrn, Gazetteer = GlobalConstants.Gazetteer.Local };
+            var request = new SearchAddressRequest() { USRN = usrn, Gazetteer = _localGazetteer };
             _classUnderTest.TestValidate(request).ShouldNotHaveError();
         }
 
@@ -282,7 +281,7 @@ namespace AddressesAPI.Tests.V1.UseCase
         [TestCase("SW1A 1AA")]
         public void GivenARequestWithOnlyAPostCode_IfGazetteerIsLocal_WhenCallingValidation_ItReturnsNoError(string postcode)
         {
-            var request = new SearchAddressRequest() { PostCode = postcode, Gazetteer = GlobalConstants.Gazetteer.Local };
+            var request = new SearchAddressRequest() { PostCode = postcode, Gazetteer = _localGazetteer };
             _classUnderTest.TestValidate(request).ShouldNotHaveError();
         }
 
@@ -296,7 +295,7 @@ namespace AddressesAPI.Tests.V1.UseCase
         [TestCase("Sesame street")]
         public void GivenARequestWithOnlyAStreet_IfGazetteerIsLocal_WhenCallingValidation_ItReturnsNoError(string street)
         {
-            var request = new SearchAddressRequest() { Street = street, Gazetteer = GlobalConstants.Gazetteer.Local };
+            var request = new SearchAddressRequest() { Street = street, Gazetteer = _localGazetteer };
             _classUnderTest.TestValidate(request).ShouldNotHaveError();
         }
 
@@ -310,7 +309,7 @@ namespace AddressesAPI.Tests.V1.UseCase
         [TestCase("someValue")]
         public void GivenARequestWithOnlyUsagePrimary_IfGazetteerIsLocal_WhenCallingValidation_ItReturnsNoError(string usagePrimary)
         {
-            var request = new SearchAddressRequest() { usagePrimary = usagePrimary, Gazetteer = GlobalConstants.Gazetteer.Local };
+            var request = new SearchAddressRequest() { usagePrimary = usagePrimary, Gazetteer = _localGazetteer };
             _classUnderTest.TestValidate(request).ShouldNotHaveError();
         }
 
@@ -324,7 +323,7 @@ namespace AddressesAPI.Tests.V1.UseCase
         [TestCase("otherValue")]
         public void GivenARequestWithOnlyUsageCode_IfGazetteerIsLocal_WhenCallingValidation_ItReturnsNoError(string usageCode)
         {
-            var request = new SearchAddressRequest() { usageCode = usageCode, Gazetteer = GlobalConstants.Gazetteer.Local };
+            var request = new SearchAddressRequest() { usageCode = usageCode, Gazetteer = _localGazetteer };
             _classUnderTest.TestValidate(request).ShouldNotHaveError();
         }
 
@@ -338,7 +337,7 @@ namespace AddressesAPI.Tests.V1.UseCase
         [TestCase("12345")]
         public void GivenARequestWithNoMandatoryFields_IfGazetteerIsLocal_WhenCallingValidation_ItReturnsAnError(string buildingNumber)
         {
-            var request = new SearchAddressRequest() { BuildingNumber = buildingNumber, Gazetteer = GlobalConstants.Gazetteer.Local };
+            var request = new SearchAddressRequest() { BuildingNumber = buildingNumber, Gazetteer = _localGazetteer };
             _classUnderTest.TestValidate(request).ShouldHaveError().WithErrorMessage("You must provide at least one of (uprn, usrn, postcode, street, usagePrimary, usageCode), when gazeteer is 'local'.");
         }
 
@@ -347,6 +346,49 @@ namespace AddressesAPI.Tests.V1.UseCase
         {
             var request = new SearchAddressRequest() { BuildingNumber = buildingNumber };
             _classUnderTest.TestValidate(request).ShouldHaveError().WithErrorMessage("You must provide at least one of (uprn, usrn, postcode), when gazetteer is 'both'.");
+        }
+
+        #endregion
+
+        #region Enum validation
+
+        [TestCase("long")]
+        [TestCase("verbose")]
+        [TestCase("short")]
+        public void GivenAnIncorrectFormat_WhenValidating_ItReturnsAnError(string format)
+        {
+            var request = new SearchAddressRequest { Format = format };
+            _classUnderTest.ShouldHaveValidationErrorFor(x => x.Format, request)
+                .WithErrorMessage("Value for Format is not valid. It should be either Simple or Detailed");
+        }
+
+        [TestCase("Simple")]
+        [TestCase("simple")]
+        [TestCase("Detailed")]
+        public void GivenACorrectFormat_WhenValidating_ItReturnsNoErrors(string format)
+        {
+            var request = new SearchAddressRequest { Format = format };
+            _classUnderTest.ShouldNotHaveValidationErrorFor(x => x.Format, request);
+        }
+
+        [TestCase("finsburypark")]
+        [TestCase("haringay")]
+        [TestCase("dalston")]
+        [TestCase("National")]
+        public void GivenAnIncorrectGazetteer_WhenValidating_ItReturnsAnError(string gazetteer)
+        {
+            var request = new SearchAddressRequest { Gazetteer = gazetteer };
+            _classUnderTest.ShouldHaveValidationErrorFor(x => x.Gazetteer, request)
+                .WithErrorMessage("Value for the parameter is not valid. It should be either Hackney or Both.");
+        }
+
+        [TestCase("Hackney")]
+        [TestCase("Local")] // To be depreciated
+        [TestCase("Both")]
+        public void GivenACorrectGazetteer_WhenValidating_ItReturnsNoErrors(string gazetteer)
+        {
+            var request = new SearchAddressRequest { Gazetteer = gazetteer };
+            _classUnderTest.ShouldNotHaveValidationErrorFor(x => x.Gazetteer, request);
         }
 
         #endregion

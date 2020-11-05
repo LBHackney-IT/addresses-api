@@ -7,7 +7,6 @@ using AddressesAPI.V1.Boundary.Requests;
 using AddressesAPI.V1.Boundary.Responses;
 using AddressesAPI.V1.Boundary.Responses.Metadata;
 using AddressesAPI.V1.UseCase.Interfaces;
-using LBHAddressesAPI.Infrastructure.V1.Validation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 
@@ -42,11 +41,6 @@ namespace AddressesAPI.V1.Controllers
         [HttpGet, MapToApiVersion("1")]
         public IActionResult GetAddresses([FromQuery] SearchAddressRequest request)
         {
-            foreach (var modelStateKey in ModelState.Keys)
-            {
-                Console.Write(modelStateKey);
-                Console.Write(ModelState.GetValueOrDefault(modelStateKey));
-            }
             if (!ModelState.IsValid)
             {
                 var errors = new List<ValidationError>();
@@ -61,7 +55,7 @@ namespace AddressesAPI.V1.Controllers
                     }
                 }
 
-                return new BadRequestObjectResult(new ErrorResponse(new RequestValidationResponse(errors)));
+                return new BadRequestObjectResult(new ErrorResponse(errors));
             }
 
             try

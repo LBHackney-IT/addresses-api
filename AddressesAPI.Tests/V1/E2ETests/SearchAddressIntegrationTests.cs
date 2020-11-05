@@ -10,7 +10,6 @@ using AddressesAPI.V1.Infrastructure;
 using AutoFixture;
 using Bogus;
 using FluentAssertions;
-using LBHAddressesAPI.Infrastructure.V1.Validation;
 using Newtonsoft.Json;
 using NUnit.Framework;
 
@@ -158,8 +157,8 @@ namespace AddressesAPI.Tests.V1.E2ETests
             response.StatusCode.Should().Be(400);
         }
 
-        [TestCase("PageSize=100", "PageSize", "PageSize cannot exceed 50" )]
-        [TestCase("PostCode=12376", "PostCode", "Must provide at least the first part of the postcode." )]
+        [TestCase("PageSize=100", "PageSize", "PageSize cannot exceed 50")]
+        [TestCase("PostCode=12376", "PostCode", "Must provide at least the first part of the postcode.")]
         [TestCase("Gazetteer=Both&street=hackneyroad", "", "You must provide at least one of (uprn, usrn, postcode), when gazetteer is 'both'.")]
         [TestCase("Gazetteer=Local", "", "You must provide at least one of (uprn, usrn, postcode, street, usagePrimary, usageCode), when gazeteer is 'local'.")]
         public async Task ValidationErrors(string queryString, string fieldName, string message)
@@ -169,7 +168,7 @@ namespace AddressesAPI.Tests.V1.E2ETests
             var errors = await ConvertToErrorResponseObject(response).ConfigureAwait(true);
             errors.Error.IsValid.Should().BeFalse();
             errors.Error.ValidationErrors.Should().ContainEquivalentOf(
-                new ValidationError{ Message = message, FieldName = fieldName}
+                new ValidationError { Message = message, FieldName = fieldName }
             );
         }
 

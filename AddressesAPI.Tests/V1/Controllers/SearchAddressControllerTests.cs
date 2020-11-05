@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AddressesAPI.V1;
 using AddressesAPI.V1.Boundary.Requests;
 using AddressesAPI.V1.Boundary.Responses;
+using AddressesAPI.V1.Boundary.Responses.Data;
 using AddressesAPI.V1.Boundary.Responses.Metadata;
 using AddressesAPI.V1.Controllers;
 using AddressesAPI.V1.UseCase;
@@ -35,7 +36,7 @@ namespace AddressesAPI.Tests.V1.Controllers
         }
 
 
-        [TestCase("RM3 0FS", GlobalConstants.Gazetteer.Local)]
+        [TestCase("RM3 0FS", GlobalConstants.Gazetteer.Hackney)]
         [TestCase("IG11 7QD", GlobalConstants.Gazetteer.Both)]
         public void GivenValidSearchAddressRequest_WhenCallingGet_ThenShouldReturnAPIResponseListOfAddresses(string postcode, GlobalConstants.Gazetteer gazetteer)
         {
@@ -49,7 +50,7 @@ namespace AddressesAPI.Tests.V1.Controllers
             var request = new SearchAddressRequest
             {
                 PostCode = postcode,
-                Gazetteer = gazetteer
+                Gazetteer = gazetteer.ToString()
             };
             //act
             var response = _classUnderTest.GetAddresses(request);

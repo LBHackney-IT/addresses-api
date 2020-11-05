@@ -90,8 +90,11 @@ namespace AddressesAPI.V1.Gateways
                         (Expression<Func<Infrastructure.Address, bool>>) (x =>
                             EF.Functions.ILike(x.UsageCode, $"%{u}%")))
                     .ToArray())
-                .Where(a => request.Gazetteer == GlobalConstants.Gazetteer.Both ||
-                            EF.Functions.ILike(a.Gazetteer, request.Gazetteer.ToString()))
+                .Where(a => request.Gazetteer == GlobalConstants.Gazetteer.Both
+                            || EF.Functions.ILike(a.Gazetteer, request.Gazetteer.ToString())
+                            || request.Gazetteer == GlobalConstants.Gazetteer.Hackney
+                                && EF.Functions.ILike(a.Gazetteer, "local")
+                            )
                 .Where(a => request.HackneyGazetteerOutOfBoroughAddress == null ||
                             request.HackneyGazetteerOutOfBoroughAddress == a.NeverExport);
             return queryBase;

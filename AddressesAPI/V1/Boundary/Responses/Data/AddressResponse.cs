@@ -1,7 +1,6 @@
-using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 
-namespace AddressesAPI.V1.Boundary.Responses
+namespace AddressesAPI.V1.Boundary.Responses.Data
 {
     public class AddressResponse
     {

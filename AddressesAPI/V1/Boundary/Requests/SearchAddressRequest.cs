@@ -1,11 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using AddressesAPI.V1.Boundary.Requests.RequestValidators;
-using AddressesAPI.V1.Boundary.Responses;
-using AddressesAPI.V1.Boundary.Responses.Metadata;
-using FluentValidation.Results;
-using LBHAddressesAPI.Infrastructure.V1.Validation;
 
 namespace AddressesAPI.V1.Boundary.Requests
 {
@@ -15,12 +8,12 @@ namespace AddressesAPI.V1.Boundary.Requests
     /// </summary>
     public class SearchAddressRequest
     {
-        private GlobalConstants.Gazetteer _gazetteer;
+        private string _gazetteer;
 
         public SearchAddressRequest()
         {
             AddressStatus = "approved preferred";
-            Gazetteer = GlobalConstants.Gazetteer.Both;
+            Gazetteer = GlobalConstants.Gazetteer.Both.ToString();
         }
 
         /// <summary>
@@ -42,18 +35,19 @@ namespace AddressesAPI.V1.Boundary.Requests
         /// <summary>
         /// LOCAL/NATIONAL/BOTH (Defaults to LOCAL)
         /// </summary>
-        public GlobalConstants.Gazetteer Gazetteer
+        public string Gazetteer
         {
             get => _gazetteer;
             set
             {
+                //This logic needs reworking
                 _gazetteer = value;
 
-                if (_gazetteer == GlobalConstants.Gazetteer.Local)
+                if (_gazetteer == GlobalConstants.Gazetteer.Hackney.ToString())
                 {
                     HackneyGazetteerOutOfBoroughAddress = false;
                 }
-                else if (_gazetteer == GlobalConstants.Gazetteer.Both)
+                else if (_gazetteer == GlobalConstants.Gazetteer.Both.ToString())
                 {
                     HackneyGazetteerOutOfBoroughAddress = null;
                 }
@@ -93,7 +87,7 @@ namespace AddressesAPI.V1.Boundary.Requests
         /// <summary>
         /// Allows a switch between simple and detailed address
         /// </summary>
-        public GlobalConstants.Format Format { get; set; }
+        public string Format { get; set; } = "Simple";
 
         /// <summary>
         /// Allows switch between address statuses:

@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AddressesAPI.Tests.V1.Helper;
 using AddressesAPI.V1;
 using AddressesAPI.V1.Boundary.Requests;
 using AddressesAPI.V1.Boundary.Responses;
 using AddressesAPI.V1.Boundary.Responses.Metadata;
 using AddressesAPI.V1.Domain;
+using AddressesAPI.V1.Factories;
 using AddressesAPI.V1.Gateways;
 using AddressesAPI.V1.UseCase;
 using AddressesAPI.V1.UseCase.Interfaces;
@@ -49,21 +48,37 @@ namespace AddressesAPI.Tests.V1.UseCase
             };
 
             var postcode = "RM3 0FS";
-            var gazetteer = "LOCAL";
             var request = new SearchAddressRequest
             {
                 PostCode = postcode,
-                Gazetteer = GlobalConstants.Gazetteer.Local
+                Gazetteer = GlobalConstants.Gazetteer.Hackney.ToString()
             };
             _fakeGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(i =>
-                    i.Postcode.Equals("RM3 0FS") && i.Gazetteer == GlobalConstants.Gazetteer.Local)))
+                    i.Postcode.Equals(postcode) && i.Gazetteer == GlobalConstants.Gazetteer.Hackney)))
                 .Returns((addresses, 1));
 
             var response = _classUnderTest.ExecuteAsync(request);
             response.Should().NotBeNull();
             response.Addresses.Count.Should().Equals(1);
             response.TotalCount.Should().Equals(1);
-            response.Addresses[0].Gazetteer.Should().Equals(gazetteer);
+            response.Addresses.Should().BeEquivalentTo(addresses.ToResponse());
+        }
+
+        [Test]
+        public void GivenLocalGazetteer_WhenExecuteAsync_InterpretsThisAsHackneyGazetteer()
+        {
+            SetupValidatorToReturnValid();
+            var request = new SearchAddressRequest
+            {
+                PostCode = "RM3 0FS",
+                Gazetteer = "Local"
+            };
+            _fakeGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(i =>
+                    i.Gazetteer == GlobalConstants.Gazetteer.Hackney)))
+                .Returns((new List<Address>(), 1)).Verifiable();
+
+            _classUnderTest.ExecuteAsync(request);
+            _fakeGateway.Verify();
         }
 
         [Test]

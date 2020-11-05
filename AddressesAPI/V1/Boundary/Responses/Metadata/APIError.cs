@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using LBHAddressesAPI.Infrastructure.V1.Validation;
 
 namespace AddressesAPI.V1.Boundary.Responses.Metadata
 {

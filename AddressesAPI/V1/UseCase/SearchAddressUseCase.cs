@@ -1,3 +1,4 @@
+using System;
 using AddressesAPI.V1.Boundary.Requests;
 using AddressesAPI.V1.Boundary.Responses;
 using AddressesAPI.V1.Boundary.Responses.Metadata;
@@ -12,7 +13,7 @@ namespace AddressesAPI.V1.UseCase
     public class SearchAddressUseCase : ISearchAddressUseCase
     {
         private readonly IAddressesGateway _addressGateway;
-        private ISearchAddressValidator _requestValidator;
+        private readonly ISearchAddressValidator _requestValidator;
 
         public SearchAddressUseCase(IAddressesGateway addressesGateway, ISearchAddressValidator requestValidator)
         {
@@ -25,7 +26,7 @@ namespace AddressesAPI.V1.UseCase
             var validation = _requestValidator.Validate(request);
             if (!validation.IsValid)
             {
-                throw new BadRequestException(new RequestValidationResponse(validation));
+                throw new BadRequestException(validation);
             }
             var searchParameters = MapRequestToSearchParameters(request);
             var (results, totalCount) = _addressGateway.SearchAddresses(searchParameters);
@@ -44,10 +45,13 @@ namespace AddressesAPI.V1.UseCase
 
         private static SearchParameters MapRequestToSearchParameters(SearchAddressRequest request)
         {
+            var gazetteer = request.Gazetteer.ToLower() == "local"
+                ? GlobalConstants.Gazetteer.Hackney
+                : Enum.Parse<GlobalConstants.Gazetteer>(request.Gazetteer, true);
             return new SearchParameters
             {
-                Format = request.Format,
-                Gazetteer = request.Gazetteer,
+                Format = Enum.Parse<GlobalConstants.Format>(request.Format, true),
+                Gazetteer = gazetteer,
                 Page = request.Page == 0 ? 1 : request.Page,
                 Postcode = request.PostCode,
                 Street = request.Street,
