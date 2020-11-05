@@ -19,7 +19,7 @@ namespace AddressesAPI.Tests.V1.Helper
             {
                 Format = GlobalConstants.Format.Simple,
                 Postcode = "",
-                Gazetteer = GlobalConstants.Gazetteer.Hackney
+                Gazetteer = GlobalConstants.Gazetteer.Local
             };
 
             var response = QueryBuilder.GetSearchAddressQuery(request, true, true, false, ref dbArgs);

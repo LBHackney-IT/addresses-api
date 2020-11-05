@@ -51,10 +51,10 @@ namespace AddressesAPI.Tests.V1.UseCase
             var request = new SearchAddressRequest
             {
                 PostCode = postcode,
-                Gazetteer = GlobalConstants.Gazetteer.Hackney.ToString()
+                Gazetteer = GlobalConstants.Gazetteer.Local.ToString()
             };
             _fakeGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(i =>
-                    i.Postcode.Equals(postcode) && i.Gazetteer == GlobalConstants.Gazetteer.Hackney)))
+                    i.Postcode.Equals(postcode) && i.Gazetteer == GlobalConstants.Gazetteer.Local)))
                 .Returns((addresses, 1));
 
             var response = _classUnderTest.ExecuteAsync(request);
@@ -62,23 +62,6 @@ namespace AddressesAPI.Tests.V1.UseCase
             response.Addresses.Count.Should().Equals(1);
             response.TotalCount.Should().Equals(1);
             response.Addresses.Should().BeEquivalentTo(addresses.ToResponse());
-        }
-
-        [Test]
-        public void GivenLocalGazetteer_WhenExecuteAsync_InterpretsThisAsHackneyGazetteer()
-        {
-            SetupValidatorToReturnValid();
-            var request = new SearchAddressRequest
-            {
-                PostCode = "RM3 0FS",
-                Gazetteer = "Local"
-            };
-            _fakeGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(i =>
-                    i.Gazetteer == GlobalConstants.Gazetteer.Hackney)))
-                .Returns((new List<Address>(), 1)).Verifiable();
-
-            _classUnderTest.ExecuteAsync(request);
-            _fakeGateway.Verify();
         }
 
         [Test]

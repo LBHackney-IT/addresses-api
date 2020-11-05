@@ -36,7 +36,7 @@ namespace AddressesAPI.Tests.V1.Controllers
         }
 
 
-        [TestCase("RM3 0FS", GlobalConstants.Gazetteer.Hackney)]
+        [TestCase("RM3 0FS", GlobalConstants.Gazetteer.Local)]
         [TestCase("IG11 7QD", GlobalConstants.Gazetteer.Both)]
         public void GivenValidSearchAddressRequest_WhenCallingGet_ThenShouldReturnAPIResponseListOfAddresses(string postcode, GlobalConstants.Gazetteer gazetteer)
         {

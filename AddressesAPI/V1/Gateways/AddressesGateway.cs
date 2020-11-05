@@ -92,8 +92,6 @@ namespace AddressesAPI.V1.Gateways
                     .ToArray())
                 .Where(a => request.Gazetteer == GlobalConstants.Gazetteer.Both
                             || EF.Functions.ILike(a.Gazetteer, request.Gazetteer.ToString())
-                            || request.Gazetteer == GlobalConstants.Gazetteer.Hackney
-                                && EF.Functions.ILike(a.Gazetteer, "local")
                             )
                 .Where(a => request.HackneyGazetteerOutOfBoroughAddress == null ||
                             request.HackneyGazetteerOutOfBoroughAddress == a.NeverExport);

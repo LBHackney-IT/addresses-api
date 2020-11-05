@@ -15,7 +15,7 @@ namespace AddressesAPI.Tests.V1
         public void SetUp()
         {
             _bothGazetteers = GlobalConstants.Gazetteer.Both.ToString();
-            _localGazetteer = GlobalConstants.Gazetteer.Hackney.ToString();
+            _localGazetteer = GlobalConstants.Gazetteer.Local.ToString();
         }
         #region Gazetteer
         [Test]

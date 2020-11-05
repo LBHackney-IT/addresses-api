@@ -282,7 +282,7 @@ namespace AddressesAPI.V1.Infrastructure
                 }
             }
 
-            if (request.Gazetteer == GlobalConstants.Gazetteer.Hackney)//Gazetteer
+            if (request.Gazetteer == GlobalConstants.Gazetteer.Local)//Gazetteer
             {
                 dbArgs.Add("@gazetteer", request.Gazetteer.ToString(), DbType.AnsiString);
                 dbArgs.Add("@neverexport", request.HackneyGazetteerOutOfBoroughAddress, DbType.Boolean);

@@ -352,10 +352,8 @@ namespace AddressesAPI.Tests.V1.Gateways
             addresses.First().Should().BeEquivalentTo(savedAddress.ToDomain());
         }
 
-        [TestCase("Local")] //To be depreciated
-        [TestCase("local")] //To be depreciated
-        [TestCase("Hackney")]
-        [TestCase("hackney")]
+        [TestCase("Local")]
+        [TestCase("local")]
         public void CanSearchOnlyLocalHackneyAddressesCaseInsensitively(string gazetteer)
         {
             var savedAddress = TestEfDataHelper.InsertAddress(DatabaseContext,
@@ -369,7 +367,7 @@ namespace AddressesAPI.Tests.V1.Gateways
                 Page = 1,
                 PageSize = 50,
                 Format = GlobalConstants.Format.Detailed,
-                Gazetteer = GlobalConstants.Gazetteer.Hackney,
+                Gazetteer = GlobalConstants.Gazetteer.Local,
             };
             var (addresses, _) = _classUnderTest.SearchAddresses(request);
 

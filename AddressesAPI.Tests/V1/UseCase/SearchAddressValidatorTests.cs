@@ -16,7 +16,7 @@ namespace AddressesAPI.Tests.V1.UseCase
         [SetUp]
         public void SetUp()
         {
-            _localGazetteer = GlobalConstants.Gazetteer.Hackney.ToString();
+            _localGazetteer = GlobalConstants.Gazetteer.Local.ToString();
             _classUnderTest = new SearchAddressValidator();
         }
 
@@ -382,8 +382,7 @@ namespace AddressesAPI.Tests.V1.UseCase
                 .WithErrorMessage("Value for the parameter is not valid. It should be either Hackney or Both.");
         }
 
-        [TestCase("Hackney")]
-        [TestCase("Local")] // To be depreciated
+        [TestCase("Local")]
         [TestCase("Both")]
         public void GivenACorrectGazetteer_WhenValidating_ItReturnsNoErrors(string gazetteer)
         {

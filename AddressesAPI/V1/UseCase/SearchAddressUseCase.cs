@@ -45,13 +45,10 @@ namespace AddressesAPI.V1.UseCase
 
         private static SearchParameters MapRequestToSearchParameters(SearchAddressRequest request)
         {
-            var gazetteer = request.Gazetteer.ToLower() == "local"
-                ? GlobalConstants.Gazetteer.Hackney
-                : Enum.Parse<GlobalConstants.Gazetteer>(request.Gazetteer, true);
             return new SearchParameters
             {
                 Format = Enum.Parse<GlobalConstants.Format>(request.Format, true),
-                Gazetteer = gazetteer,
+                Gazetteer = Enum.Parse<GlobalConstants.Gazetteer>(request.Gazetteer, true),
                 Page = request.Page == 0 ? 1 : request.Page,
                 Postcode = request.PostCode,
                 Street = request.Street,
