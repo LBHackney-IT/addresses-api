@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AddressesAPI.V2.Controllers
 {
-    [ApiVersion("1")]
+    [ApiVersion("2")]
     [Produces("application/json")]
     [Route("api/v2/addresses")]
     public class GetAddressController : V1.Controllers.BaseController
