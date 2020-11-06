@@ -1,3 +1,4 @@
+using System;
 using AddressesAPI.V2.Boundary.Requests;
 using AddressesAPI.V2.Boundary.Responses;
 using AddressesAPI.V2.Boundary.Responses.Metadata;
@@ -33,9 +34,20 @@ namespace AddressesAPI.V2.Controllers
         public IActionResult GetAddressCrossReference(long uprn)
         {
             var request = new GetAddressCrossReferenceRequest { uprn = uprn };
-            var response = _getAddressCrossReferenceUseCase.ExecuteAsync(request);
-            //We convert the result to an APIResponse via extensions on BaseController
-            return HandleResponse(response);
+            try
+            {
+                var response = _getAddressCrossReferenceUseCase.ExecuteAsync(request);
+                if (response == null)
+                {
+                    return new NotFoundResult();
+                }
+                return new OkObjectResult(new APIResponse<GetAddressCrossReferenceResponse>(response));
+            }
+            catch (BadRequestException e)
+            {
+                return new BadRequestObjectResult(e.ValidationResponse);
+            }
+
         }
     }
 }

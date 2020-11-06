@@ -23,21 +23,36 @@ namespace AddressesAPI.Tests.V2.Controllers
         }
 
         [Test]
-        public void GivenValidSearchAddressRequest_WhenCallingGet_ThenShouldReturn200()
+        public void GivenValidAddressKey_WhenCallingGet_ThenShouldReturn200()
         {
             _mock.Setup(s => s.ExecuteAsync(It.IsAny<GetAddressRequest>()))
                 .Returns(new SearchAddressResponse
                 {
-                    Addresses = new List<AddressResponse>()
+                    Addresses = new List<AddressResponse>{new AddressResponse()}
                 });
             var lpi_key = "ABCDEFGHIJKLMN";
 
             var response = _classUnderTest.GetAddress(lpi_key);
 
             response.Should().NotBeNull();
-            response.Should().BeOfType<ObjectResult>();
-            var objectResult = response as ObjectResult;
+            response.Should().BeOfType<OkObjectResult>();
+            var objectResult = response as OkObjectResult;
             objectResult.StatusCode.Should().Be(200);
+        }
+
+        [Test]
+        public void WhenNoAddressIsProvidedByTheUsecase_ThenShouldReturn404()
+        {
+            _mock.Setup(s => s.ExecuteAsync(It.IsAny<GetAddressRequest>()))
+                .Returns(new SearchAddressResponse());
+            var lpi_key = "ABCDEFGHIJKLMN";
+
+            var response = _classUnderTest.GetAddress(lpi_key);
+
+            response.Should().NotBeNull();
+            response.Should().BeOfType<NotFoundResult>();
+            var objectResult = response as NotFoundResult;
+            objectResult.StatusCode.Should().Be(404);
         }
     }
 }

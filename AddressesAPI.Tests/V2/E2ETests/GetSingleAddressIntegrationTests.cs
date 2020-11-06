@@ -21,7 +21,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
             var addressId = _faker.Random.String2(14);
             TestEfDataHelper.InsertAddress(DatabaseContext, addressId);
 
-            var url = new Uri($"api/v1/addresses/{addressId}", UriKind.Relative);
+            var url = new Uri($"api/v2/addresses/{addressId}", UriKind.Relative);
 
             var response = await Client.GetAsync(url).ConfigureAwait(true);
 
@@ -38,7 +38,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
 
             TestEfDataHelper.InsertAddress(DatabaseContext, addressId, addressRecord);
 
-            var url = new Uri($"api/v1/addresses/{addressId}", UriKind.Relative);
+            var url = new Uri($"api/v2/addresses/{addressId}", UriKind.Relative);
 
             var response = await Client.GetAsync(url).ConfigureAwait(true);
 
@@ -59,10 +59,8 @@ namespace AddressesAPI.Tests.V2.E2ETests
             returnedRecord.Postcode.Should().BeEquivalentTo(addressRecord.Postcode);
         }
 
-        //TODO: We would want this to return 400 rather than 500
-
         [Test]
-        public async Task GetAddressReturns500WhenAddressIdParameterIsNot14Characters()
+        public async Task GetAddressReturns400WhenAddressIdParameterIsNot14Characters()
         {
 
             var addressId = _faker.Random.String2(14);
@@ -70,23 +68,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
 
             var incorrectLength = addressId.Substring(0, 10);
 
-            var url = new Uri($"api/v1/addresses/{incorrectLength}", UriKind.Relative);
-
-            var response = await Client.GetAsync(url).ConfigureAwait(true);
-
-            response.StatusCode.Should().Be(500);
-            response.ReasonPhrase.Should().Be("Internal Server Error");
-        }
-
-        [Test]
-        public async Task GetAddressReturns400IfAddressIdParameterIsEmpty()
-        {
-
-            var addressId = _faker.Random.String2(14);
-            TestEfDataHelper.InsertAddress(DatabaseContext, addressId);
-
-            const string emptyId = "";
-            var url = new Uri($"api/v1/addresses/{emptyId}", UriKind.Relative);
+            var url = new Uri($"api/v2/addresses/{incorrectLength}", UriKind.Relative);
 
             var response = await Client.GetAsync(url).ConfigureAwait(true);
 
@@ -94,7 +76,21 @@ namespace AddressesAPI.Tests.V2.E2ETests
             response.ReasonPhrase.Should().Be("Bad Request");
         }
 
-        //TODO: We would want this to return a 404 rather than 200
+        [Test]
+        public async Task GetAddressReturns400IfAddressIdParameterIsEmpty()
+        {
+            var addressId = _faker.Random.String2(14);
+            TestEfDataHelper.InsertAddress(DatabaseContext, addressId);
+
+            const string emptyId = "";
+            var url = new Uri($"api/v2/addresses/{emptyId}", UriKind.Relative);
+
+            var response = await Client.GetAsync(url).ConfigureAwait(true);
+
+            response.StatusCode.Should().Be(400);
+            response.ReasonPhrase.Should().Be("Bad Request");
+        }
+
         [Test]
         public async Task GetAddressReturnsNoAddressesIfAddressIdParameterDoesNotMatchARecordInTheDatabase()
         {
@@ -104,15 +100,11 @@ namespace AddressesAPI.Tests.V2.E2ETests
 
             var differentId = _faker.Random.String2(14);
 
-            var url = new Uri($"api/v1/addresses/{differentId}", UriKind.Relative);
+            var url = new Uri($"api/v2/addresses/{differentId}", UriKind.Relative);
 
             var response = await Client.GetAsync(url).ConfigureAwait(true);
 
-            response.StatusCode.Should().Be(200);
-
-            var convertedResponse = await response.ConvertToSearchAddressResponseObject().ConfigureAwait(true);
-
-            convertedResponse.Data.Addresses.Should().BeNull();
+            response.StatusCode.Should().Be(404);
         }
     }
 }

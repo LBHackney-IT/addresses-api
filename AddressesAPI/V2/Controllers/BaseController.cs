@@ -28,12 +28,5 @@ namespace AddressesAPI.V2.Controllers
                 return settings;
             };
         }
-
-        protected IActionResult HandleResponse<T>(T result) where T : class
-        {
-            var apiResponse = new APIResponse<T>(result);
-            //Set a statusCode as well as an object
-            return StatusCode(apiResponse.StatusCode, apiResponse);
-        }
     }
 }

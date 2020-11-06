@@ -38,10 +38,27 @@ namespace AddressesAPI.Tests.V2.Controllers
             var response = _classUnderTest.GetAddressCrossReference(uprn);
             //assert
             response.Should().NotBeNull();
-            response.Should().BeOfType<ObjectResult>();
-            var objectResult = response as ObjectResult;
+            response.Should().BeOfType<OkObjectResult>();
+            var objectResult = response as OkObjectResult;
             var getAddresses = objectResult?.Value as APIResponse<GetAddressCrossReferenceResponse>;
             getAddresses.Should().NotBeNull();
+        }
+
+        [Test]
+        public void IfPropertyCanNotBeFound_ReturnsA404StatusCode()
+        {
+            //arrange
+            _mock.Setup(s => s.ExecuteAsync(It.IsAny<GetAddressCrossReferenceRequest>()))
+                .Returns((GetAddressCrossReferenceResponse) null);
+            long uprn = 12345;
+
+            //act
+            var response = _classUnderTest.GetAddressCrossReference(uprn);
+            //assert
+            response.Should().NotBeNull();
+            response.Should().BeOfType<NotFoundResult>();
+            var objectResult = response as NotFoundResult;
+            objectResult.StatusCode.Should().Be(404);
         }
     }
 }

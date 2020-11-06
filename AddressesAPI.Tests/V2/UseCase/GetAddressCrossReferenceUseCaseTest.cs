@@ -137,6 +137,12 @@ namespace AddressesAPI.Tests.V2.UseCase
             testDelegate.Should().Throw<BadRequestException>();
         }
 
+        [Test]
+        public void If()
+        {
+            
+        }
+
         private void SetupValidatorToReturnValid(bool valid = true)
         {
             var result = new Mock<ValidationResult>();

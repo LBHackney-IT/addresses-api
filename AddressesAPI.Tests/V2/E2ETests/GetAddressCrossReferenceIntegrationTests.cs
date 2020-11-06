@@ -24,7 +24,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
             var uprn = _faker.Random.Int();
             TestEfDataHelper.InsertCrossReference(DatabaseContext, uprn);
 
-            var url = new Uri($"api/v1/properties/{uprn}/crossreferences", UriKind.Relative);
+            var url = new Uri($"api/v2/properties/{uprn}/crossreferences", UriKind.Relative);
             var response = await Client.GetAsync(url).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);
 
@@ -42,7 +42,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
                                                .Create();
             TestEfDataHelper.InsertCrossReference(DatabaseContext, uprn, record);
 
-            var url = new Uri($"api/v1/properties/{uprn}/crossreferences", UriKind.Relative);
+            var url = new Uri($"api/v2/properties/{uprn}/crossreferences", UriKind.Relative);
             var response = await Client.GetAsync(url).ConfigureAwait(true);
             var apiResponse = await ConvertToCrossReferenceResponseObject(response).ConfigureAwait(true);
 
@@ -55,22 +55,21 @@ namespace AddressesAPI.Tests.V2.E2ETests
             recordReturned.EndDate.Value.Date.Should().Be(record.EndDate.Value.Date);
         }
         [Test]
-        public async Task Get404WhenUPRNIsNotProvided()
+        public async Task Get400WhenUPRNIsNotProvided()
         {
             var uprn = _faker.Random.Int();
             TestEfDataHelper.InsertCrossReference(DatabaseContext, uprn);
 
-            var url = new Uri($"api/v1/properties/crossreferences", UriKind.Relative);
+            var url = new Uri($"api/v2/properties/crossreferences", UriKind.Relative);
             var response = await Client.GetAsync(url).ConfigureAwait(true);
-            response.StatusCode.Should().Be(404);
+            response.StatusCode.Should().Be(400);
         }
 
-        [Ignore("This needs to be implemented")]
         [Test]
         public async Task Get404WhenAddressCannotBeFound()
         {
             var uprn = _faker.Random.Int();
-            var url = new Uri($"api/v1/properties/{uprn}/crossreferences", UriKind.Relative);
+            var url = new Uri($"api/v2/properties/{uprn}/crossreferences", UriKind.Relative);
             var response = await Client.GetAsync(url).ConfigureAwait(true);
             response.StatusCode.Should().Be(404);
         }

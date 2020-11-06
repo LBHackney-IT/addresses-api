@@ -1,3 +1,12 @@
+
+# Get Address
+
+If an address can not be found for the address key provided, the API will now return a 404 status code instead of a 200 status code.
+
+Returns a 404 if address cant be found
+Returns a 400 if address key is invalid
+
+# Search Addresses
 ## Changes to Address Response Object
 
 Currently the address response object looks like:
