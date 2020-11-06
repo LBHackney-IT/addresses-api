@@ -167,10 +167,9 @@ namespace AddressesAPI
             app.UseCors(builder => builder
                 .AllowAnyOrigin()
                 .AllowAnyHeader()
-                .AllowCredentials()
                 .WithMethods("GET"));
 
-        if (env.IsDevelopment())
+            if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
