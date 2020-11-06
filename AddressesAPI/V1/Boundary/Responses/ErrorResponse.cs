@@ -15,9 +15,6 @@ namespace AddressesAPI.V1.Boundary.Responses
         [JsonProperty("error")]
         public APIError Error { get; set; }
 
-        [JsonProperty("errors")]
-        public ValidationError Errors { get; set; }
-
         public ErrorResponse() { }
 
         public ErrorResponse(ValidationResult validationResult)

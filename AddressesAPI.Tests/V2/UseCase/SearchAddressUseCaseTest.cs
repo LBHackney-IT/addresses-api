@@ -178,7 +178,7 @@ namespace AddressesAPI.Tests.V2.UseCase
             var response = _classUnderTest.ExecuteAsync(request);
 
             response.Should().NotBeNull();
-            response.Addresses[0].AddressShouldEqual(address);
+            response.Addresses[0].Should().BeEquivalentTo(address.ToResponse());
         }
 
         [Test]

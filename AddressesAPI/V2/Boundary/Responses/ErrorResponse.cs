@@ -11,11 +11,8 @@ namespace AddressesAPI.V2.Boundary.Responses
         [JsonProperty("statusCode")]
         public int StatusCode { get; set; }
 
-        [JsonProperty("error")]
-        public APIError Error { get; set; }
-
         [JsonProperty("errors")]
-        public ValidationError Errors { get; set; }
+        public IEnumerable<ValidationError> Errors { get; set; }
 
         public ErrorResponse() { }
 
@@ -24,12 +21,12 @@ namespace AddressesAPI.V2.Boundary.Responses
             var errors = validationResult.Errors
                 .Select(validationResultError => new ValidationError(validationResultError)).ToList();
 
-            Error = new APIError { IsValid = validationResult.IsValid, ValidationErrors = errors };
+            Errors = errors;
         }
 
         public ErrorResponse(IList<ValidationError> validationResult)
         {
-            Error = new APIError { IsValid = !validationResult.Any(), ValidationErrors = validationResult };
+            Errors = validationResult;
         }
     }
 }

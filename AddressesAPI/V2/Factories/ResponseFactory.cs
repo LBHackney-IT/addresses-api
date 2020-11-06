@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using AddressesAPI.V2.Boundary.Responses.Data;
@@ -33,7 +34,7 @@ namespace AddressesAPI.V2.Factories
                 AddressKey = domain.AddressKey,
                 USRN = domain.USRN,
                 ParentUPRN = domain.ParentUPRN,
-                AddressStatus = domain.AddressStatus,
+                AddressStatus = MapAddressStatus(domain.AddressStatus),
                 UnitName = domain.UnitName,
                 UnitNumber = domain.UnitNumber,
                 BuildingName = domain.BuildingName,
@@ -60,6 +61,14 @@ namespace AddressesAPI.V2.Factories
                 PropertyEndDate = domain.PropertyEndDate,
                 PropertyChangeDate = domain.PropertyChangeDate,
             };
+        }
+
+        private static string MapAddressStatus(string domainStatus)
+        {
+            if (domainStatus == null) return null;
+            return domainStatus.Equals("Approved Preferred", StringComparison.InvariantCultureIgnoreCase)
+                ? "Approved"
+                : domainStatus;
         }
 
         public static List<AddressCrossReferenceResponse> ToResponse(this IEnumerable<AddressCrossReferenceDomain> domainList)

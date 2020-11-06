@@ -82,7 +82,7 @@ namespace AddressesAPI.Tests.V2.UseCase
                 UPRN = 10024389298,
                 USRN = 21320239,
                 ParentUPRN = 10024389282,
-                AddressStatus = "Approved Preferred",
+                AddressStatus = "Historical",
                 UnitName = "FLAT 16",
                 UnitNumber = "",
                 BuildingName = "HAZELNUT COURT",

@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using AddressesAPI.Infrastructure;
 using AddressesAPI.Tests.V2.Helper;
-using AddressesAPI.V1.Boundary.Responses.Metadata;
+using AddressesAPI.V2.Boundary.Responses.Metadata;
 using AutoFixture;
 using Bogus;
 using FluentAssertions;
@@ -42,7 +42,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
 
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);
-            var returnedAddress = await ConvertToSearchAddressResponseObject(response).ConfigureAwait(true);
+            var returnedAddress = await response.ConvertToSearchAddressResponseObject().ConfigureAwait(true);
             returnedAddress.Data.Addresses.Count.Should().Be(1);
             returnedAddress.Data.Addresses.First().AddressKey.Should().Be(addressKey);
         }
@@ -63,7 +63,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);
 
-            var returnedAddress = await ConvertToSearchAddressResponseObject(response).ConfigureAwait(true);
+            var returnedAddress = await response.ConvertToSearchAddressResponseObject().ConfigureAwait(true);
             returnedAddress.Data.Addresses.Count.Should().Be(1);
             returnedAddress.Data.Addresses.First().AddressKey.Should().Be(addressKey);
         }
@@ -85,7 +85,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);
 
-            var returnedAddress = await ConvertToSearchAddressResponseObject(response).ConfigureAwait(true);
+            var returnedAddress = await response.ConvertToSearchAddressResponseObject().ConfigureAwait(true);
             returnedAddress.Data.Addresses.Count.Should().Be(1);
             returnedAddress.Data.Addresses.First().AddressKey.Should().Be(addressKey);
         }
@@ -141,7 +141,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);
 
-            var returnedAddress = await ConvertToSearchAddressResponseObject(response).ConfigureAwait(true);
+            var returnedAddress = await response.ConvertToSearchAddressResponseObject().ConfigureAwait(true);
             returnedAddress.Data.Addresses.Count.Should().Be(1);
             returnedAddress.Data.Addresses.First().AddressKey.Should().Be(addressKey);
         }
@@ -162,9 +162,8 @@ namespace AddressesAPI.Tests.V2.E2ETests
         {
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(400);
-            var errors = await ConvertToErrorResponseObject(response).ConfigureAwait(true);
-            errors.Error.IsValid.Should().BeFalse();
-            errors.Error.ValidationErrors.Should().ContainEquivalentOf(
+            var errors = await response.ConvertToErrorResponseObject().ConfigureAwait(true);
+            errors.Errors.Should().ContainEquivalentOf(
                 new ValidationError { Message = message, FieldName = fieldName }
             );
         }
@@ -183,7 +182,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
 
         private async Task<HttpResponseMessage> CallEndpointWithQueryParameters(string query)
         {
-            var url = new Uri($"api/v1/addresses?{query}", UriKind.Relative);
+            var url = new Uri($"api/v2/addresses?{query}", UriKind.Relative);
             return await Client.GetAsync(url).ConfigureAwait(true);
         }
     }

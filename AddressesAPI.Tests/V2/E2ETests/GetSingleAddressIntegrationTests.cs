@@ -44,7 +44,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
 
             response.StatusCode.Should().Be(200);
 
-            var apiResponse = await ConvertToSearchAddressResponseObject(response).ConfigureAwait(true);
+            var apiResponse = await response.ConvertToSearchAddressResponseObject().ConfigureAwait(true);
 
             var returnedRecord = apiResponse.Data.Addresses.FirstOrDefault();
 
@@ -110,7 +110,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
 
             response.StatusCode.Should().Be(200);
 
-            var convertedResponse = await ConvertToSearchAddressResponseObject(response).ConfigureAwait(true);
+            var convertedResponse = await response.ConvertToSearchAddressResponseObject().ConfigureAwait(true);
 
             convertedResponse.Data.Addresses.Should().BeNull();
         }
