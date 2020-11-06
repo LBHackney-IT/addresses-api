@@ -29,6 +29,7 @@ functions:
           path: /{proxy+}
           method: ANY
           private: true
+          cors: true
 resources:
   Resources:
     lambdaExecutionRole:
