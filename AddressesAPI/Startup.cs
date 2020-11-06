@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using AddressesAPI.Infrastructure;
 using AddressesAPI.V1.Gateways;
-using AddressesAPI.V1.Infrastructure;
 using AddressesAPI.V1.UseCase;
 using AddressesAPI.V1.UseCase.Interfaces;
 using AddressesAPI.Versioning;
@@ -114,8 +114,10 @@ namespace AddressesAPI
                     c.IncludeXmlComments(xmlPath);
             });
             ConfigureDbContext(services);
-            RegisterGateways(services);
-            RegisterUseCases(services);
+            RegisterV1Gateways(services);
+            RegisterV2Gateways(services);
+            RegisterV1UseCases(services);
+            RegisterV2UseCases(services);
         }
 
         private static void ConfigureDbContext(IServiceCollection services)
@@ -126,13 +128,19 @@ namespace AddressesAPI
                 opt => opt.UseNpgsql(connectionString));
         }
 
-        private static void RegisterGateways(IServiceCollection services)
+        private static void RegisterV1Gateways(IServiceCollection services)
         {
             services.AddScoped<IAddressesGateway, AddressesGateway>();
             services.AddScoped<ICrossReferencesGateway, CrossReferencesGateway>();
         }
 
-        private static void RegisterUseCases(IServiceCollection services)
+        private static void RegisterV2Gateways(IServiceCollection services)
+        {
+            services.AddScoped<V2.Gateways.IAddressesGateway, V2.Gateways.AddressesGateway>();
+            services.AddScoped<V2.Gateways.ICrossReferencesGateway, V2.Gateways.CrossReferencesGateway>();
+        }
+
+        private static void RegisterV1UseCases(IServiceCollection services)
         {
             services.AddScoped<ISearchAddressValidator, SearchAddressValidator>();
             services.AddScoped<ISearchAddressUseCase, SearchAddressUseCase>();
@@ -140,6 +148,16 @@ namespace AddressesAPI
             services.AddScoped<IGetCrossReferenceRequestValidator, GetCrossReferenceRequestValidator>();
             services.AddScoped<IGetSingleAddressUseCase, GetSingleAddressUseCase>();
             services.AddScoped<IGetAddressCrossReferenceUseCase, GetAddressCrossReferenceUseCase>();
+        }
+
+        private static void RegisterV2UseCases(IServiceCollection services)
+        {
+            services.AddScoped<V2.UseCase.Interfaces.ISearchAddressValidator, V2.UseCase.SearchAddressValidator>();
+            services.AddScoped<V2.UseCase.Interfaces.ISearchAddressUseCase, V2.UseCase.SearchAddressUseCase>();
+            services.AddScoped<V2.UseCase.Interfaces.IGetAddressRequestValidator, V2.UseCase.GetAddressRequestValidator>();
+            services.AddScoped<V2.UseCase.Interfaces.IGetCrossReferenceRequestValidator, V2.UseCase.GetCrossReferenceRequestValidator>();
+            services.AddScoped<V2.UseCase.Interfaces.IGetSingleAddressUseCase, V2.UseCase.GetSingleAddressUseCase>();
+            services.AddScoped<V2.UseCase.Interfaces.IGetAddressCrossReferenceUseCase, V2.UseCase.GetAddressCrossReferenceUseCase>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
+using AddressesAPI.Infrastructure;
 using AddressesAPI.V1.Domain;
 using AddressesAPI.V1.Factories;
-using AddressesAPI.V1.Infrastructure;
 
 namespace AddressesAPI.V1.Gateways
 {

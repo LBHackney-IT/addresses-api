@@ -7,7 +7,6 @@ using AddressesAPI.V1.Boundary.Responses;
 using AddressesAPI.V1.Boundary.Responses.Metadata;
 using AddressesAPI.V1.Domain;
 using AddressesAPI.V1.Gateways;
-using AddressesAPI.V1.Infrastructure;
 using AddressesAPI.V1.UseCase;
 using AddressesAPI.V1.UseCase.Interfaces;
 using FluentAssertions;

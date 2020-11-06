@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using AddressesAPI.Infrastructure;
 using AddressesAPI.V1.Domain;
 using AddressesAPI.V1.Factories;
-using AddressesAPI.V1.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Address = AddressesAPI.V1.Domain.Address;
 
@@ -38,7 +38,7 @@ namespace AddressesAPI.V1.Gateways
             return (addresses, totalCount);
         }
 
-        private static IQueryable<Infrastructure.Address> PageAddresses(IQueryable<Infrastructure.Address> query,
+        private static IQueryable<AddressesAPI.Infrastructure.Address> PageAddresses(IQueryable<AddressesAPI.Infrastructure.Address> query,
             int pageSize, int page)
         {
             var pageOffset = pageSize * (page == 0 ? 0 : page - 1);
@@ -47,7 +47,7 @@ namespace AddressesAPI.V1.Gateways
                 .Take(pageSize);
         }
 
-        private static IQueryable<Infrastructure.Address> OrderAddresses(IQueryable<Infrastructure.Address> query)
+        private static IQueryable<AddressesAPI.Infrastructure.Address> OrderAddresses(IQueryable<AddressesAPI.Infrastructure.Address> query)
         {
             return query.OrderBy(a => a.Town)
                 .ThenBy(a => a.Postcode == null)
@@ -64,7 +64,7 @@ namespace AddressesAPI.V1.Gateways
                 .ThenBy(a => a.UnitName);
         }
 
-        private IQueryable<Infrastructure.Address> CompileBaseSearchQuery(SearchParameters request)
+        private IQueryable<AddressesAPI.Infrastructure.Address> CompileBaseSearchQuery(SearchParameters request)
         {
             var postcodeSearchTerm = request.Postcode == null ? null : $"{request.Postcode.Replace(" ", "")}%";
             var buildingNumberSearchTerm = GenerateSearchTerm(request.BuildingNumber);
@@ -87,7 +87,7 @@ namespace AddressesAPI.V1.Gateways
                 .Where(a => (usageSearchTerms == null || !usageSearchTerms.Any())
                             || usageSearchTerms.Contains(a.UsagePrimary))
                 .WhereAny(usageCodeSearchTerms?.Select(u =>
-                        (Expression<Func<Infrastructure.Address, bool>>) (x =>
+                        (Expression<Func<AddressesAPI.Infrastructure.Address, bool>>) (x =>
                             EF.Functions.ILike(x.UsageCode, $"%{u}%")))
                     .ToArray())
                 .Where(a => request.Gazetteer == GlobalConstants.Gazetteer.Both

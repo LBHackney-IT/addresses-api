@@ -1,5 +1,5 @@
+using AddressesAPI.Infrastructure;
 using AddressesAPI.V1.Domain;
-using AddressesAPI.V1.Infrastructure;
 using Address = AddressesAPI.V1.Domain.Address;
 
 namespace AddressesAPI.V1.Factories
@@ -7,7 +7,7 @@ namespace AddressesAPI.V1.Factories
     public static class EntityFactory
     {
         //TODO: Refactor the next two methods to not be repeated.
-        public static Address ToDomain(this Infrastructure.Address addressEntity)
+        public static Address ToDomain(this AddressesAPI.Infrastructure.Address addressEntity)
         {
             return new Address
             {
@@ -93,7 +93,7 @@ namespace AddressesAPI.V1.Factories
             };
         }
 
-        public static Address ToSimpleDomain(this Infrastructure.Address addressEntity)
+        public static Address ToSimpleDomain(this AddressesAPI.Infrastructure.Address addressEntity)
         {
             return new Address
             {

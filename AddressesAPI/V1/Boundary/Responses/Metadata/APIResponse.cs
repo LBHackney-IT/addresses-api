@@ -1,7 +1,4 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using FluentValidation.Results;
 using Newtonsoft.Json;
 
 namespace AddressesAPI.V1.Boundary.Responses.Metadata
@@ -28,30 +25,6 @@ namespace AddressesAPI.V1.Boundary.Responses.Metadata
         {
             StatusCode = (int) HttpStatusCode.OK;
             Data = result;
-        }
-    }
-
-    public class ErrorResponse
-    {
-        [JsonProperty("statusCode")] public int StatusCode { get; set; }
-
-        [JsonProperty("error")] public APIError Error { get; set; }
-
-        public ErrorResponse()
-        {
-        }
-
-        public ErrorResponse(ValidationResult validationResult)
-        {
-            var errors = validationResult.Errors
-                .Select(validationResultError => new ValidationError(validationResultError)).ToList();
-
-            Error = new APIError { IsValid = validationResult.IsValid, ValidationErrors = errors };
-        }
-
-        public ErrorResponse(IList<ValidationError> validationResult)
-        {
-            Error = new APIError { IsValid = !validationResult.Any(), ValidationErrors = validationResult };
         }
     }
 }

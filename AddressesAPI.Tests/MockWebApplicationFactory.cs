@@ -1,6 +1,6 @@
 using System.Data.Common;
 using AddressesAPI;
-using AddressesAPI.V1.Infrastructure;
+using AddressesAPI.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;

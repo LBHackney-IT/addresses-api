@@ -1,0 +1,13 @@
+using System.Collections.Generic;
+using AddressesAPI.V2.Domain;
+
+namespace AddressesAPI.V2.Gateways
+{
+    public interface IAddressesGateway
+    {
+        Address GetSingleAddress(string addressKey);
+
+        (List<Address>, int) SearchAddresses(SearchParameters request);
+
+    }
+}
