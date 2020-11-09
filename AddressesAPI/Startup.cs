@@ -158,7 +158,7 @@ namespace AddressesAPI
             services.AddScoped<V2.UseCase.Interfaces.IGetAddressRequestValidator, V2.UseCase.GetAddressRequestValidator>();
             services.AddScoped<V2.UseCase.Interfaces.IGetCrossReferenceRequestValidator, V2.UseCase.GetCrossReferenceRequestValidator>();
             services.AddScoped<V2.UseCase.Interfaces.IGetSingleAddressUseCase, V2.UseCase.GetSingleAddressUseCase>();
-            services.AddScoped<V2.UseCase.Interfaces.IGetAddressCrossReferenceUseCase, V2.UseCase.GetAddressCrossReferenceUseCase>();
+            services.AddScoped<V2.UseCase.Interfaces.IGetPropertiesCrossReferenceUseCase, V2.UseCase.GetPropertiesCrossReferenceUseCase>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

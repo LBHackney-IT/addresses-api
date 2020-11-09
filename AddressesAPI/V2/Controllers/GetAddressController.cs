@@ -21,17 +21,27 @@ namespace AddressesAPI.V2.Controllers
         /// <summary>
         /// Returns an address from the given addressID or LPI_Key
         /// </summary>
-        /// <param name="addressId"></param>
+        /// <param name="addressKey"></param>
         /// <returns></returns>
         [HttpGet, MapToApiVersion("1")]
-        [Route("{addressID}")]
+        [Route("{addressKey}")]
         [ProducesResponseType(typeof(APIResponse<SearchAddressResponse>), 200)]
-        public IActionResult GetAddress(string addressId)
+        public IActionResult GetAddress(string addressKey)
         {
-            var request = new GetAddressRequest { addressID = addressId };
-            var response = _getAddressUseCase.ExecuteAsync(request);
-
-            return HandleResponse(response);
+            try
+            {
+                var request = new GetAddressRequest { addressID = addressKey };
+                var response = _getAddressUseCase.ExecuteAsync(request);
+                if (response?.Address == null)
+                {
+                    return new NotFoundResult();
+                }
+                return new OkObjectResult(new APIResponse<GetAddressResponse>(response));
+            }
+            catch (BadRequestException)
+            {
+                return new BadRequestResult();
+            }
         }
 
         ///<summary>

@@ -4,7 +4,7 @@ using FluentValidation;
 
 namespace AddressesAPI.V2.UseCase
 {
-    public class GetCrossReferenceRequestValidator : AbstractValidator<GetAddressCrossReferenceRequest>, IGetCrossReferenceRequestValidator
+    public class GetCrossReferenceRequestValidator : AbstractValidator<GetPropertiesCrossReferenceRequest>, IGetCrossReferenceRequestValidator
     {
         public GetCrossReferenceRequestValidator()
         {

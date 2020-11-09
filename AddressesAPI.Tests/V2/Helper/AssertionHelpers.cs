@@ -38,7 +38,7 @@ namespace AddressesAPI.Tests.V2.Helper
             received.UsagePrimary.Should().BeEquivalentTo(expected.UsagePrimary);
             received.UsageCode.Should().BeEquivalentTo(expected.UsageCode);
             received.PropertyShell.Should().Be(expected.PropertyShell);
-            received.HackneyGazetteerOutOfBoroughAddress.Should().Be(expected.HackneyGazetteerOutOfBoroughAddress);
+            received.OutOfBoroughAddress.Should().Be(expected.OutOfBoroughAddress);
             received.Easting.Should().Be(expected.Easting);
             received.Northing.Should().Be(expected.Northing);
 

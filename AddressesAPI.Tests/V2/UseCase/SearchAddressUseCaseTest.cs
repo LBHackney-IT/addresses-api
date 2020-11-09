@@ -39,18 +39,18 @@ namespace AddressesAPI.Tests.V2.UseCase
             {
                 new Address
                 {
-                    AddressKey = "ABCDEFGHIJKLMN", UPRN = 10024389298,USRN = 21320239,ParentUPRN = 10024389282,AddressStatus = "Approved Preferred",UnitName = "FLAT 16",UnitNumber = "",BuildingName = "HAZELNUT COURT",BuildingNumber = "1",Street = "FIRWOOD LANE",Postcode = "RM3 0FS",Locality = "",Gazetteer = "NATIONAL",CommercialOccupier = "",UsageDescription = "Unclassified, Awaiting Classification",UsagePrimary = "Unclassified", UsageCode = "UC",PropertyShell = false,HackneyGazetteerOutOfBoroughAddress = false,Easting = 554189.4500,Northing = 190281.1000,Longitude = 0.2244347,Latitude = 51.590289
+                    AddressKey = "ABCDEFGHIJKLMN", UPRN = 10024389298,USRN = 21320239,ParentUPRN = 10024389282,AddressStatus = "Approved Preferred",UnitName = "FLAT 16",UnitNumber = "",BuildingName = "HAZELNUT COURT",BuildingNumber = "1",Street = "FIRWOOD LANE",Postcode = "RM3 0FS",Locality = "",Gazetteer = "NATIONAL",CommercialOccupier = "",UsageDescription = "Unclassified, Awaiting Classification",UsagePrimary = "Unclassified", UsageCode = "UC",PropertyShell = false,OutOfBoroughAddress = false,Easting = 554189.4500,Northing = 190281.1000,Longitude = 0.2244347,Latitude = 51.590289
                 },
                 new Address
                 {
-                    AddressKey = "ABCDEFGHIJKLM2", UPRN = 10024389298,USRN = 21320239,ParentUPRN = 10024389282,AddressStatus = "Approved Preferred",UnitName = "FLAT 16",UnitNumber = "",BuildingName = "HAZELNUT COURT",BuildingNumber = "1",Street = "FIRWOOD LANE",Postcode = "RM3 0FS",Locality = "",Gazetteer = "LOCAL",CommercialOccupier  = "",UsageDescription = "Unclassified, Awaiting Classification",UsagePrimary = "Unclassified", UsageCode = "UC",PropertyShell = false,HackneyGazetteerOutOfBoroughAddress = false,Easting = 554189.4500,Northing = 190281.1000,Longitude = 0.2244347,Latitude = 51.590289
+                    AddressKey = "ABCDEFGHIJKLM2", UPRN = 10024389298,USRN = 21320239,ParentUPRN = 10024389282,AddressStatus = "Approved Preferred",UnitName = "FLAT 16",UnitNumber = "",BuildingName = "HAZELNUT COURT",BuildingNumber = "1",Street = "FIRWOOD LANE",Postcode = "RM3 0FS",Locality = "",Gazetteer = "LOCAL",CommercialOccupier  = "",UsageDescription = "Unclassified, Awaiting Classification",UsagePrimary = "Unclassified", UsageCode = "UC",PropertyShell = false,OutOfBoroughAddress = false,Easting = 554189.4500,Northing = 190281.1000,Longitude = 0.2244347,Latitude = 51.590289
                 }
             };
 
             var postcode = "RM3 0FS";
             var request = new SearchAddressRequest
             {
-                PostCode = postcode,
+                Postcode = postcode,
                 Gazetteer = GlobalConstants.Gazetteer.Hackney.ToString()
             };
             _fakeGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(i =>
@@ -70,7 +70,7 @@ namespace AddressesAPI.Tests.V2.UseCase
             SetupValidatorToReturnValid();
             var request = new SearchAddressRequest
             {
-                PostCode = "RM3 0FS",
+                Postcode = "RM3 0FS",
                 Gazetteer = "Local"
             };
             _fakeGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(i =>
@@ -94,7 +94,7 @@ namespace AddressesAPI.Tests.V2.UseCase
 
             var request = new SearchAddressRequest
             {
-                PostCode = postcode
+                Postcode = postcode
             };
             //act
             var response = _classUnderTest.ExecuteAsync(request);
@@ -110,18 +110,18 @@ namespace AddressesAPI.Tests.V2.UseCase
             {
                 new Address
                 {
-                    AddressKey = "ABCDEFGHIJKLMN", UPRN = 10024389298,USRN = 21320239,ParentUPRN = 10024389282,AddressStatus = "Approved Preferred",UnitName = "FLAT 16",UnitNumber = "",BuildingName = "HAZELNUT COURT",BuildingNumber = "1",Street = "FIRWOOD LANE",Postcode = "RM3 0FS",Locality = "",Gazetteer = "NATIONAL",CommercialOccupier = "",UsageDescription = "Unclassified, Awaiting Classification",UsagePrimary = "Unclassified",                UsageCode = "UC",PropertyShell = false,HackneyGazetteerOutOfBoroughAddress = false,Easting = 554189.4500,Northing = 190281.1000,Longitude = 0.2244347,Latitude = 51.590289
+                    AddressKey = "ABCDEFGHIJKLMN", UPRN = 10024389298,USRN = 21320239,ParentUPRN = 10024389282,AddressStatus = "Approved Preferred",UnitName = "FLAT 16",UnitNumber = "",BuildingName = "HAZELNUT COURT",BuildingNumber = "1",Street = "FIRWOOD LANE",Postcode = "RM3 0FS",Locality = "",Gazetteer = "NATIONAL",CommercialOccupier = "",UsageDescription = "Unclassified, Awaiting Classification",UsagePrimary = "Unclassified",                UsageCode = "UC",PropertyShell = false,OutOfBoroughAddress = false,Easting = 554189.4500,Northing = 190281.1000,Longitude = 0.2244347,Latitude = 51.590289
                 },
                 new Address
                 {
-                    AddressKey = "ABCDEFGHIJKLM2", UPRN = 10024389298,USRN = 21320239,ParentUPRN = 10024389282,AddressStatus = "Approved Preferred",UnitName = "FLAT 16",UnitNumber = "",BuildingName = "HAZELNUT COURT",BuildingNumber = "1",Street = "FIRWOOD LANE",Postcode = "RM3 0FS",Locality = "",Gazetteer = "NATIONAL",CommercialOccupier = "",UsageDescription = "Unclassified, Awaiting Classification",UsagePrimary = "Unclassified",                UsageCode = "UC",PropertyShell = false,HackneyGazetteerOutOfBoroughAddress = false,Easting = 554189.4500,Northing = 190281.1000,Longitude = 0.2244347,Latitude = 51.590289
+                    AddressKey = "ABCDEFGHIJKLM2", UPRN = 10024389298,USRN = 21320239,ParentUPRN = 10024389282,AddressStatus = "Approved Preferred",UnitName = "FLAT 16",UnitNumber = "",BuildingName = "HAZELNUT COURT",BuildingNumber = "1",Street = "FIRWOOD LANE",Postcode = "RM3 0FS",Locality = "",Gazetteer = "NATIONAL",CommercialOccupier = "",UsageDescription = "Unclassified, Awaiting Classification",UsagePrimary = "Unclassified",                UsageCode = "UC",PropertyShell = false,OutOfBoroughAddress = false,Easting = 554189.4500,Northing = 190281.1000,Longitude = 0.2244347,Latitude = 51.590289
                 }
             };
 
             var postcode = "RM3 0FS";
             var request = new SearchAddressRequest
             {
-                PostCode = postcode
+                Postcode = postcode
             };
             _fakeGateway.Setup(s =>
                     s.SearchAddresses(It.Is<SearchParameters>(i => i.Postcode.Equals("RM3 0FS"))))
@@ -158,7 +158,7 @@ namespace AddressesAPI.Tests.V2.UseCase
                 UsagePrimary = "Unclassified",
                 UsageCode = "UC",
                 PropertyShell = false,
-                HackneyGazetteerOutOfBoroughAddress = false,
+                OutOfBoroughAddress = false,
                 Easting = 554189.4500,
                 Northing = 190281.1000,
                 Longitude = 0.2244347,
@@ -169,7 +169,7 @@ namespace AddressesAPI.Tests.V2.UseCase
             var postcode = "RM3 0FS";
             var request = new SearchAddressRequest
             {
-                PostCode = postcode
+                Postcode = postcode
             };
             _fakeGateway.Setup(s =>
                     s.SearchAddresses(It.Is<SearchParameters>(i => i.Postcode.Equals("RM3 0FS"))))
@@ -178,7 +178,7 @@ namespace AddressesAPI.Tests.V2.UseCase
             var response = _classUnderTest.ExecuteAsync(request);
 
             response.Should().NotBeNull();
-            response.Addresses[0].AddressShouldEqual(address);
+            response.Addresses[0].Should().BeEquivalentTo(address.ToResponse());
         }
 
         [Test]

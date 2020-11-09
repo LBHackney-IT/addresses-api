@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace AddressesAPI.V2.Boundary.Responses
 {
-    public class GetAddressCrossReferenceResponse
+    public class GetPropertiesCrossReferenceResponse
     {
         [JsonProperty("addresscrossreferences")]
         public List<AddressCrossReferenceResponse> AddressCrossReferences { get; set; }

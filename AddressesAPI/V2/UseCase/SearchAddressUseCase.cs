@@ -53,7 +53,7 @@ namespace AddressesAPI.V2.UseCase
                 Format = Enum.Parse<GlobalConstants.Format>(request.Format, true),
                 Gazetteer = gazetteer,
                 Page = request.Page == 0 ? 1 : request.Page,
-                Postcode = request.PostCode,
+                Postcode = request.Postcode,
                 Street = request.Street,
                 Uprn = request.UPRN,
                 Usrn = request.USRN,

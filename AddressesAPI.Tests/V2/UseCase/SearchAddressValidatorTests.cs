@@ -62,72 +62,72 @@ namespace AddressesAPI.Tests.V2.UseCase
         [TestCase("NE7")]
         public void GivenAPostCodeValueInUpperCase_WhenCallingValidation_ItReturnsNoErrors(string postCode)
         {
-            var request = new SearchAddressRequest { PostCode = postCode };
-            _classUnderTest.ShouldNotHaveValidationErrorFor(x => x.PostCode, request);
+            var request = new SearchAddressRequest { Postcode = postCode };
+            _classUnderTest.ShouldNotHaveValidationErrorFor(x => x.Postcode, request);
         }
 
         [TestCase("w2 5jq")]
         [TestCase("ne7")]
         public void GivenAPostCodeValueInLowerCase_WhenCallingValidation_ItReturnsNoErrors(string postCode)
         {
-            var request = new SearchAddressRequest() { PostCode = postCode };
-            _classUnderTest.ShouldNotHaveValidationErrorFor(x => x.PostCode, request);
+            var request = new SearchAddressRequest() { Postcode = postCode };
+            _classUnderTest.ShouldNotHaveValidationErrorFor(x => x.Postcode, request);
         }
 
         [TestCase("w2 5JQ")]
         [TestCase("E11 5ra")]
         public void GivenAPostCodeValueInLowerCaseAndUpperCase_WhenCallingValidation_ItReturnsNoErrors(string postCode)
         {
-            var request = new SearchAddressRequest() { PostCode = postCode };
-            _classUnderTest.ShouldNotHaveValidationErrorFor(x => x.PostCode, request);
+            var request = new SearchAddressRequest() { Postcode = postCode };
+            _classUnderTest.ShouldNotHaveValidationErrorFor(x => x.Postcode, request);
         }
 
         [TestCase("w2 ")]
         [TestCase("E11 ")]
         public void GivenAnOutcodeWithSpace_WhenCallingValidation_ItReturnsNoErrors(string postCode)
         {
-            var request = new SearchAddressRequest() { PostCode = postCode };
-            _classUnderTest.ShouldNotHaveValidationErrorFor(x => x.PostCode, request);
+            var request = new SearchAddressRequest() { Postcode = postCode };
+            _classUnderTest.ShouldNotHaveValidationErrorFor(x => x.Postcode, request);
         }
 
         [TestCase("CR13ED")]
         [TestCase("RE15AD")]
         public void GivenPostCodeValueWithoutSpaces_WhenCallingValidation_ItReturnsNoErrors(string postCode)
         {
-            var request = new SearchAddressRequest() { PostCode = postCode };
-            _classUnderTest.ShouldNotHaveValidationErrorFor(x => x.PostCode, request);
+            var request = new SearchAddressRequest() { Postcode = postCode };
+            _classUnderTest.ShouldNotHaveValidationErrorFor(x => x.Postcode, request);
         }
 
         [TestCase("NW")]
         [TestCase("E")]
         public void GivenOnlyAnAreaPartOfThePostCode_WhenCallingValidation_ItReturnsAnError(string postCode)
         {
-            var request = new SearchAddressRequest() { PostCode = postCode };
-            _classUnderTest.ShouldHaveValidationErrorFor(x => x.PostCode, request).WithErrorMessage("Must provide at least the first part of the postcode.");
+            var request = new SearchAddressRequest() { Postcode = postCode };
+            _classUnderTest.ShouldHaveValidationErrorFor(x => x.Postcode, request).WithErrorMessage("Must provide at least the first part of the postcode.");
         }
 
         [TestCase("17 9LL")]
         [TestCase("8 1LA")]
         public void GivenOnlyAnIncodeAndADistrictPartsOfThePostCode_WhenCallingValidation_ItReturnsAnError(string postCode)
         {
-            var request = new SearchAddressRequest() { PostCode = postCode };
-            _classUnderTest.ShouldHaveValidationErrorFor(x => x.PostCode, request).WithErrorMessage("Must provide at least the first part of the postcode.");
+            var request = new SearchAddressRequest() { Postcode = postCode };
+            _classUnderTest.ShouldHaveValidationErrorFor(x => x.Postcode, request).WithErrorMessage("Must provide at least the first part of the postcode.");
         }
 
         [TestCase("NW 9LL")]
         [TestCase("NR1LW")]
         public void GivenOnlyAnIncodeAndAnAreaPartsOfThePostCode_WhenCallingValidation_ItReturnsAnError(string postCode)
         {
-            var request = new SearchAddressRequest() { PostCode = postCode };
-            _classUnderTest.ShouldHaveValidationErrorFor(x => x.PostCode, request).WithErrorMessage("Must provide at least the first part of the postcode.");
+            var request = new SearchAddressRequest() { Postcode = postCode };
+            _classUnderTest.ShouldHaveValidationErrorFor(x => x.Postcode, request).WithErrorMessage("Must provide at least the first part of the postcode.");
         }
 
         [TestCase("1LL")]
         [TestCase(" 6BQ")]
         public void GivenOnlyAnIncodePartOfThePostCode_WhenCallingValidation_ItReturnsAnError(string postCode)
         {
-            var request = new SearchAddressRequest() { PostCode = postCode };
-            _classUnderTest.ShouldHaveValidationErrorFor(x => x.PostCode, request).WithErrorMessage("Must provide at least the first part of the postcode.");
+            var request = new SearchAddressRequest() { Postcode = postCode };
+            _classUnderTest.ShouldHaveValidationErrorFor(x => x.Postcode, request).WithErrorMessage("Must provide at least the first part of the postcode.");
         }
 
         [TestCase("E9")] //A9
@@ -144,64 +144,64 @@ namespace AddressesAPI.Tests.V2.UseCase
         [TestCase("CR1H")]
         public void GivenOnlyAnOutcodePartOfPostCode_WhenCallingValidation_ItReturnsNoErrors(string postCode)
         {
-            var request = new SearchAddressRequest() { PostCode = postCode };
-            _classUnderTest.ShouldNotHaveValidationErrorFor(x => x.PostCode, request);
+            var request = new SearchAddressRequest() { Postcode = postCode };
+            _classUnderTest.ShouldNotHaveValidationErrorFor(x => x.Postcode, request);
         }
 
         [TestCase("E8 1LL")]
         [TestCase("SW17 1JK")]
         public void GivenBothPartsOfPostCode_WhenCallingValidation_ItReturnsNoErrors(string postCode)
         {
-            var request = new SearchAddressRequest() { PostCode = postCode };
-            _classUnderTest.ShouldNotHaveValidationErrorFor(x => x.PostCode, request);
+            var request = new SearchAddressRequest() { Postcode = postCode };
+            _classUnderTest.ShouldNotHaveValidationErrorFor(x => x.Postcode, request);
         }
 
         [TestCase("IG117QDfdsfdsfd")]
         [TestCase("E1llolol")]
         public void GivenAValidPostcodeFolowedByRandomCharacters_WhenCallingValidation_ItReturnsAnError(string postCode)
         {
-            var request = new SearchAddressRequest() { PostCode = postCode };
-            _classUnderTest.ShouldHaveValidationErrorFor(x => x.PostCode, request).WithErrorMessage("Must provide at least the first part of the postcode.");
+            var request = new SearchAddressRequest() { Postcode = postCode };
+            _classUnderTest.ShouldHaveValidationErrorFor(x => x.Postcode, request).WithErrorMessage("Must provide at least the first part of the postcode.");
         }
 
         [TestCase("EEE")]
         [TestCase("THE")]
         public void GivenThreeCharacters_WhenCallingValidation_ItReturnsAnError(string postCode)
         {
-            var request = new SearchAddressRequest() { PostCode = postCode };
-            _classUnderTest.ShouldHaveValidationErrorFor(x => x.PostCode, request).WithErrorMessage("Must provide at least the first part of the postcode.");
+            var request = new SearchAddressRequest() { Postcode = postCode };
+            _classUnderTest.ShouldHaveValidationErrorFor(x => x.Postcode, request).WithErrorMessage("Must provide at least the first part of the postcode.");
         }
 
         [TestCase("SW11 9")]
         [TestCase("e14 2")]
         public void GivenAnOutcodeAndASector_WhenCallingValidation_ItReturnsNoErrors(string postCode)
         {
-            var request = new SearchAddressRequest() { PostCode = postCode };
-            _classUnderTest.ShouldNotHaveValidationErrorFor(x => x.PostCode, request);
+            var request = new SearchAddressRequest() { Postcode = postCode };
+            _classUnderTest.ShouldNotHaveValidationErrorFor(x => x.Postcode, request);
         }
 
         [TestCase("SW7 9A")]
         [TestCase("n12 8F")]
         public void GivenAnOutcodeAndASectorAndTheFirstLetterOfTheUnit_WhenCallingValidation_ItReturnsNoErrors(string postCode)
         {
-            var request = new SearchAddressRequest() { PostCode = postCode };
-            _classUnderTest.ShouldNotHaveValidationErrorFor(x => x.PostCode, request);
+            var request = new SearchAddressRequest() { Postcode = postCode };
+            _classUnderTest.ShouldNotHaveValidationErrorFor(x => x.Postcode, request);
         }
 
         [TestCase("N8 LL")]
         [TestCase("NW11 AE")]
         public void GivenAnOutcodeAndAUnit_WhenCallingValidation_ItReturnsAnError(string postCode)
         {
-            var request = new SearchAddressRequest() { PostCode = postCode };
-            _classUnderTest.ShouldHaveValidationErrorFor(x => x.PostCode, request).WithErrorMessage("Must provide at least the first part of the postcode.");
+            var request = new SearchAddressRequest() { Postcode = postCode };
+            _classUnderTest.ShouldHaveValidationErrorFor(x => x.Postcode, request).WithErrorMessage("Must provide at least the first part of the postcode.");
         }
 
         [TestCase("S10 H")]
         [TestCase("W1 J")]
         public void GivenAnOutcodeAndOnlyOneLetterOfAUnit_WhenCallingValidation_ItReturnsAnError(string postCode)
         {
-            var request = new SearchAddressRequest() { PostCode = postCode };
-            _classUnderTest.ShouldHaveValidationErrorFor(x => x.PostCode, request).WithErrorMessage("Must provide at least the first part of the postcode.");
+            var request = new SearchAddressRequest() { Postcode = postCode };
+            _classUnderTest.ShouldHaveValidationErrorFor(x => x.Postcode, request).WithErrorMessage("Must provide at least the first part of the postcode.");
         }
 
         #endregion
@@ -212,7 +212,7 @@ namespace AddressesAPI.Tests.V2.UseCase
         public void GivenAnInvalidFilterParameterAndMandatoryParameter_WhenCallingValidation_ItReturnsAnError(string queryParameter1, string queryParameter2, string postcode)
         {
             var queryStringParameters = new List<string>() { queryParameter1, queryParameter2 };
-            var request = new SearchAddressRequest() { PostCode = postcode, RequestFields = queryStringParameters };
+            var request = new SearchAddressRequest() { Postcode = postcode, RequestFields = queryStringParameters };
 
             _classUnderTest.ShouldHaveValidationErrorFor(x => x.RequestFields, request).WithErrorMessage("Invalid properties have been provided.");
         }
@@ -222,7 +222,7 @@ namespace AddressesAPI.Tests.V2.UseCase
         public void GivenOnlyValidFilterParameters_WhenCallingValidation_ItReturnsNoErrors(string queryParameter1, string queryParameter2, string postcode)
         {
             var queryStringParameters = new List<string>() { queryParameter1, queryParameter2 };
-            var request = new SearchAddressRequest() { PostCode = postcode, RequestFields = queryStringParameters };
+            var request = new SearchAddressRequest() { Postcode = postcode, RequestFields = queryStringParameters };
 
             _classUnderTest.ShouldNotHaveValidationErrorFor(x => x.RequestFields, request);
         }
@@ -232,7 +232,7 @@ namespace AddressesAPI.Tests.V2.UseCase
         public void GivenInvalidFilterParameterWhoseNameMatchesOneOfSearchAddressRequestPropertiesThatAreNotUsedToGetOrFilterData_WhenCallingValidation_ItReturnsAnError(string queryParameter1, string queryParameter2, string postcode) //we also provide postcode, because it's mandatory and the other validation will interfere with this test if it's not put in.
         {
             var queryStringParameters = new List<string>() { queryParameter1, queryParameter2 };
-            var request = new SearchAddressRequest() { PostCode = postcode, RequestFields = queryStringParameters };
+            var request = new SearchAddressRequest() { Postcode = postcode, RequestFields = queryStringParameters };
 
             _classUnderTest.ShouldHaveValidationErrorFor(x => x.RequestFields, request).WithErrorMessage("Invalid properties have been provided.");
         }
@@ -242,7 +242,7 @@ namespace AddressesAPI.Tests.V2.UseCase
         public void GivenMultipleInvalidFilterParametersAndMandatoryParameter_WhenCallingValidation_ItReturnsAnError(string queryParameter1, string queryParameter2, string queryParameter3, string postcode)
         {
             var queryStringParameters = new List<string>() { queryParameter1, queryParameter2, queryParameter3 };
-            var request = new SearchAddressRequest() { PostCode = postcode, RequestFields = queryStringParameters };
+            var request = new SearchAddressRequest() { Postcode = postcode, RequestFields = queryStringParameters };
 
             _classUnderTest.ShouldHaveValidationErrorFor(x => x.RequestFields, request).WithErrorMessage("Invalid properties have been provided.");
         }
@@ -281,14 +281,14 @@ namespace AddressesAPI.Tests.V2.UseCase
         [TestCase("SW1A 1AA")]
         public void GivenARequestWithOnlyAPostCode_IfGazetteerIsLocal_WhenCallingValidation_ItReturnsNoError(string postcode)
         {
-            var request = new SearchAddressRequest() { PostCode = postcode, Gazetteer = _localGazetteer };
+            var request = new SearchAddressRequest() { Postcode = postcode, Gazetteer = _localGazetteer };
             _classUnderTest.TestValidate(request).ShouldNotHaveError();
         }
 
         [TestCase("SW1A 1AA")]
         public void GivenARequestWithOnlyAPostCode_IfGazetteerIsBoth_WhenCallingValidation_ItReturnsNoError(string postcode)
         {
-            var request = new SearchAddressRequest() { PostCode = postcode };
+            var request = new SearchAddressRequest() { Postcode = postcode };
             _classUnderTest.TestValidate(request).ShouldNotHaveError();
         }
 

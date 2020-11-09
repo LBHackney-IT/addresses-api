@@ -20,6 +20,16 @@ namespace AddressesAPI.Tests.V2.Factories
         }
 
         [Test]
+        public void MapsTheStatusApprovedPreferredToApproved()
+        {
+            var domain = _fixture.Build<Address>()
+                .With(a => a.AddressStatus, "Approved Preferred")
+                .Create();
+            var response = domain.ToResponse();
+            response.AddressStatus.Should().Be("Approved");
+        }
+
+        [Test]
         public void MapsAnAddressCrossReferenceDomainDirectlyToAResponse()
         {
             var domain = _fixture.Create<AddressCrossReference>();

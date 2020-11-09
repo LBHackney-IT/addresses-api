@@ -21,7 +21,7 @@ namespace AddressesAPI.V2.Domain
         public string UsageCode { get; set; }
         public string PlanningUseClass { get; set; }
         public bool? PropertyShell { get; set; }
-        public bool? HackneyGazetteerOutOfBoroughAddress { get; set; } //for LLPG results; should be null in results for NLPG
+        public bool? OutOfBoroughAddress { get; set; }
         public double? Easting { get; set; }
         public double? Northing { get; set; }
         public double? Longitude { get; set; }

@@ -49,7 +49,7 @@ namespace AddressesAPI.Tests.V2.UseCase
         public void GivenInvalidInput_WhenExecuteAsync_ThrowsValidationError()
         {
             SetupValidatorToReturnValid(false);
-            Func<SearchAddressResponse> testDelegate = () => _classUnderTest.ExecuteAsync(new GetAddressRequest());
+            Func<GetAddressResponse> testDelegate = () => _classUnderTest.ExecuteAsync(new GetAddressRequest());
             testDelegate.Should().Throw<BadRequestException>();
         }
 
@@ -69,7 +69,7 @@ namespace AddressesAPI.Tests.V2.UseCase
             //act
             var response = _classUnderTest.ExecuteAsync(request);
             //assert
-            response.Addresses.Should().BeNull();
+            response.Address.Should().BeNull();
         }
 
         [Test]
@@ -82,7 +82,7 @@ namespace AddressesAPI.Tests.V2.UseCase
                 UPRN = 10024389298,
                 USRN = 21320239,
                 ParentUPRN = 10024389282,
-                AddressStatus = "Approved Preferred",
+                AddressStatus = "Historical",
                 UnitName = "FLAT 16",
                 UnitNumber = "",
                 BuildingName = "HAZELNUT COURT",
@@ -96,7 +96,7 @@ namespace AddressesAPI.Tests.V2.UseCase
                 UsagePrimary = "Unclassified",
                 UsageCode = "UC",
                 PropertyShell = false,
-                HackneyGazetteerOutOfBoroughAddress = false,
+                OutOfBoroughAddress = false,
                 Easting = 554189.4500,
                 Northing = 190281.1000,
                 Longitude = 0.2244347,
@@ -115,7 +115,7 @@ namespace AddressesAPI.Tests.V2.UseCase
 
             response.Should().NotBeNull();
 
-            response.Addresses[0].AddressShouldEqual(address);
+            response.Address.AddressShouldEqual(address);
         }
 
         private void SetupValidatorToReturnValid(bool valid = true)

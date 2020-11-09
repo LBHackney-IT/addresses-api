@@ -7,19 +7,19 @@ using AddressesAPI.V2.UseCase.Interfaces;
 
 namespace AddressesAPI.V2.UseCase
 {
-    public class GetAddressCrossReferenceUseCase : IGetAddressCrossReferenceUseCase
+    public class GetPropertiesCrossReferenceUseCase : IGetPropertiesCrossReferenceUseCase
     {
         private readonly ICrossReferencesGateway _crossReferenceGateway;
         private readonly IGetCrossReferenceRequestValidator _getAddressCrossReferenceValidator;
 
-        public GetAddressCrossReferenceUseCase(ICrossReferencesGateway crossReferencesGateway,
+        public GetPropertiesCrossReferenceUseCase(ICrossReferencesGateway crossReferencesGateway,
             IGetCrossReferenceRequestValidator getAddressCrossReferenceValidator)
         {
             _crossReferenceGateway = crossReferencesGateway;
             _getAddressCrossReferenceValidator = getAddressCrossReferenceValidator;
         }
 
-        public GetAddressCrossReferenceResponse ExecuteAsync(GetAddressCrossReferenceRequest request)
+        public GetPropertiesCrossReferenceResponse ExecuteAsync(GetPropertiesCrossReferenceRequest request)
         {
             var validationResponse = _getAddressCrossReferenceValidator.Validate(request);
             if (!validationResponse.IsValid)
@@ -27,9 +27,7 @@ namespace AddressesAPI.V2.UseCase
 
             var response = _crossReferenceGateway.GetAddressCrossReference(request.uprn);
 
-            if (response == null)
-                return new GetAddressCrossReferenceResponse();
-            var useCaseResponse = new GetAddressCrossReferenceResponse
+            var useCaseResponse = new GetPropertiesCrossReferenceResponse
             {
                 AddressCrossReferences = response.ToResponse()
             };

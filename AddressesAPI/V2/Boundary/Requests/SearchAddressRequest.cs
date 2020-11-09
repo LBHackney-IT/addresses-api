@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AddressesAPI.V2.Boundary.Requests
 {
@@ -20,11 +21,12 @@ namespace AddressesAPI.V2.Boundary.Requests
         /// Postcode partial match i.e. "E8 4" will return addresses that have a postcode starting with E84**
         /// (Whitespace is removed automatically)
         /// </summary>
-        public string PostCode { get; set; }
+        public string Postcode { get; set; }
 
         /// <summary>
         /// Building number search
         /// </summary>
+        [FromQuery(Name = "building_number")]
         public string BuildingNumber { get; set; }
 
         /// <summary>
@@ -77,6 +79,7 @@ namespace AddressesAPI.V2.Boundary.Requests
         /// Unclassified
         /// ALL (default)
         /// </summary>
+        [FromQuery(Name = "usage_primary")]
         public string usagePrimary { get; set; }
 
         /// <summary>
@@ -96,6 +99,7 @@ namespace AddressesAPI.V2.Boundary.Requests
         /// Historical,
         /// Provisional
         /// </summary>
+        [FromQuery(Name = "address_status")]
         public string AddressStatus { get; set; }
 
         /// <summary>
@@ -116,6 +120,7 @@ namespace AddressesAPI.V2.Boundary.Requests
         /// <summary>
         /// PageSize defaults to 50 if not provided
         /// </summary>
+        [FromQuery(Name = "page_size")]
         public int PageSize { get; set; } = 50;
 
         /// <summary>

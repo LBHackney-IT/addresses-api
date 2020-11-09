@@ -5,6 +5,6 @@ namespace AddressesAPI.V2.UseCase.Interfaces
 {
     public interface IGetCrossReferenceRequestValidator
     {
-        ValidationResult Validate(GetAddressCrossReferenceRequest instance);
+        ValidationResult Validate(GetPropertiesCrossReferenceRequest instance);
     }
 }
