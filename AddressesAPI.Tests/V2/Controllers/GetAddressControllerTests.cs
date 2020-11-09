@@ -35,8 +35,7 @@ namespace AddressesAPI.Tests.V2.Controllers
 
             response.Should().NotBeNull();
             response.Should().BeOfType<OkObjectResult>();
-            var objectResult = response as OkObjectResult;
-            objectResult.StatusCode.Should().Be(200);
+            (response as OkObjectResult).StatusCode.Should().Be(200);
         }
 
         [Test]
@@ -50,8 +49,7 @@ namespace AddressesAPI.Tests.V2.Controllers
 
             response.Should().NotBeNull();
             response.Should().BeOfType<NotFoundResult>();
-            var objectResult = response as NotFoundResult;
-            objectResult.StatusCode.Should().Be(404);
+            (response as NotFoundResult).StatusCode.Should().Be(404);
         }
     }
 }
