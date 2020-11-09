@@ -23,7 +23,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
             var addressKey = "eytshdnshsuahs";
             TestEfDataHelper.InsertAddress(DatabaseContext, addressKey);
 
-            var queryString = "PostCode=E8";
+            var queryString = "postcode=E8";
 
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);
@@ -38,7 +38,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
                 new NationalAddress { Postcode = postcode });
             AddSomeRandomAddressToTheDatabase();
 
-            var queryString = $"PostCode={postcode}&AddressStatus={record.AddressStatus}&Format=Detailed";
+            var queryString = $"postcode={postcode}&address_status={record.AddressStatus}&format=Detailed";
 
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);
@@ -58,7 +58,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
             var record = TestEfDataHelper.InsertAddress(DatabaseContext, addressKey, queryParameters);
             AddSomeRandomAddressToTheDatabase();
 
-            var queryString = $"UPRN={queryParameters.UPRN}&AddressStatus={record.AddressStatus}&Format=Detailed";
+            var queryString = $"uprn={queryParameters.UPRN}&address_status={record.AddressStatus}&format=Detailed";
 
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);
@@ -80,7 +80,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
             TestEfDataHelper.InsertAddress(DatabaseContext, addressKey, queryParameters);
             AddSomeRandomAddressToTheDatabase();
 
-            var queryString = $"USRN={queryParameters.USRN}&AddressStatus=Historical&Format=Detailed";
+            var queryString = $"USRN={queryParameters.USRN}&address_status=Historical&Format=Detailed";
 
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);
@@ -107,7 +107,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
             };
             TestEfDataHelper.InsertAddress(DatabaseContext, addressKey, addressDetails);
             AddSomeRandomAddressToTheDatabase();
-            var queryString = $"UPRN={addressDetails.UPRN}&AddressStatus=Historical&Format=Simple";
+            var queryString = $"uprn={addressDetails.UPRN}&address_status=Historical&format=Simple";
 
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);
@@ -120,7 +120,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
                     $"\"line3\":\"{addressDetails.Line3}\",\"line4\":\"{addressDetails.Line4}\"," +
                     $"\"town\":\"{addressDetails.Town}\",\"postcode\":\"{addressDetails.Postcode}\"," +
                     $"\"UPRN\":{addressDetails.UPRN}}}" +
-                "],\"page_count\":1,\"total_count\":1},\"statusCode\":200}");
+                "],\"pageCount\":1,\"totalCount\":1},\"statusCode\":200}");
         }
 
         [Test]
@@ -136,7 +136,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
 
             AddSomeRandomAddressToTheDatabase(count: 3);
             AddSomeRandomAddressToTheDatabase(count: 3, gazetteer: "National");
-            var queryString = $"UPRN={queryParameters.UPRN}&AddressStatus={record.AddressStatus}&Format=Detailed&Gazetteer=Both";
+            var queryString = $"uprn={queryParameters.UPRN}&address_status={record.AddressStatus}&format=Detailed&gazetteer=Both";
 
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);
@@ -149,13 +149,13 @@ namespace AddressesAPI.Tests.V2.E2ETests
         [Test]
         public async Task PassingAnIncorrectFormat()
         {
-            var queryString = "street=hackneyroad&gazetteer=local&Format=yes";
+            var queryString = "street=hackneyroad&gazetteer=local&format=yes";
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(400);
         }
 
-        [TestCase("PageSize=100", "PageSize", "PageSize cannot exceed 50")]
-        [TestCase("PostCode=12376", "PostCode", "Must provide at least the first part of the postcode.")]
+        [TestCase("page_size=100", "PageSize", "PageSize cannot exceed 50")]
+        [TestCase("postcode=12376", "Postcode", "Must provide at least the first part of the postcode.")]
         [TestCase("Gazetteer=Both&street=hackneyroad", "", "You must provide at least one of (uprn, usrn, postcode), when gazetteer is 'both'.")]
         [TestCase("Gazetteer=Local", "", "You must provide at least one of (uprn, usrn, postcode, street, usagePrimary, usageCode), when gazeteer is 'local'.")]
         public async Task ValidationErrors(string queryString, string fieldName, string message)

@@ -50,7 +50,7 @@ namespace AddressesAPI.Tests.V2.UseCase
             var postcode = "RM3 0FS";
             var request = new SearchAddressRequest
             {
-                PostCode = postcode,
+                Postcode = postcode,
                 Gazetteer = GlobalConstants.Gazetteer.Hackney.ToString()
             };
             _fakeGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(i =>
@@ -70,7 +70,7 @@ namespace AddressesAPI.Tests.V2.UseCase
             SetupValidatorToReturnValid();
             var request = new SearchAddressRequest
             {
-                PostCode = "RM3 0FS",
+                Postcode = "RM3 0FS",
                 Gazetteer = "Local"
             };
             _fakeGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(i =>
@@ -94,7 +94,7 @@ namespace AddressesAPI.Tests.V2.UseCase
 
             var request = new SearchAddressRequest
             {
-                PostCode = postcode
+                Postcode = postcode
             };
             //act
             var response = _classUnderTest.ExecuteAsync(request);
@@ -121,7 +121,7 @@ namespace AddressesAPI.Tests.V2.UseCase
             var postcode = "RM3 0FS";
             var request = new SearchAddressRequest
             {
-                PostCode = postcode
+                Postcode = postcode
             };
             _fakeGateway.Setup(s =>
                     s.SearchAddresses(It.Is<SearchParameters>(i => i.Postcode.Equals("RM3 0FS"))))
@@ -169,7 +169,7 @@ namespace AddressesAPI.Tests.V2.UseCase
             var postcode = "RM3 0FS";
             var request = new SearchAddressRequest
             {
-                PostCode = postcode
+                Postcode = postcode
             };
             _fakeGateway.Setup(s =>
                     s.SearchAddresses(It.Is<SearchParameters>(i => i.Postcode.Equals("RM3 0FS"))))

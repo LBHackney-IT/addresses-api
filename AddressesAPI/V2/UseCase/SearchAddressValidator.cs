@@ -29,7 +29,7 @@ namespace AddressesAPI.V2.UseCase
             RuleFor(x => x.PageSize)
                 .LessThan(51).WithMessage("PageSize cannot exceed 50");
 
-            RuleFor(r => r.PostCode)
+            RuleFor(r => r.Postcode)
                 .Matches(new Regex("^((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]))))( )?(([0-9][A-Za-z]?[A-Za-z]?)?))$"))
                 .WithMessage("Must provide at least the first part of the postcode.");
 
@@ -65,7 +65,7 @@ namespace AddressesAPI.V2.UseCase
             return request.Gazetteer == GlobalConstants.Gazetteer.Both.ToString()
                    || request.UPRN != null
                    || request.USRN != null
-                   || request.PostCode != null
+                   || request.Postcode != null
                    || request.Street != null
                    || request.usagePrimary != null
                    || request.usageCode != null;
@@ -76,7 +76,7 @@ namespace AddressesAPI.V2.UseCase
             return request.Gazetteer != GlobalConstants.Gazetteer.Both.ToString()
                    || request.UPRN != null
                    || request.USRN != null
-                   || request.PostCode != null;
+                   || request.Postcode != null;
         }
 
         private static bool CanBeAnyCombinationOfAllowedAddressStatuses(string addressStatus)

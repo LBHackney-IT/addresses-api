@@ -47,7 +47,7 @@ namespace AddressesAPI.Tests.V2.Controllers
 
             var request = new SearchAddressRequest
             {
-                PostCode = postcode,
+                Postcode = postcode,
                 Gazetteer = gazetteer.ToString()
             };
             //act
