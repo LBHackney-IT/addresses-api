@@ -94,7 +94,7 @@ namespace AddressesAPI.V1.Gateways
                             || EF.Functions.ILike(a.Gazetteer, request.Gazetteer.ToString())
                             )
                 .Where(a => request.HackneyGazetteerOutOfBoroughAddress == null ||
-                            request.HackneyGazetteerOutOfBoroughAddress == a.NeverExport);
+                            request.HackneyGazetteerOutOfBoroughAddress == a.OutOfBoroughAddress);
             return queryBase;
         }
 

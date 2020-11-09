@@ -29,7 +29,7 @@ namespace AddressesAPI.V1.Factories
                 UsageCode = addressEntity.UsageCode,
                 PlanningUseClass = addressEntity.PlanningUseClass,
                 PropertyShell = addressEntity.PropertyShell,
-                HackneyGazetteerOutOfBoroughAddress = addressEntity.NeverExport,
+                HackneyGazetteerOutOfBoroughAddress = addressEntity.OutOfBoroughAddress,
                 Easting = addressEntity.Easting,
                 Northing = addressEntity.Northing,
                 Longitude = addressEntity.Longitude,

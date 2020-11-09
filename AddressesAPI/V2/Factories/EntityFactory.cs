@@ -1,4 +1,5 @@
 
+using System;
 using AddressesAPI.Infrastructure;
 using AddressesAPI.V2.Domain;
 using Address = AddressesAPI.V2.Domain.Address;
@@ -30,7 +31,8 @@ namespace AddressesAPI.V2.Factories
                 UsageCode = addressEntity.UsageCode,
                 PlanningUseClass = addressEntity.PlanningUseClass,
                 PropertyShell = addressEntity.PropertyShell,
-                OutOfBoroughAddress = addressEntity.NeverExport,
+                OutOfBoroughAddress = addressEntity.Gazetteer.Equals("national", StringComparison.InvariantCultureIgnoreCase)
+                    || addressEntity.OutOfBoroughAddress,
                 Easting = addressEntity.Easting,
                 Northing = addressEntity.Northing,
                 Longitude = addressEntity.Longitude,

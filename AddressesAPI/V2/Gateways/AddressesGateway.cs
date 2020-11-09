@@ -96,7 +96,7 @@ namespace AddressesAPI.V2.Gateways
                                 && EF.Functions.ILike(a.Gazetteer, "local")
                             )
                 .Where(a => request.HackneyGazetteerOutOfBoroughAddress == null ||
-                            request.HackneyGazetteerOutOfBoroughAddress == a.NeverExport);
+                            request.HackneyGazetteerOutOfBoroughAddress == a.OutOfBoroughAddress);
             return queryBase;
         }
 

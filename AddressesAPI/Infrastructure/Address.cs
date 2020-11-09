@@ -112,7 +112,7 @@ namespace AddressesAPI.Infrastructure
         public string PlanningUseClass { get; set; }
 
         [Column("neverexport")]
-        public bool NeverExport { get; set; }
+        public bool OutOfBoroughAddress { get; set; }
 
         [Column("longitude")]
         public double Longitude { get; set; }
