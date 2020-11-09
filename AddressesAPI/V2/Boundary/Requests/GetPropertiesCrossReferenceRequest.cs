@@ -1,6 +1,6 @@
 namespace AddressesAPI.V2.Boundary.Requests
 {
-    public class GetAddressCrossReferenceRequest
+    public class GetPropertiesCrossReferenceRequest
     {
 
         /// <summary>

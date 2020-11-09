@@ -15,9 +15,9 @@ using NUnit.Framework;
 
 namespace AddressesAPI.Tests.V2.UseCase
 {
-    public class GetAddressCrossReferenceUseCaseTest
+    public class GetPropertiesCrossReferenceUseCaseTest
     {
-        private IGetAddressCrossReferenceUseCase _classUnderTest;
+        private IGetPropertiesCrossReferenceUseCase _classUnderTest;
         private Mock<ICrossReferencesGateway> _fakeGateway;
         private Mock<IGetCrossReferenceRequestValidator> _validator;
 
@@ -26,7 +26,7 @@ namespace AddressesAPI.Tests.V2.UseCase
         {
             _fakeGateway = new Mock<ICrossReferencesGateway>();
             _validator = new Mock<IGetCrossReferenceRequestValidator>();
-            _classUnderTest = new GetAddressCrossReferenceUseCase(_fakeGateway.Object, _validator.Object);
+            _classUnderTest = new GetPropertiesCrossReferenceUseCase(_fakeGateway.Object, _validator.Object);
         }
 
         [Test]
@@ -36,7 +36,7 @@ namespace AddressesAPI.Tests.V2.UseCase
             var uprn = 1234578912;
             _fakeGateway.Setup(s => s.GetAddressCrossReference(1234578912)).Returns(new List<AddressCrossReference>()).Verifiable();
 
-            var request = new GetAddressCrossReferenceRequest
+            var request = new GetPropertiesCrossReferenceRequest
             {
                 uprn = uprn
             };
@@ -56,7 +56,7 @@ namespace AddressesAPI.Tests.V2.UseCase
             _fakeGateway.Setup(s => s.GetAddressCrossReference(1234578912))
                 .Returns(new List<AddressCrossReference>());
 
-            var request = new GetAddressCrossReferenceRequest
+            var request = new GetPropertiesCrossReferenceRequest
             {
                 uprn = uprn
             };
@@ -82,7 +82,7 @@ namespace AddressesAPI.Tests.V2.UseCase
             };
 
             var uprn = 10024389298;
-            var request = new GetAddressCrossReferenceRequest
+            var request = new GetPropertiesCrossReferenceRequest
             {
                 uprn = uprn
             };
@@ -116,7 +116,7 @@ namespace AddressesAPI.Tests.V2.UseCase
             };
 
             var uprn = 10024389298;
-            var request = new GetAddressCrossReferenceRequest
+            var request = new GetPropertiesCrossReferenceRequest
             {
                 uprn = uprn
             };
@@ -133,14 +133,8 @@ namespace AddressesAPI.Tests.V2.UseCase
         public void GivenInvalidRequest_ExecuteAsyncShouldThrowAValidationError()
         {
             SetupValidatorToReturnValid(false);
-            Func<GetAddressCrossReferenceResponse> testDelegate = () => _classUnderTest.ExecuteAsync(null);
+            Func<GetPropertiesCrossReferenceResponse> testDelegate = () => _classUnderTest.ExecuteAsync(null);
             testDelegate.Should().Throw<BadRequestException>();
-        }
-
-        [Test]
-        public void If()
-        {
-            
         }
 
         private void SetupValidatorToReturnValid(bool valid = true)
@@ -148,7 +142,7 @@ namespace AddressesAPI.Tests.V2.UseCase
             var result = new Mock<ValidationResult>();
 
             result.Setup(x => x.IsValid).Returns(valid);
-            _validator.Setup(x => x.Validate(It.IsAny<GetAddressCrossReferenceRequest>()))
+            _validator.Setup(x => x.Validate(It.IsAny<GetPropertiesCrossReferenceRequest>()))
                 .Returns(result.Object);
         }
     }

@@ -12,53 +12,36 @@ using NUnit.Framework;
 
 namespace AddressesAPI.Tests.V2.Controllers
 {
-    public class GetAddressCrossReferenceControllerTests
+    public class GetPropertiesCrossReferenceControllerTests
     {
-        private GetAddressCrossReferenceController _classUnderTest;
-        private Mock<IGetAddressCrossReferenceUseCase> _mock;
+        private GetPropertiesCrossReferenceController _classUnderTest;
+        private Mock<IGetPropertiesCrossReferenceUseCase> _mock;
 
-        public GetAddressCrossReferenceControllerTests()
+        public GetPropertiesCrossReferenceControllerTests()
         {
-            _mock = new Mock<IGetAddressCrossReferenceUseCase>();
-            _classUnderTest = new GetAddressCrossReferenceController(_mock.Object);
+            _mock = new Mock<IGetPropertiesCrossReferenceUseCase>();
+            _classUnderTest = new GetPropertiesCrossReferenceController(_mock.Object);
         }
 
         [Test]
         public void GivenValidAddressRequest_WhenCallingGet_ThenShouldReturnAPIResponseListOfAddresses()
         {
             //arrange
-            _mock.Setup(s => s.ExecuteAsync(It.IsAny<GetAddressCrossReferenceRequest>()))
-                .Returns(new GetAddressCrossReferenceResponse
+            _mock.Setup(s => s.ExecuteAsync(It.IsAny<GetPropertiesCrossReferenceRequest>()))
+                .Returns(new GetPropertiesCrossReferenceResponse
                 {
                     AddressCrossReferences = new List<AddressCrossReferenceResponse>()
                 });
             long uprn = 12345;
 
             //act
-            var response = _classUnderTest.GetAddressCrossReference(uprn);
+            var response = _classUnderTest.GetPropertiesCrossReference(uprn);
             //assert
             response.Should().NotBeNull();
             response.Should().BeOfType<OkObjectResult>();
             var objectResult = response as OkObjectResult;
-            var getAddresses = objectResult?.Value as APIResponse<GetAddressCrossReferenceResponse>;
+            var getAddresses = objectResult?.Value as APIResponse<GetPropertiesCrossReferenceResponse>;
             getAddresses.Should().NotBeNull();
-        }
-
-        [Test]
-        public void IfPropertyCanNotBeFound_ReturnsA404StatusCode()
-        {
-            //arrange
-            _mock.Setup(s => s.ExecuteAsync(It.IsAny<GetAddressCrossReferenceRequest>()))
-                .Returns((GetAddressCrossReferenceResponse) null);
-            long uprn = 12345;
-
-            //act
-            var response = _classUnderTest.GetAddressCrossReference(uprn);
-            //assert
-            response.Should().NotBeNull();
-            response.Should().BeOfType<NotFoundResult>();
-            var objectResult = response as NotFoundResult;
-            objectResult.StatusCode.Should().Be(404);
         }
     }
 }

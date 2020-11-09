@@ -1,4 +1,3 @@
-using System;
 using AddressesAPI.V2.Boundary.Requests;
 using AddressesAPI.V2.Boundary.Responses;
 using AddressesAPI.V2.Boundary.Responses.Metadata;
@@ -12,12 +11,12 @@ namespace AddressesAPI.V2.Controllers
     [Route("api/v2/properties")]
     [ProducesResponseType(typeof(APIResponse<object>), 400)]
     [ProducesResponseType(typeof(APIResponse<object>), 500)]
-    public class GetAddressCrossReferenceController : BaseController
+    public class GetPropertiesCrossReferenceController : BaseController
     {
-        private readonly IGetAddressCrossReferenceUseCase _getAddressCrossReferenceUseCase;
-        public GetAddressCrossReferenceController(IGetAddressCrossReferenceUseCase getAddressCrossReferenceUseCase)
+        private readonly IGetPropertiesCrossReferenceUseCase _getPropertiesCrossReferenceUseCase;
+        public GetPropertiesCrossReferenceController(IGetPropertiesCrossReferenceUseCase getPropertiesCrossReferenceUseCase)
         {
-            _getAddressCrossReferenceUseCase = getAddressCrossReferenceUseCase;
+            _getPropertiesCrossReferenceUseCase = getPropertiesCrossReferenceUseCase;
         }
 
         /// <summary>
@@ -28,20 +27,16 @@ namespace AddressesAPI.V2.Controllers
         /// </remarks>
         /// <param name="uprn"></param>
         /// <returns></returns>
-        [ProducesResponseType(typeof(APIResponse<GetAddressCrossReferenceResponse>), 200)]
+        [ProducesResponseType(typeof(APIResponse<GetPropertiesCrossReferenceResponse>), 200)]
         [HttpGet]
         [Route("{uprn}/crossreferences")]
-        public IActionResult GetAddressCrossReference(long uprn)
+        public IActionResult GetPropertiesCrossReference(long uprn)
         {
-            var request = new GetAddressCrossReferenceRequest { uprn = uprn };
+            var request = new GetPropertiesCrossReferenceRequest { uprn = uprn };
             try
             {
-                var response = _getAddressCrossReferenceUseCase.ExecuteAsync(request);
-                if (response == null)
-                {
-                    return new NotFoundResult();
-                }
-                return new OkObjectResult(new APIResponse<GetAddressCrossReferenceResponse>(response));
+                var response = _getPropertiesCrossReferenceUseCase.ExecuteAsync(request);
+                return new OkObjectResult(new APIResponse<GetPropertiesCrossReferenceResponse>(response));
             }
             catch (BadRequestException e)
             {
