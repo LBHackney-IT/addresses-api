@@ -12,6 +12,7 @@ services:
       - CONNECTION_STRING=Host=dev-database;Port=5432;Database=devdb;Username=postgres;Password=mypassword
     links:
       - dev-database
+      - elasticsearch
   dev-database:
     environment:
       - POSTGRES_USER=postgres
@@ -23,6 +24,22 @@ services:
       - 5433:5432
     volumes:
       - ./database/seed-dev-data.sql:/var/seed-dev-data.sql
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.3
+    ports:
+      - 9200:9200
+  logstash:
+    labels:
+      com.example.service: "logstash"
+      com.example.description: "For logging data"
+    image: logstash:5.4.3
+    volumes:
+      - ./:/logstash_dir
+    command: logstash -f /logstash_dir/logstash.conf
+    depends_on:
+      - elasticsearch
+    ports:
+      - "5959:5959"
 
   addresses-api-test:
     image: addresses-api-test
