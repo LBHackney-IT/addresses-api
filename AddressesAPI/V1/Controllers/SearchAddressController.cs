@@ -13,14 +13,11 @@ namespace AddressesAPI.V1.Controllers
     public class SearchAddressController : BaseController
     {
         private readonly ISearchAddressUseCase _searchAddressUseCase;
-        private readonly ISearchAddressValidator _searchAddressValidator;
 
 
-        public SearchAddressController(ISearchAddressUseCase searchAddressUseCase,
-            ISearchAddressValidator searchAddressValidator)
+        public SearchAddressController(ISearchAddressUseCase searchAddressUseCase)
         {
             _searchAddressUseCase = searchAddressUseCase;
-            _searchAddressValidator = searchAddressValidator;
         }
 
         /// <summary>
@@ -32,7 +29,7 @@ namespace AddressesAPI.V1.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [ProducesResponseType(typeof(APIResponse<SearchAddressResponse>), 200)]
-        [ProducesResponseType(typeof(APIResponse<BadRequestException>), 400)]
+        [ProducesResponseType(typeof(ErrorResponse), 400)]
         [HttpGet, MapToApiVersion("1")]
         public IActionResult GetAddresses([FromQuery] SearchAddressRequest request)
         {

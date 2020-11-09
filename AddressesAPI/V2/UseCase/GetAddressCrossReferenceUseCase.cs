@@ -27,8 +27,6 @@ namespace AddressesAPI.V2.UseCase
 
             var response = _crossReferenceGateway.GetAddressCrossReference(request.uprn);
 
-            if (response == null)
-                return null;
             var useCaseResponse = new GetAddressCrossReferenceResponse
             {
                 AddressCrossReferences = response.ToResponse()

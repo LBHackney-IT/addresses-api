@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using AddressesAPI.V2.Boundary.Requests;
 using AddressesAPI.V2.Boundary.Responses;
 using AddressesAPI.V2.Boundary.Responses.Data;
@@ -26,9 +25,9 @@ namespace AddressesAPI.Tests.V2.Controllers
         public void GivenValidAddressKey_WhenCallingGet_ThenShouldReturn200()
         {
             _mock.Setup(s => s.ExecuteAsync(It.IsAny<GetAddressRequest>()))
-                .Returns(new SearchAddressResponse
+                .Returns(new GetAddressResponse
                 {
-                    Addresses = new List<AddressResponse>{new AddressResponse()}
+                    Address = new AddressResponse()
                 });
             var lpi_key = "ABCDEFGHIJKLMN";
 
@@ -44,7 +43,7 @@ namespace AddressesAPI.Tests.V2.Controllers
         public void WhenNoAddressIsProvidedByTheUsecase_ThenShouldReturn404()
         {
             _mock.Setup(s => s.ExecuteAsync(It.IsAny<GetAddressRequest>()))
-                .Returns(new SearchAddressResponse());
+                .Returns(new GetAddressResponse());
             var lpi_key = "ABCDEFGHIJKLMN";
 
             var response = _classUnderTest.GetAddress(lpi_key);

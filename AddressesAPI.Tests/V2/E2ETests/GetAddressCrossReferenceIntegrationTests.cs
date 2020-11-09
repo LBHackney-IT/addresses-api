@@ -55,23 +55,25 @@ namespace AddressesAPI.Tests.V2.E2ETests
             recordReturned.EndDate.Value.Date.Should().Be(record.EndDate.Value.Date);
         }
         [Test]
-        public async Task Get400WhenUPRNIsNotProvided()
+        public async Task Get404WhenUPRNIsNotProvided()
         {
             var uprn = _faker.Random.Int();
             TestEfDataHelper.InsertCrossReference(DatabaseContext, uprn);
 
             var url = new Uri($"api/v2/properties/crossreferences", UriKind.Relative);
             var response = await Client.GetAsync(url).ConfigureAwait(true);
-            response.StatusCode.Should().Be(400);
+            response.StatusCode.Should().Be(404);
         }
 
         [Test]
-        public async Task Get404WhenAddressCannotBeFound()
+        public async Task Get400WhenUPRNIsNotNumeric()
         {
             var uprn = _faker.Random.Int();
-            var url = new Uri($"api/v2/properties/{uprn}/crossreferences", UriKind.Relative);
+            TestEfDataHelper.InsertCrossReference(DatabaseContext, uprn);
+
+            var url = new Uri($"api/v2/properties/1937dhhu/crossreferences", UriKind.Relative);
             var response = await Client.GetAsync(url).ConfigureAwait(true);
-            response.StatusCode.Should().Be(404);
+            response.StatusCode.Should().Be(400);
         }
 
         private static async Task<APIResponse<GetAddressCrossReferenceResponse>> ConvertToCrossReferenceResponseObject(HttpResponseMessage response)

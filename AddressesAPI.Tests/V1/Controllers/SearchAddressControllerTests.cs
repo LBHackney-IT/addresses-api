@@ -27,7 +27,7 @@ namespace AddressesAPI.Tests.V1.Controllers
         {
             _mock = new Mock<ISearchAddressUseCase>();
             var validator = new SearchAddressValidator();
-            _classUnderTest = new SearchAddressController(_mock.Object, validator);
+            _classUnderTest = new SearchAddressController(_mock.Object);
 
             _classUnderTest.ControllerContext = new ControllerContext();
             _classUnderTest.ControllerContext.HttpContext = new DefaultHttpContext();

@@ -49,7 +49,7 @@ namespace AddressesAPI.Tests.V2.UseCase
         public void GivenInvalidInput_WhenExecuteAsync_ThrowsValidationError()
         {
             SetupValidatorToReturnValid(false);
-            Func<SearchAddressResponse> testDelegate = () => _classUnderTest.ExecuteAsync(new GetAddressRequest());
+            Func<GetAddressResponse> testDelegate = () => _classUnderTest.ExecuteAsync(new GetAddressRequest());
             testDelegate.Should().Throw<BadRequestException>();
         }
 
@@ -69,7 +69,7 @@ namespace AddressesAPI.Tests.V2.UseCase
             //act
             var response = _classUnderTest.ExecuteAsync(request);
             //assert
-            response.Addresses.Should().BeNull();
+            response.Address.Should().BeNull();
         }
 
         [Test]
@@ -115,7 +115,7 @@ namespace AddressesAPI.Tests.V2.UseCase
 
             response.Should().NotBeNull();
 
-            response.Addresses[0].AddressShouldEqual(address);
+            response.Address.AddressShouldEqual(address);
         }
 
         private void SetupValidatorToReturnValid(bool valid = true)

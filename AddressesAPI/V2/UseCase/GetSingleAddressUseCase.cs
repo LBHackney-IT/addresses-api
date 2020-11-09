@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using AddressesAPI.V2.Boundary.Requests;
 using AddressesAPI.V2.Boundary.Responses;
-using AddressesAPI.V2.Boundary.Responses.Data;
 using AddressesAPI.V2.Boundary.Responses.Metadata;
 using AddressesAPI.V2.Factories;
 using AddressesAPI.V2.Gateways;
@@ -12,7 +11,7 @@ namespace AddressesAPI.V2.UseCase
     public class GetSingleAddressUseCase : IGetSingleAddressUseCase
     {
         private readonly IAddressesGateway _addressGateway;
-        private IGetAddressRequestValidator _getAddressValidator;
+        private readonly IGetAddressRequestValidator _getAddressValidator;
 
         public GetSingleAddressUseCase(IAddressesGateway addressesGateway, IGetAddressRequestValidator getAddressValidator)
         {
@@ -20,7 +19,7 @@ namespace AddressesAPI.V2.UseCase
             _getAddressValidator = getAddressValidator;
         }
 
-        public SearchAddressResponse ExecuteAsync(GetAddressRequest request)
+        public GetAddressResponse ExecuteAsync(GetAddressRequest request)
         {
             var validationResponse = _getAddressValidator.Validate(request);
             if (!validationResponse.IsValid)
@@ -29,10 +28,10 @@ namespace AddressesAPI.V2.UseCase
             var response = _addressGateway.GetSingleAddress(request.addressID);
 
             if (response == null)
-                return new SearchAddressResponse();
-            var useCaseResponse = new SearchAddressResponse
+                return new GetAddressResponse();
+            var useCaseResponse = new GetAddressResponse
             {
-                Addresses = new List<AddressResponse> { response.ToResponse() }
+                Address = response.ToResponse()
             };
             return useCaseResponse;
         }

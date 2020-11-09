@@ -1,4 +1,3 @@
-using System.Linq;
 using AddressesAPI.V2.Boundary.Requests;
 using AddressesAPI.V2.Boundary.Responses;
 using AddressesAPI.V2.Boundary.Responses.Metadata;
@@ -33,11 +32,11 @@ namespace AddressesAPI.V2.Controllers
             {
                 var request = new GetAddressRequest { addressID = addressKey };
                 var response = _getAddressUseCase.ExecuteAsync(request);
-                if (response?.Addresses == null || !response.Addresses.Any())
+                if (response?.Address == null)
                 {
                     return new NotFoundResult();
                 }
-                return new OkObjectResult(new APIResponse<SearchAddressResponse>(response));
+                return new OkObjectResult(new APIResponse<GetAddressResponse>(response));
             }
             catch (BadRequestException)
             {

@@ -44,9 +44,9 @@ namespace AddressesAPI.Tests.V2.E2ETests
 
             response.StatusCode.Should().Be(200);
 
-            var apiResponse = await response.ConvertToSearchAddressResponseObject().ConfigureAwait(true);
+            var apiResponse = await response.ConvertToGetAddressResponseObject().ConfigureAwait(true);
 
-            var returnedRecord = apiResponse.Data.Addresses.FirstOrDefault();
+            var returnedRecord = apiResponse.Data.Address;
 
             returnedRecord.AddressKey.Should().Be(addressId);
             returnedRecord.USRN.Should().Be(addressRecord.USRN);
