@@ -90,7 +90,7 @@ namespace AddressesAPI.V2.Boundary.Responses.Data
         /// <summary>
         /// Only included if format query parameter is set to detailed.
         /// </summary>
-        public bool? HackneyGazetteerOutOfBoroughAddress { get; set; } //for LLPG results; should be null in results for NLPG
+        public bool? OutOfBoroughAddress { get; set; } //for LLPG results; should be null in results for NLPG
         /// <summary>
         /// Only included if format query parameter is set to detailed.
         /// </summary>

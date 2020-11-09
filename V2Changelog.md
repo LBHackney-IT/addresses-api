@@ -5,6 +5,7 @@
 ## Changes to the address response object
 1. The `Approved Preferred` option of the `addressStatus` property is changing to `Approved`. Making the new possible values:
 ```[ Approved, Historial, Alternative, Provisional ]```.
+2. The `hackneyGazetteerOutOfBoroughAddress` property has been replaced with the `outOfBoroughAddress` property, and denotes whether, or nor, an address is within the hackney borough.
 
 ## Changes to the get single address endpoint
 `/api/v2/addresses/{addressKey}`

@@ -96,7 +96,7 @@ namespace AddressesAPI.Tests.V2.UseCase
                 UsagePrimary = "Unclassified",
                 UsageCode = "UC",
                 PropertyShell = false,
-                HackneyGazetteerOutOfBoroughAddress = false,
+                OutOfBoroughAddress = false,
                 Easting = 554189.4500,
                 Northing = 190281.1000,
                 Longitude = 0.2244347,

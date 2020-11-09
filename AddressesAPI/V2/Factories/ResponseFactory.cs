@@ -49,7 +49,7 @@ namespace AddressesAPI.V2.Factories
                 UsageCode = domain.UsageCode,
                 PlanningUseClass = domain.PlanningUseClass,
                 PropertyShell = domain.PropertyShell,
-                HackneyGazetteerOutOfBoroughAddress = domain.HackneyGazetteerOutOfBoroughAddress,
+                OutOfBoroughAddress = domain.OutOfBoroughAddress,
                 Easting = domain.Easting,
                 Northing = domain.Northing,
                 Longitude = domain.Longitude,
