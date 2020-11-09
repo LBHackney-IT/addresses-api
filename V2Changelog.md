@@ -45,8 +45,11 @@ going forward it will look like:
 
 
 
-## Search Addresses
+## Changes to the search addresses endpoint
 `/api/v2/addresses`
+
+1. Page count and total count properties in the response are now camel case instead of snake case. i.e. `page_count` is not `pageCount` and `total_count` is now `totalCount`.
+
 
 # Properties
 ## Get cross references for a propery
