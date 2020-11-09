@@ -80,23 +80,25 @@ namespace AddressesAPI.V2.Gateways
                             || EF.Functions.ILike(a.BuildingNumber, buildingNumberSearchTerm))
                 .Where(a => string.IsNullOrWhiteSpace(request.Street) ||
                             EF.Functions.ILike(a.Street.Replace(" ", ""), streetSearchTerm))
-                .Where(a => addressStatusSearchTerms == null || addressStatusSearchTerms.Contains(a.AddressStatus.ToLower()))
+                .Where(a => addressStatusSearchTerms == null ||
+                            addressStatusSearchTerms.Contains(a.AddressStatus.ToLower()))
                 .Where(a => request.Uprn == null || a.UPRN == request.Uprn)
                 .Where(a => request.Usrn == null
                             || a.USRN == request.Usrn)
                 .Where(a => (usageSearchTerms == null || !usageSearchTerms.Any())
                             || usageSearchTerms.Contains(a.UsagePrimary))
                 .WhereAny(usageCodeSearchTerms?.Select(u =>
-                        (Expression<Func<Infrastructure.Address, bool>>) (x =>
+                        (Expression<Func<Address, bool>>) (x =>
                             EF.Functions.ILike(x.UsageCode, $"%{u}%")))
                     .ToArray())
                 .Where(a => request.Gazetteer == GlobalConstants.Gazetteer.Both
                             || EF.Functions.ILike(a.Gazetteer, request.Gazetteer.ToString())
                             || request.Gazetteer == GlobalConstants.Gazetteer.Hackney
-                                && EF.Functions.ILike(a.Gazetteer, "local")
-                            )
-                .Where(a => request.HackneyGazetteerOutOfBoroughAddress == null ||
-                            request.HackneyGazetteerOutOfBoroughAddress == a.OutOfBoroughAddress);
+                            && EF.Functions.ILike(a.Gazetteer, "local")
+                )
+                .Where(a => request.OutOfBoroughAddress
+                            || !(EF.Functions.ILike(a.Gazetteer, "national") || a.OutOfBoroughAddress)
+                );
             return queryBase;
         }
 

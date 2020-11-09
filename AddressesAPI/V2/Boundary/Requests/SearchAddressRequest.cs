@@ -9,12 +9,9 @@ namespace AddressesAPI.V2.Boundary.Requests
     /// </summary>
     public class SearchAddressRequest
     {
-        private string _gazetteer;
-
         public SearchAddressRequest()
         {
             AddressStatus = "approved preferred";
-            Gazetteer = GlobalConstants.Gazetteer.Both.ToString();
         }
 
         /// <summary>
@@ -37,24 +34,7 @@ namespace AddressesAPI.V2.Boundary.Requests
         /// <summary>
         /// LOCAL/NATIONAL/BOTH (Defaults to LOCAL)
         /// </summary>
-        public string Gazetteer
-        {
-            get => _gazetteer;
-            set
-            {
-                //This logic needs reworking
-                _gazetteer = value;
-
-                if (_gazetteer == GlobalConstants.Gazetteer.Hackney.ToString())
-                {
-                    HackneyGazetteerOutOfBoroughAddress = false;
-                }
-                else if (_gazetteer == GlobalConstants.Gazetteer.Both.ToString())
-                {
-                    HackneyGazetteerOutOfBoroughAddress = null;
-                }
-            }
-        }
+        public string Gazetteer { get; set; } = GlobalConstants.Gazetteer.Both.ToString();
 
         /// <summary>
         /// Filter by UPRN (unique property reference number - unique identifier of the BLPU (Basic Land and Property Unit); a UPRN can have more than one LPI/address. )
@@ -110,7 +90,8 @@ namespace AddressesAPI.V2.Boundary.Requests
         ///precedence over the national gazetteer
         ///version.
         /// </summary>
-        public bool? HackneyGazetteerOutOfBoroughAddress { get; set; }
+        [FromQuery(Name = "out_of_borough")]
+        public bool OutOfBoroughAddress { get; set; } = true;
 
         /// <summary>
         /// Page defaults to 1 as paging is 1 index based not 0 index based
