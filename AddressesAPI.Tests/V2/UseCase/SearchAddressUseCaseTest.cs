@@ -66,8 +66,8 @@ namespace AddressesAPI.Tests.V2.UseCase
             response.Addresses.Should().BeEquivalentTo(addresses.ToResponse());
         }
 
-        [TestCase("approved,historical", new[]{ "approved", "historical" })]
-        [TestCase("provisional", new[]{ "provisional" })]
+        [TestCase("approved,historical", new[] { "approved", "historical" })]
+        [TestCase("provisional", new[] { "provisional" })]
         public void ExecuteAsync_CorrectlyConvertsAddressStatusIntoAList(string addressQuery, IEnumerable<string> expectedList)
         {
             SetupValidatorToReturnValid();
