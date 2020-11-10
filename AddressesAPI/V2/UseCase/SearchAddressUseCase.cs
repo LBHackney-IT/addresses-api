@@ -62,7 +62,7 @@ namespace AddressesAPI.V2.UseCase
                 PageSize = request.PageSize,
                 UsageCode = request.usageCode,
                 UsagePrimary = request.usagePrimary,
-                HackneyGazetteerOutOfBoroughAddress = request.HackneyGazetteerOutOfBoroughAddress
+                OutOfBoroughAddress = request.OutOfBoroughAddress
             };
         }
     }

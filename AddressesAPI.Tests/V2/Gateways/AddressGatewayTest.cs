@@ -377,15 +377,14 @@ namespace AddressesAPI.Tests.V2.Gateways
             addresses.First().Should().BeEquivalentTo(savedAddress.ToDomain());
         }
 
-        [TestCase(true)]
-        [TestCase(false)]
-        public void WillFilterByOutOfBoroughAddresses(bool outOfBoroughAddressFlag)
+        [Test]
+        public void WillFilterHackneyAddressByOutOfBoroughAddresses()
         {
-            var savedAddress = TestEfDataHelper.InsertAddress(DatabaseContext,
-                request: new NationalAddress { NeverExport = outOfBoroughAddressFlag }
+            var outOfBorough = TestEfDataHelper.InsertAddress(DatabaseContext,
+                request: new NationalAddress { NeverExport = true, Gazetteer = "Hackney" }
             );
-            TestEfDataHelper.InsertAddress(DatabaseContext,
-                request: new NationalAddress { NeverExport = !outOfBoroughAddressFlag }
+            var hackneyAddress = TestEfDataHelper.InsertAddress(DatabaseContext,
+                request: new NationalAddress { NeverExport = false, Gazetteer = "Hackney" }
             );
             var request = new SearchParameters
             {
@@ -393,12 +392,62 @@ namespace AddressesAPI.Tests.V2.Gateways
                 PageSize = 50,
                 Format = GlobalConstants.Format.Detailed,
                 Gazetteer = GlobalConstants.Gazetteer.Both,
-                HackneyGazetteerOutOfBoroughAddress = outOfBoroughAddressFlag,
+                OutOfBoroughAddress = false,
             };
             var (addresses, _) = _classUnderTest.SearchAddresses(request);
 
             addresses.Count.Should().Be(1);
-            addresses.First().Should().BeEquivalentTo(savedAddress.ToDomain());
+            addresses.First().Should().BeEquivalentTo(hackneyAddress.ToDomain());
+        }
+
+        [Test]
+        public void WillFilterOutAllNationalAddressesWhenQueryingForNoOutOfBoroughAddresses()
+        {
+            var outOfBorough1 = TestEfDataHelper.InsertAddress(DatabaseContext,
+                request: new NationalAddress { NeverExport = true, Gazetteer = "National" }
+            );
+            var outOfBorough2 = TestEfDataHelper.InsertAddress(DatabaseContext,
+                request: new NationalAddress { NeverExport = false, Gazetteer = "National" }
+            );
+            var request = new SearchParameters
+            {
+                Page = 1,
+                PageSize = 50,
+                Format = GlobalConstants.Format.Detailed,
+                Gazetteer = GlobalConstants.Gazetteer.Both,
+                OutOfBoroughAddress = false,
+            };
+            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+
+            addresses.Count.Should().Be(0);
+        }
+
+        [Test]
+        public void IfOutOfBoroughFlagIsTrueReturnsAllAddresses()
+        {
+            TestEfDataHelper.InsertAddress(DatabaseContext,
+                request: new NationalAddress { NeverExport = true, Gazetteer = "Hackney" }
+            );
+            TestEfDataHelper.InsertAddress(DatabaseContext,
+                request: new NationalAddress { NeverExport = false, Gazetteer = "Hackney" }
+            );
+            TestEfDataHelper.InsertAddress(DatabaseContext,
+                request: new NationalAddress { NeverExport = false, Gazetteer = "National" }
+            );
+            TestEfDataHelper.InsertAddress(DatabaseContext,
+                request: new NationalAddress { NeverExport = true, Gazetteer = "National" }
+            );
+            var request = new SearchParameters
+            {
+                Page = 1,
+                PageSize = 50,
+                Format = GlobalConstants.Format.Detailed,
+                Gazetteer = GlobalConstants.Gazetteer.Both,
+                OutOfBoroughAddress = true,
+            };
+            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+
+            addresses.Count.Should().Be(4);
         }
         #endregion
 

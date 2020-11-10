@@ -147,6 +147,39 @@ namespace AddressesAPI.Tests.V2.E2ETests
         }
 
         [Test]
+        public async Task CanQueryForNoOutOfBoroughAddresses()
+        {
+            var hackneyOutOfBorough = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress
+            {
+                Postcode = "N1 3JH",
+                Gazetteer = "Hackney",
+                NeverExport = true
+            });
+
+            var hackneyInBorough = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress
+            {
+                Postcode = "N1 7YH",
+                Gazetteer = "Hackney",
+                NeverExport = false
+            });
+
+            var nationalAddress = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress
+            {
+                Postcode = "N1 7UK",
+                Gazetteer = "National"
+            });
+
+            var queryString = "postcode=N1&format=Detailed&gazetteer=Both&out_of_borough=false";
+
+            var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
+            response.StatusCode.Should().Be(200);
+
+            var returnedAddress = await response.ConvertToSearchAddressResponseObject().ConfigureAwait(true);
+            returnedAddress.Data.Addresses.Count.Should().Be(1);
+            returnedAddress.Data.Addresses.First().AddressKey.Should().Be(hackneyInBorough.AddressKey);
+        }
+
+        [Test]
         public async Task PassingAnIncorrectFormat()
         {
             var queryString = "street=hackneyroad&gazetteer=local&format=yes";

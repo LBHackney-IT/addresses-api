@@ -21,7 +21,7 @@ namespace AddressesAPI.Tests.V1.Factories
             var exceptions = new Dictionary<string, object>
             {
                 {"CommercialOccupier", addressEntity.Organisation},
-                {"HackneyGazetteerOutOfBoroughAddress", addressEntity.NeverExport }
+                {"HackneyGazetteerOutOfBoroughAddress", addressEntity.OutOfBoroughAddress }
             };
             address.ShouldBeEquivalentToExpectedObjectWithExceptions(addressEntity, exceptions);
         }

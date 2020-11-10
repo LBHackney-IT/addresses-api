@@ -12,7 +12,7 @@ namespace AddressesAPI.V2.Domain
         public string UsageCode { get; set; }
         public GlobalConstants.Format Format { get; set; }
         public string AddressStatus { get; set; }
-        public bool? HackneyGazetteerOutOfBoroughAddress { get; set; }
+        public bool OutOfBoroughAddress { get; set; }
         public int Page { get; set; }
         public int PageSize { get; set; }
     }

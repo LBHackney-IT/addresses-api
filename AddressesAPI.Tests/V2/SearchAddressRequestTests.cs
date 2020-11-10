@@ -40,44 +40,30 @@ namespace AddressesAPI.Tests.V2
         }
         #endregion
 
-        #region HackneyGazetteerOutOfBoroughAddress
-        [Test] //Gazetteer -> no input, HGOBAddress -> no input
-        public void GivenNoInputValueForGazetteerAndHackneyGazetteerOutOfBoroughAddressParameters_WhenSearchAddressRequestObjectIsCreated_GazetteerIsSetToItsDefaultAndHackneyGazetteerOutOfBoroughAddressIsSetToNullBasedOnThat()
+        #region OutOfBoroughAddress
+        [Test]
+        public void GivenNoInputValueForOutOfBoroughAddressParameter_WhenSearchAddressRequestObjectIsCreated_OutOfBoroughAddressIsSetToTrue()
         {
             var classUnderTest = new SearchAddressRequest();
-            classUnderTest.HackneyGazetteerOutOfBoroughAddress.Should().BeNull();
-        }
-
-        [Test] //Gazetteer = Both, HGOBAddress -> no input
-        public void GivenGazetteerValueBothAndNoInputForHackneyGazetteerOutOfBoroughAddress_WhenSearchAddressRequestObjectIsCreated_HackneyGazetteerOutOfBoroughAddressIsSetToNull()
-        {
-            var classUnderTest = new SearchAddressRequest { Gazetteer = _bothGazetteers };
-            classUnderTest.HackneyGazetteerOutOfBoroughAddress.Should().BeNull();
-        }
-
-        [Test] //Gazetteer = Local, HGOBAddress -> no input
-        public void GivenGazetteerValueLocalAndNoInputForHackneyGazetteerOutOfBoroughAddress_WhenSearchAddressRequestObjectIsCreated_HackneyGazetteerOutOfBoroughAddressIsSetToFalse()
-        {
-            var classUnderTest = new SearchAddressRequest { Gazetteer = _localGazetteer };
-            classUnderTest.HackneyGazetteerOutOfBoroughAddress.Should().BeFalse();
+            classUnderTest.OutOfBoroughAddress.Should().BeTrue();
         }
 
         [TestCase("Both", false)]
         [TestCase("Both", true)]
         [TestCase("Local", false)]
         [TestCase("Local", true)]
-        public void GivenAHackneyGazetteerOutOfBoroughAddressInputValueAndAnyGazetteerValue_WhenSearchAddressRequestObjectIsCreated_HackneyGazetteerOutOfBoroughAddressIsSetToWhateverItsInputWas(string gazetteer, bool? hackneyGazetteerOutOfBoroughAddress)
+        public void GivenAHackneyGazetteerOutOfBoroughAddressInputValueAndAnyGazetteerValue_WhenSearchAddressRequestObjectIsCreated_HackneyGazetteerOutOfBoroughAddressIsSetToWhateverItsInputWas(string gazetteer, bool hackneyGazetteerOutOfBoroughAddress)
         {
-            var classUnderTest = new SearchAddressRequest { Gazetteer = gazetteer, HackneyGazetteerOutOfBoroughAddress = hackneyGazetteerOutOfBoroughAddress };
-            classUnderTest.HackneyGazetteerOutOfBoroughAddress.Should().Be(hackneyGazetteerOutOfBoroughAddress);
+            var classUnderTest = new SearchAddressRequest { Gazetteer = gazetteer, OutOfBoroughAddress = hackneyGazetteerOutOfBoroughAddress };
+            classUnderTest.OutOfBoroughAddress.Should().Be(hackneyGazetteerOutOfBoroughAddress);
         }
 
         [TestCase(true)]
         [TestCase(false)]
-        public void GivenNoInputForGazetteerAndInputValueForHackneyGazetteerOutOfBoroughAddress_WhenSearchAddressRequestObjectIsCreated_HackneyGazetteerOutOfBoroughAddressIsSetToWhateverItsInputWas(bool? hackneyGazetteerOutOfBoroughAddress)
+        public void GivenNoInputForGazetteerAndInputValueForHackneyGazetteerOutOfBoroughAddress_WhenSearchAddressRequestObjectIsCreated_HackneyGazetteerOutOfBoroughAddressIsSetToWhateverItsInputWas(bool hackneyGazetteerOutOfBoroughAddress)
         {
-            var classUnderTest = new SearchAddressRequest { HackneyGazetteerOutOfBoroughAddress = hackneyGazetteerOutOfBoroughAddress };
-            classUnderTest.HackneyGazetteerOutOfBoroughAddress.Should().Be(hackneyGazetteerOutOfBoroughAddress);
+            var classUnderTest = new SearchAddressRequest { OutOfBoroughAddress = hackneyGazetteerOutOfBoroughAddress };
+            classUnderTest.OutOfBoroughAddress.Should().Be(hackneyGazetteerOutOfBoroughAddress);
         }
         #endregion
     }
