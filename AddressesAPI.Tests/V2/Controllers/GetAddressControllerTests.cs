@@ -48,8 +48,8 @@ namespace AddressesAPI.Tests.V2.Controllers
             var response = _classUnderTest.GetAddress(lpi_key);
 
             response.Should().NotBeNull();
-            response.Should().BeOfType<NotFoundResult>();
-            (response as NotFoundResult).StatusCode.Should().Be(404);
+            response.Should().BeOfType<NotFoundObjectResult>();
+            (response as NotFoundObjectResult).StatusCode.Should().Be(404);
         }
     }
 }

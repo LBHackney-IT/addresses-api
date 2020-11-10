@@ -196,8 +196,9 @@ namespace AddressesAPI.Tests.V2.E2ETests
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(400);
             var errors = await response.ConvertToErrorResponseObject().ConfigureAwait(true);
+            errors.StatusCode.Should().Be(400);
             errors.Errors.Should().ContainEquivalentOf(
-                new ValidationError { Message = message, FieldName = fieldName }
+                new Error { Message = message, FieldName = fieldName }
             );
         }
 

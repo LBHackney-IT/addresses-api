@@ -40,7 +40,7 @@ namespace AddressesAPI.V2.Controllers
             }
             catch (BadRequestException e)
             {
-                return new BadRequestObjectResult(e.ValidationResponse);
+                return new BadRequestObjectResult(new ErrorResponse(e.ValidationResponse));
             }
 
         }

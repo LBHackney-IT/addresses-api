@@ -12,21 +12,22 @@ namespace AddressesAPI.V2.Boundary.Responses
         public int StatusCode { get; set; }
 
         [JsonProperty("errors")]
-        public IEnumerable<ValidationError> Errors { get; set; }
+        public IEnumerable<Error> Errors { get; set; }
 
         public ErrorResponse() { }
 
         public ErrorResponse(ValidationResult validationResult)
         {
             var errors = validationResult.Errors
-                .Select(validationResultError => new ValidationError(validationResultError)).ToList();
-
+                .Select(validationResultError => new Error(validationResultError)).ToList();
             Errors = errors;
+            StatusCode = 400;
         }
 
-        public ErrorResponse(IList<ValidationError> validationResult)
+        public ErrorResponse(int statusCode, IEnumerable<Error> errors)
         {
-            Errors = validationResult;
+            Errors = errors;
+            StatusCode = statusCode;
         }
     }
 }

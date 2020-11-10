@@ -2,20 +2,23 @@ using FluentValidation.Results;
 
 namespace AddressesAPI.V2.Boundary.Responses.Metadata
 {
-    public class ValidationError
+    public class Error
     {
         public string Message { get; set; }
         public string FieldName { get; set; }
 
-        public ValidationError()
-        {
+        public Error() { }
 
-        }
-
-        public ValidationError(ValidationFailure validationFailure)
+        public Error(ValidationFailure validationFailure)
         {
             Message = validationFailure?.ErrorMessage;
             FieldName = validationFailure?.PropertyName;
+        }
+
+        public Error(string message, string fieldName = null)
+        {
+            Message = message;
+            FieldName = fieldName;
         }
     }
 }

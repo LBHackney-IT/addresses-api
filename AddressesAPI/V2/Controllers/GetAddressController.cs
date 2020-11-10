@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using AddressesAPI.V2.Boundary.Requests;
 using AddressesAPI.V2.Boundary.Responses;
 using AddressesAPI.V2.Boundary.Responses.Metadata;
@@ -34,13 +35,19 @@ namespace AddressesAPI.V2.Controllers
                 var response = _getAddressUseCase.ExecuteAsync(request);
                 if (response?.Address == null)
                 {
-                    return new NotFoundResult();
+                    return new NotFoundObjectResult(new ErrorResponse(404, new List<Error>
+                    {
+                        new Error("An address could not be found for the given key")
+                    }));
                 }
                 return new OkObjectResult(new APIResponse<GetAddressResponse>(response));
             }
             catch (BadRequestException)
             {
-                return new BadRequestResult();
+                return new BadRequestObjectResult(new ErrorResponse(400, new List<Error>
+                {
+                    new Error("Address Key is invalid. It should by 14 characters long string.")
+                }));
             }
         }
 
