@@ -69,8 +69,10 @@ namespace AddressesAPI.V2.Gateways
             var postcodeSearchTerm = request.Postcode == null ? null : $"{request.Postcode.Replace(" ", "")}%";
             var buildingNumberSearchTerm = GenerateSearchTerm(request.BuildingNumber);
             var streetSearchTerm = GenerateSearchTerm(request.Street);
-            var addressStatusSearchTerms = request.AddressStatus?.Split(',').Select(a => a.ToLower())
-                                           ?? new[] { "approved preferred" };
+            var addressStatusQuery = (request.AddressStatus?.Select(a => a.ToLower()) ?? new[] { "approved" }).ToList();
+            var addressStatusSearchTerms = addressStatusQuery.Contains("approved")
+                ? addressStatusQuery.Append("approved preferred")
+                : addressStatusQuery;
             var usageSearchTerms = request.UsagePrimary?.Split(',').Where(u => u != "Parent Shell").ToList();
             var usageCodeSearchTerms = request.UsageCode?.Split(',').ToList();
             var queryBase = _addressesContext.Addresses

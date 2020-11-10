@@ -11,7 +11,7 @@ namespace AddressesAPI.V2.Boundary.Requests
     {
         public SearchAddressRequest()
         {
-            AddressStatus = "approved preferred";
+            AddressStatus = "approved";
         }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace AddressesAPI.V2.Boundary.Requests
         /// <summary>
         /// Allows switch between address statuses:
         /// Alternative,
-        /// Approved Preferred (Default),
+        /// Approved (Default),
         /// Historical,
         /// Provisional
         /// </summary>
