@@ -171,16 +171,17 @@ namespace AddressesAPI.Tests.V2.Gateways
             addresses.First().Should().BeEquivalentTo(savedAddress.ToDomain());
         }
 
-        [TestCase("Alternative", "Alternative")]
-        [TestCase("Approved Preferred", "Approved Preferred")]
-        [TestCase("Historical", "Historical")]
-        [TestCase("Provisional", "Provisional")]
-        [TestCase("Alternative", "Alternative,Approved Preferred")]
-        [TestCase("alternative", "Alternative,Approved Preferred")]
-        [TestCase("Historical", "Alternative,Approved Preferred,Historical")]
-        [TestCase("Provisional", "Historical,Provisional")]
-        [TestCase("Provisional", "Historical,provisional")]
-        public void WillSearchForAddressesWithStatus(string savedStatus, string statusSearchTerm)
+        [TestCase("Alternative", new[] { "Alternative" })]
+        [TestCase("Approved", new[] { "Approved" })]
+        [TestCase("Approved Preferred", new[] { "Approved" })]
+        [TestCase("Historical", new[] { "Historical" })]
+        [TestCase("Provisional", new[] { "Provisional" })]
+        [TestCase("Alternative", new[] { "Alternative", "Approved" })]
+        [TestCase("alternative", new[] { "Alternative", "Approved" })]
+        [TestCase("Historical", new[] { "Alternative", "Approved", "Historical" })]
+        [TestCase("Provisional", new[] { "Historical", "Provisional" })]
+        [TestCase("Provisional", new[] { "Historical", "provisional" })]
+        public void WillSearchForAddressesWithStatus(string savedStatus, IEnumerable<string> statusSearchTerm)
         {
             var savedAddress = TestEfDataHelper.InsertAddress(DatabaseContext,
                 request: new NationalAddress { AddressStatus = savedStatus }

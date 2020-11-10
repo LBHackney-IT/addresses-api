@@ -9,7 +9,7 @@ namespace AddressesAPI.Tests.V2.Helper
         {
             var fixture = new Fixture();
             var randomAddressRecord = fixture.Build<NationalAddress>()
-                .With(a => a.AddressStatus, request?.AddressStatus ?? "Approved Preferred")
+                .With(a => a.AddressStatus, request?.AddressStatus ?? "Approved")
                 .Create();
             if (key != null) randomAddressRecord.AddressKey = key;
             if (request?.Postcode != null)

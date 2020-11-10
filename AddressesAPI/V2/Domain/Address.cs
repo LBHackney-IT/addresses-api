@@ -6,7 +6,7 @@ namespace AddressesAPI.V2.Domain
         public string AddressKey { get; set; }
         public int? USRN { get; set; }
         public long? ParentUPRN { get; set; } //nullable
-        public string AddressStatus { get; set; } //1 = "Approved Preferred", 3 = "Alternative", 5 = "Candidate", 6 = "Provisional", 7 = "Rejected External",  8 = "Historical", 9 = "Rejected Internal"
+        public string AddressStatus { get; set; } //1 = "Approved", 3 = "Alternative", 5 = "Candidate", 6 = "Provisional", 7 = "Rejected External",  8 = "Historical", 9 = "Rejected Internal"
         public string UnitName { get; set; }
         public string UnitNumber { get; set; } //string because can be e.g. "1a"
         public string BuildingName { get; set; }

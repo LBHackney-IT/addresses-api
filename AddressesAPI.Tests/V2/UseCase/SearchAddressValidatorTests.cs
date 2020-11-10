@@ -33,7 +33,7 @@ namespace AddressesAPI.Tests.V2.UseCase
 
         [TestCase("alternative")]
         [TestCase("historical")]
-        [TestCase("approved preferred,historical")]
+        [TestCase("approved,historical")]
         public void GivenAnAllowedAddressStatusValue_WhenCallingValidation_ItReturnsNoErrors(string addressStatusVal)
         {
             var request = new SearchAddressRequest { AddressStatus = addressStatusVal };

@@ -57,7 +57,7 @@ namespace AddressesAPI.V2.UseCase
                 Street = request.Street,
                 Uprn = request.UPRN,
                 Usrn = request.USRN,
-                AddressStatus = request.AddressStatus,
+                AddressStatus = request.AddressStatus?.Split(','),
                 BuildingNumber = request.BuildingNumber,
                 PageSize = request.PageSize,
                 UsageCode = request.usageCode,

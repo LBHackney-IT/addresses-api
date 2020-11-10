@@ -30,7 +30,7 @@ namespace AddressesAPI.V2.Boundary.Responses.Data
         /// <summary>
         /// Only included if format query parameter is set to detailed.
         /// </summary>
-        public string AddressStatus { get; set; } //1 = "Approved Preferred", 3 = "Alternative", 5 = "Candidate", 6 = "Provisional", 7 = "Rejected External",  8 = "Historical", 9 = "Rejected Internal"
+        public string AddressStatus { get; set; } //1 = "Approved", 3 = "Alternative", 5 = "Candidate", 6 = "Provisional", 7 = "Rejected External",  8 = "Historical", 9 = "Rejected Internal"
         /// <summary>
         /// Only included if format query parameter is set to detailed.
         /// </summary>

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace AddressesAPI.V2.Domain
 {
     public class SearchParameters
@@ -11,7 +13,7 @@ namespace AddressesAPI.V2.Domain
         public string UsagePrimary { get; set; }
         public string UsageCode { get; set; }
         public GlobalConstants.Format Format { get; set; }
-        public string AddressStatus { get; set; }
+        public IEnumerable<string> AddressStatus { get; set; }
         public bool OutOfBoroughAddress { get; set; }
         public int Page { get; set; }
         public int PageSize { get; set; }

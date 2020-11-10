@@ -80,7 +80,9 @@ Going forward they will look like:
   ]
 }
 ```
-4. There is a new query parameter `out_of_borough` which will toggle whether or not to include addresses which are outside of the borough of Hackney. The default setting for this parameter is `true` which will return all addresses, you can set `out_of_borough=false` if you wish to only receive addresses within Hackney.
+4. The `Approved Preferred` option of the `address_status` query parameter is changing to `Approved`. Making the new possible values:
+   ```[ Approved, Historial, Alternative, Provisional ]```.
+5. There is a new query parameter `out_of_borough` which will toggle whether or not to include addresses which are outside of the borough of Hackney. The default setting for this parameter is `true` which will return all addresses, you can set `out_of_borough=false` if you wish to only receive addresses within Hackney.
 
 # Properties
 ## Get cross references for a propery

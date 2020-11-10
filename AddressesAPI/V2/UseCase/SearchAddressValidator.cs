@@ -81,7 +81,7 @@ namespace AddressesAPI.V2.UseCase
 
         private static bool CanBeAnyCombinationOfAllowedAddressStatuses(string addressStatus)
         {
-            var allowedValues = new List<string> { "historical", "alternative", "approved preferred", "provisional" };
+            var allowedValues = new List<string> { "historical", "alternative", "approved", "provisional" };
             if (string.IsNullOrEmpty(addressStatus))
             {
                 return false;
