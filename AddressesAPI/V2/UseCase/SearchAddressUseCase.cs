@@ -60,8 +60,8 @@ namespace AddressesAPI.V2.UseCase
                 AddressStatus = request.AddressStatus?.Split(','),
                 BuildingNumber = request.BuildingNumber,
                 PageSize = request.PageSize,
-                UsageCode = request.usageCode,
-                UsagePrimary = request.usagePrimary,
+                UsageCode = request.UsageCode,
+                UsagePrimary = request.UsagePrimary,
                 OutOfBoroughAddress = request.OutOfBoroughAddress
             };
         }

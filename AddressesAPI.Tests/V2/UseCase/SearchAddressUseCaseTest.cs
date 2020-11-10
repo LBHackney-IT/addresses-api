@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using AddressesAPI.Tests.V2.Helper;
 using AddressesAPI.V2;
 using AddressesAPI.V2.Boundary.Requests;
 using AddressesAPI.V2.Boundary.Responses;
@@ -11,11 +10,12 @@ using AddressesAPI.V2.Factories;
 using AddressesAPI.V2.Gateways;
 using AddressesAPI.V2.UseCase;
 using AddressesAPI.V2.UseCase.Interfaces;
+using AutoFixture;
+using Bogus;
 using FluentAssertions;
-using FluentAssertions.Common;
-using FluentValidation.Results;
 using Moq;
 using NUnit.Framework;
+using ValidationResult = FluentValidation.Results.ValidationResult;
 
 namespace AddressesAPI.Tests.V2.UseCase
 {
@@ -24,6 +24,8 @@ namespace AddressesAPI.Tests.V2.UseCase
         private ISearchAddressUseCase _classUnderTest;
         private Mock<IAddressesGateway> _fakeGateway;
         private Mock<ISearchAddressValidator> _fakeValidator;
+        private Faker _faker = new Faker();
+        private Fixture _fixture = new Fixture();
 
         [SetUp]
         public void SetUp()
@@ -34,36 +36,42 @@ namespace AddressesAPI.Tests.V2.UseCase
         }
 
         [Test]
-        public void GivenLocalGazetteer_WhenExecuteAsync_ThenOnlyLocalAddressesShouldBeReturned()
+        public void GivenValidInput_WhenExecute_WillPassAllSearchParametersToTheGateway()
         {
             SetupValidatorToReturnValid();
-            var addresses = new List<Address>
-            {
-                new Address
-                {
-                    AddressKey = "ABCDEFGHIJKLMN",UPRN = 10024389298,USRN = 21320239,ParentUPRN = 10024389282,AddressStatus = "Approved",UnitName = "FLAT 16",UnitNumber = "",BuildingName = "HAZELNUT COURT",BuildingNumber = "1",Street = "FIRWOOD LANE",Postcode = "RM3 0FS",Locality = "",Gazetteer = "NATIONAL",CommercialOccupier = "",UsageDescription = "Unclassified, Awaiting Classification",UsagePrimary = "Unclassified", UsageCode = "UC",PropertyShell = false,OutOfBoroughAddress = false,Easting = 554189.4500,Northing = 190281.1000,Longitude = 0.2244347,Latitude = 51.590289
-                },
-                new Address
-                {
-                    AddressKey = "ABCDEFGHIJKLM2", UPRN = 10024389298,USRN = 21320239,ParentUPRN = 10024389282,AddressStatus = "Approved",UnitName = "FLAT 16",UnitNumber = "",BuildingName = "HAZELNUT COURT",BuildingNumber = "1",Street = "FIRWOOD LANE",Postcode = "RM3 0FS",Locality = "",Gazetteer = "LOCAL",CommercialOccupier  = "",UsageDescription = "Unclassified, Awaiting Classification",UsagePrimary = "Unclassified", UsageCode = "UC",PropertyShell = false,OutOfBoroughAddress = false,Easting = 554189.4500,Northing = 190281.1000,Longitude = 0.2244347,Latitude = 51.590289
-                }
-            };
 
-            var postcode = "RM3 0FS";
             var request = new SearchAddressRequest
             {
-                Postcode = postcode,
-                Gazetteer = GlobalConstants.Gazetteer.Hackney.ToString()
+                Postcode = "RM3 0FS",
+                Gazetteer = "Local",
+                Format = "Detailed",
+                Page = _faker.Random.Int(),
+                Street = _faker.Address.StreetAddress(),
+                UsageCode = _faker.Random.String2(4),
+                UsagePrimary = _faker.Random.Word(),
+                AddressStatus = "approved",
+                BuildingNumber = _faker.Address.BuildingNumber(),
+                PageSize = _faker.Random.Int(10, 40),
+                UPRN = _faker.Random.Long(0, 9999999999),
+                USRN = _faker.Random.Int(0, 9999999),
             };
-            _fakeGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(i =>
-                    i.Postcode.Equals(postcode) && i.Gazetteer == GlobalConstants.Gazetteer.Hackney)))
-                .Returns((addresses, 1));
+            _fakeGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(
+                    x => x.Format == GlobalConstants.Format.Detailed
+                         && x.Gazetteer == GlobalConstants.Gazetteer.Hackney
+                         && x.Page == request.Page
+                         && x.Postcode == request.Postcode
+                         && x.Street == request.Street
+                         && x.Uprn == request.UPRN
+                         && x.Usrn == request.USRN
+                         && x.AddressStatus == new []{"approved"}
+                         && x.BuildingNumber == request.BuildingNumber
+                         && x.PageSize == request.PageSize
+                         && x.UsageCode == request.UsageCode
+                         && x.UsagePrimary == request.UsagePrimary)))
+                .Returns((new List<Address>(), 1)).Verifiable();
 
-            var response = _classUnderTest.ExecuteAsync(request);
-            response.Should().NotBeNull();
-            response.Addresses.Count.Should().Equals(1);
-            response.TotalCount.Should().Equals(1);
-            response.Addresses.Should().BeEquivalentTo(addresses.ToResponse());
+            _classUnderTest.ExecuteAsync(request);
+            _fakeGateway.Verify();
         }
 
         [TestCase("approved,historical", new[] { "approved", "historical" })]
@@ -84,12 +92,11 @@ namespace AddressesAPI.Tests.V2.UseCase
         }
 
         [Test]
-        public void GivenLocalGazetteer_WhenExecuteAsync_InterpretsThisAsHackneyGazetteer()
+        public void GivenLocalGazetteer_WhenExecute_InterpretsThisAsHackneyGazetteer()
         {
             SetupValidatorToReturnValid();
             var request = new SearchAddressRequest
             {
-                Postcode = "RM3 0FS",
                 Gazetteer = "Local"
             };
             _fakeGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(i =>
@@ -105,37 +112,21 @@ namespace AddressesAPI.Tests.V2.UseCase
         {
             SetupValidatorToReturnValid();
             //arrange
-            var postcode = "RM3 0FS";
-
-            _fakeGateway.Setup(s => s.SearchAddresses(
-                    It.Is<SearchParameters>(i => i.Postcode.Equals(postcode))))
+            _fakeGateway.Setup(s => s.SearchAddresses(It.IsAny<SearchParameters>()))
                 .Returns((null, 0));
 
-            var request = new SearchAddressRequest
-            {
-                Postcode = postcode
-            };
             //act
-            var response = _classUnderTest.ExecuteAsync(request);
+            var response = _classUnderTest.ExecuteAsync(new SearchAddressRequest());
             //assert
             response.Addresses.Should().BeNull();
         }
 
         [Test]
-        public void GivenValidPostCode_WhenExecuteAsync_ThenMultipleAddressesShouldBeReturned()
+        public void GivenValidInput_WhenExecute_ThenAddressDetailsShouldBeReturned()
         {
             SetupValidatorToReturnValid();
-            var addresses = new List<Address>
-            {
-                new Address
-                {
-                    AddressKey = "ABCDEFGHIJKLMN", UPRN = 10024389298,USRN = 21320239,ParentUPRN = 10024389282,AddressStatus = "Approved",UnitName = "FLAT 16",UnitNumber = "",BuildingName = "HAZELNUT COURT",BuildingNumber = "1",Street = "FIRWOOD LANE",Postcode = "RM3 0FS",Locality = "",Gazetteer = "NATIONAL",CommercialOccupier = "",UsageDescription = "Unclassified, Awaiting Classification",UsagePrimary = "Unclassified",                UsageCode = "UC",PropertyShell = false,OutOfBoroughAddress = false,Easting = 554189.4500,Northing = 190281.1000,Longitude = 0.2244347,Latitude = 51.590289
-                },
-                new Address
-                {
-                    AddressKey = "ABCDEFGHIJKLM2", UPRN = 10024389298,USRN = 21320239,ParentUPRN = 10024389282,AddressStatus = "Approved",UnitName = "FLAT 16",UnitNumber = "",BuildingName = "HAZELNUT COURT",BuildingNumber = "1",Street = "FIRWOOD LANE",Postcode = "RM3 0FS",Locality = "",Gazetteer = "NATIONAL",CommercialOccupier = "",UsageDescription = "Unclassified, Awaiting Classification",UsagePrimary = "Unclassified",                UsageCode = "UC",PropertyShell = false,OutOfBoroughAddress = false,Easting = 554189.4500,Northing = 190281.1000,Longitude = 0.2244347,Latitude = 51.590289
-                }
-            };
+
+            var addresses = _fixture.CreateMany<Address>().ToList();
 
             var postcode = "RM3 0FS";
             var request = new SearchAddressRequest
@@ -143,65 +134,36 @@ namespace AddressesAPI.Tests.V2.UseCase
                 Postcode = postcode
             };
             _fakeGateway.Setup(s =>
-                    s.SearchAddresses(It.Is<SearchParameters>(i => i.Postcode.Equals("RM3 0FS"))))
-                .Returns((addresses, 2));
-
-            var response = _classUnderTest.ExecuteAsync(request);
-            response.Should().NotBeNull();
-            response.Addresses.Count.Should().Equals(2);
-            response.TotalCount.Should().Equals(2);
-        }
-
-        [Test]
-        public void GivenValidPostCode_WhenExecuteAsync_ThenAddressShouldBeReturned()
-        {
-            SetupValidatorToReturnValid();
-            var addresses = new List<Address>();
-            var address = new Address
-            {
-                AddressKey = "ABCDEFGHIJKLMN",
-                UPRN = 10024389298,
-                USRN = 21320239,
-                ParentUPRN = 10024389282,
-                AddressStatus = "Approved",
-                UnitName = "FLAT 16",
-                UnitNumber = "",
-                BuildingName = "HAZELNUT COURT",
-                BuildingNumber = "1",
-                Street = "FIRWOOD LANE",
-                Postcode = "RM3 0FS",
-                Locality = "",
-                Gazetteer = "NATIONAL",
-                CommercialOccupier = "",
-                UsageDescription = "Unclassified, Awaiting Classification",
-                UsagePrimary = "Unclassified",
-                UsageCode = "UC",
-                PropertyShell = false,
-                OutOfBoroughAddress = false,
-                Easting = 554189.4500,
-                Northing = 190281.1000,
-                Longitude = 0.2244347,
-                Latitude = 51.590289
-
-            };
-            addresses.Add(address);
-            var postcode = "RM3 0FS";
-            var request = new SearchAddressRequest
-            {
-                Postcode = postcode
-            };
-            _fakeGateway.Setup(s =>
-                    s.SearchAddresses(It.Is<SearchParameters>(i => i.Postcode.Equals("RM3 0FS"))))
+                    s.SearchAddresses(It.Is<SearchParameters>(i => i.Postcode.Equals(postcode))))
                 .Returns((addresses, 1));
 
             var response = _classUnderTest.ExecuteAsync(request);
 
             response.Should().NotBeNull();
-            response.Addresses[0].Should().BeEquivalentTo(address.ToResponse());
+            response.Addresses.Should().BeEquivalentTo(addresses.ToResponse());
         }
 
         [Test]
-        public void GivenPageZero_WhenExecuteAsync_ReturnsPageOne()
+        public void GivenValidInput_WhenExecute_ThenAddressesShouldBeReturnedWithCount()
+        {
+            SetupValidatorToReturnValid();
+
+            var totalCount = _faker.Random.Int(30, 200);
+            var numberOfAddressesInPage = _faker.Random.Int(3, 30);
+            var addresses = _fixture.CreateMany<Address>(numberOfAddressesInPage).ToList();
+
+            _fakeGateway.Setup(s =>
+                    s.SearchAddresses(It.IsAny<SearchParameters>()))
+                .Returns((addresses, totalCount));
+
+            var response = _classUnderTest.ExecuteAsync(new SearchAddressRequest());
+
+            response.Addresses.Count.Should().Be(numberOfAddressesInPage);
+            response.TotalCount.Should().Be(totalCount);
+        }
+
+        [Test]
+        public void GivenPageZero_WhenExecute_ReturnsPageOne()
         {
             SetupValidatorToReturnValid();
             //arrange
@@ -218,7 +180,7 @@ namespace AddressesAPI.Tests.V2.UseCase
         }
 
         [Test]
-        public void GivenInvalidInput_WhenExecuteAsync_ThrowsValidationError()
+        public void GivenInvalidInput_WhenExecute_ThrowsValidationError()
         {
             SetupValidatorToReturnValid(false);
             Func<SearchAddressResponse> testDelegate = () => _classUnderTest.ExecuteAsync(new SearchAddressRequest());

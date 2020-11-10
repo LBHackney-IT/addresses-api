@@ -309,28 +309,28 @@ namespace AddressesAPI.Tests.V2.UseCase
         [TestCase("someValue")]
         public void GivenARequestWithOnlyUsagePrimary_IfGazetteerIsLocal_WhenCallingValidation_ItReturnsNoError(string usagePrimary)
         {
-            var request = new SearchAddressRequest() { usagePrimary = usagePrimary, Gazetteer = _localGazetteer };
+            var request = new SearchAddressRequest() { UsagePrimary = usagePrimary, Gazetteer = _localGazetteer };
             _classUnderTest.TestValidate(request).ShouldNotHaveError();
         }
 
         [TestCase("someValue")]
         public void GivenARequestWithOnlyUsagePrimary_IfGazetteerIsBoth_WhenCallingValidation_ItReturnsAnError(string usagePrimary)
         {
-            var request = new SearchAddressRequest() { usagePrimary = usagePrimary };
+            var request = new SearchAddressRequest() { UsagePrimary = usagePrimary };
             _classUnderTest.TestValidate(request).ShouldHaveError().WithErrorMessage("You must provide at least one of (uprn, usrn, postcode), when gazetteer is 'both'.");
         }
 
         [TestCase("otherValue")]
         public void GivenARequestWithOnlyUsageCode_IfGazetteerIsLocal_WhenCallingValidation_ItReturnsNoError(string usageCode)
         {
-            var request = new SearchAddressRequest() { usageCode = usageCode, Gazetteer = _localGazetteer };
+            var request = new SearchAddressRequest() { UsageCode = usageCode, Gazetteer = _localGazetteer };
             _classUnderTest.TestValidate(request).ShouldNotHaveError();
         }
 
         [TestCase("otherValue")]
         public void GivenARequestWithOnlyUsageCode_IfGazetteerIsBoth_WhenCallingValidation_ItReturnsAnError(string usageCode)
         {
-            var request = new SearchAddressRequest() { usageCode = usageCode };
+            var request = new SearchAddressRequest() { UsageCode = usageCode };
             _classUnderTest.TestValidate(request).ShouldHaveError().WithErrorMessage("You must provide at least one of (uprn, usrn, postcode), when gazetteer is 'both'.");
         }
 

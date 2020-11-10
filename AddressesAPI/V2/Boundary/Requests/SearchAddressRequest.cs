@@ -60,12 +60,13 @@ namespace AddressesAPI.V2.Boundary.Requests
         /// ALL (default)
         /// </summary>
         [FromQuery(Name = "usage_primary")]
-        public string usagePrimary { get; set; }
+        public string UsagePrimary { get; set; }
 
         /// <summary>
         /// Identifies land and property usage according to this system of classification: https://www.geoplace.co.uk/documents/10181/38204/Appendix+C+-+Classifications/ ; this is a textual description
         /// </summary>
-        public string usageCode { get; set; }
+        [FromQuery(Name = "usage_code")]
+        public string UsageCode { get; set; }
 
         /// <summary>
         /// Allows a switch between simple and detailed address
