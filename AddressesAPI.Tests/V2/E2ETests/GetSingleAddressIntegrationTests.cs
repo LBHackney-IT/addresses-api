@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AddressesAPI.Infrastructure;
 using AddressesAPI.Tests.V2.Helper;
+using AddressesAPI.V2.Boundary.Responses.Metadata;
 using AutoFixture;
 using Bogus;
 using FluentAssertions;
@@ -71,24 +72,12 @@ namespace AddressesAPI.Tests.V2.E2ETests
             var url = new Uri($"api/v2/addresses/{incorrectLength}", UriKind.Relative);
 
             var response = await Client.GetAsync(url).ConfigureAwait(true);
-
             response.StatusCode.Should().Be(400);
-            response.ReasonPhrase.Should().Be("Bad Request");
-        }
 
-        [Test]
-        public async Task GetAddressReturns400IfAddressIdParameterIsEmpty()
-        {
-            var addressId = _faker.Random.String2(14);
-            TestEfDataHelper.InsertAddress(DatabaseContext, addressId);
-
-            const string emptyId = "";
-            var url = new Uri($"api/v2/addresses/{emptyId}", UriKind.Relative);
-
-            var response = await Client.GetAsync(url).ConfigureAwait(true);
-
-            response.StatusCode.Should().Be(400);
-            response.ReasonPhrase.Should().Be("Bad Request");
+            var data = await response.ConvertToErrorResponseObject().ConfigureAwait(true);
+            data.StatusCode.Should().Be(400);
+            data.Errors.Count().Should().Be(1);
+            data.Errors.First().Message.Should().BeEquivalentTo("Address Key is invalid. It should by 14 characters long string.");
         }
 
         [Test]
@@ -105,6 +94,11 @@ namespace AddressesAPI.Tests.V2.E2ETests
             var response = await Client.GetAsync(url).ConfigureAwait(true);
 
             response.StatusCode.Should().Be(404);
+
+            var data = await response.ConvertToErrorResponseObject().ConfigureAwait(true);
+            data.StatusCode.Should().Be(404);
+            data.Errors.Count().Should().Be(1);
+            data.Errors.First().Message.Should().BeEquivalentTo("An address could not be found for the given key");
         }
     }
 }

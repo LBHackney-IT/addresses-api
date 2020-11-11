@@ -9,7 +9,7 @@ namespace AddressesAPI.V2.UseCase
         public GetCrossReferenceRequestValidator()
         {
             RuleFor(x => x).NotNull().WithMessage("request is null");
-            RuleFor(x => x.uprn).NotNull().NotEmpty().WithMessage("UPRN must be provided");
+            RuleFor(x => x.uprn).NotNull().NotEmpty().WithMessage("UPRN must be provided and must be numeric");
         }
     }
 }

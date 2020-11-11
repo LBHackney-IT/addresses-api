@@ -22,7 +22,7 @@ namespace AddressesAPI.Tests.V2.UseCase
             var request = new GetPropertiesCrossReferenceRequest();
             //act & assert
             _classUnderTest.ShouldHaveValidationErrorFor(x => x.uprn, request)
-                .WithErrorMessage("UPRN must be provided");
+                .WithErrorMessage("UPRN must be provided and must be numeric");
         }
     }
 }

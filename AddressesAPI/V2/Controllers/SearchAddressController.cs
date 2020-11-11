@@ -35,10 +35,10 @@ namespace AddressesAPI.V2.Controllers
         {
             if (!ModelState.IsValid)
             {
-                var errors = new List<ValidationError>();
+                var errors = new List<Error>();
                 foreach (var (key, value) in ModelState)
                 {
-                    var err = new ValidationError();
+                    var err = new Error();
                     foreach (var error in value.Errors)
                     {
                         err.FieldName = key;
@@ -47,7 +47,7 @@ namespace AddressesAPI.V2.Controllers
                     }
                 }
 
-                return new BadRequestObjectResult(new ErrorResponse(errors));
+                return new BadRequestObjectResult(new ErrorResponse(400, errors));
             }
 
             try

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using AddressesAPI.Infrastructure;
 using AddressesAPI.Tests.V2.Helper;
 using AddressesAPI.V1.Boundary.Responses;
-using AddressesAPI.V1.Boundary.Responses.Metadata;
+using AddressesAPI.V2.Boundary.Responses.Metadata;
 using AutoFixture;
 using Bogus;
 using FluentAssertions;
@@ -74,6 +74,11 @@ namespace AddressesAPI.Tests.V2.E2ETests
             var url = new Uri($"api/v2/properties/1937dhhu/crossreferences", UriKind.Relative);
             var response = await Client.GetAsync(url).ConfigureAwait(true);
             response.StatusCode.Should().Be(400);
+
+            var data = await response.ConvertToErrorResponseObject().ConfigureAwait(true);
+            data.StatusCode.Should().Be(400);
+            data.Errors.Count().Should().Be(1);
+            data.Errors.First().Message.Should().Be("UPRN must be provided and must be numeric");
         }
 
         private static async Task<APIResponse<GetAddressCrossReferenceResponse>> ConvertToCrossReferenceResponseObject(HttpResponseMessage response)
