@@ -67,8 +67,8 @@ namespace AddressesAPI.V2.UseCase
                    || request.USRN != null
                    || request.Postcode != null
                    || request.Street != null
-                   || request.usagePrimary != null
-                   || request.usageCode != null;
+                   || request.UsagePrimary != null
+                   || request.UsageCode != null;
         }
 
         private static bool CheckForAtLeastOneMandatoryFilterPropertyWithGazetteerBoth(SearchAddressRequest request)

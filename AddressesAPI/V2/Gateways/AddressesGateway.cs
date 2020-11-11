@@ -27,15 +27,50 @@ namespace AddressesAPI.V2.Gateways
         public (List<V2.Domain.Address>, int) SearchAddresses(SearchParameters request)
         {
             var baseQuery = CompileBaseSearchQuery(request);
+            var baseAddresses = baseQuery;
+
+            if (request.IncludeParentShells)
+            {
+                baseAddresses = GetParentShells(baseQuery, baseAddresses);
+            }
+
             var totalCount = baseQuery.Count();
 
-            var addresses = PageAddresses(OrderAddresses(baseQuery), request.PageSize, request.Page)
+            var addresses = PageAddresses(OrderAddresses(baseAddresses), request.PageSize, request.Page)
                 .Select(
                     a => request.Format == GlobalConstants.Format.Simple ? a.ToSimpleDomain() : a.ToDomain()
-                    )
+                )
                 .ToList();
 
             return (addresses, totalCount);
+        }
+
+        private IQueryable<Address> GetParentShells(IQueryable<Address> baseQuery, IQueryable<Address> baseAddresses)
+        {
+            var childShells = baseQuery;
+            while (true)
+            {
+                var parentUprns = GetImmediateParentUprns(childShells);
+                if (!parentUprns.Any()) break;
+                var parentShells = GetImmediateParentShells(parentUprns, ref baseAddresses);
+                childShells = parentShells;
+            }
+
+            return baseAddresses;
+        }
+
+        private static IQueryable<long?> GetImmediateParentUprns(IQueryable<Address> childShells)
+        {
+            return childShells.Select(a => a.ParentUPRN)
+                .Where(pu => pu != null && pu != 0)
+                .Distinct();
+        }
+
+        private IQueryable<Address> GetImmediateParentShells(IQueryable<long?> parentUprns, ref IQueryable<Address> baseAddresses)
+        {
+            var parentShells = _addressesContext.Addresses.Where(ps => parentUprns.Contains(ps.UPRN));
+            baseAddresses = baseAddresses.Union(parentShells);
+            return parentShells;
         }
 
         private static IQueryable<Address> PageAddresses(IQueryable<Address> query,
@@ -73,9 +108,10 @@ namespace AddressesAPI.V2.Gateways
             var addressStatusSearchTerms = addressStatusQuery.Contains("approved")
                 ? addressStatusQuery.Append("approved preferred")
                 : addressStatusQuery;
-            var usageSearchTerms = request.UsagePrimary?.Split(',').Where(u => u != "Parent Shell").ToList();
+            var usageSearchTerms = request.UsagePrimary?.Split(',').ToList();
             var usageCodeSearchTerms = request.UsageCode?.Split(',').ToList();
-            var queryBase = _addressesContext.Addresses
+
+            var queryResults = _addressesContext.Addresses
                 .Where(a => string.IsNullOrWhiteSpace(request.Postcode)
                             || EF.Functions.ILike(a.Postcode.Replace(" ", ""), postcodeSearchTerm))
                 .Where(a => string.IsNullOrWhiteSpace(request.BuildingNumber)
@@ -101,7 +137,7 @@ namespace AddressesAPI.V2.Gateways
                 .Where(a => request.OutOfBoroughAddress
                             || !(EF.Functions.ILike(a.Gazetteer, "national") || a.OutOfBoroughAddress)
                 );
-            return queryBase;
+            return queryResults;
         }
 
         private static string GenerateSearchTerm(string request)

@@ -302,29 +302,6 @@ namespace AddressesAPI.Tests.V2.Gateways
             addresses.First().Should().BeEquivalentTo(savedAddress.ToDomain());
         }
 
-        [Test]
-        public void WontFilterByParentShellWhenSearchingByPrimaryUsage()
-        {
-            TestEfDataHelper.InsertAddress(DatabaseContext,
-                request: new NationalAddress { UsagePrimary = "Parent Shell" }
-            );
-            TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress
-            {
-                UsagePrimary = "Commercial"
-            });
-            var request = new SearchParameters
-            {
-                Page = 1,
-                PageSize = 50,
-                Format = GlobalConstants.Format.Detailed,
-                Gazetteer = GlobalConstants.Gazetteer.Both,
-                UsagePrimary = "Parent Shell"
-            };
-            var (addresses, _) = _classUnderTest.SearchAddresses(request);
-
-            addresses.Count.Should().Be(2);
-        }
-
         [TestCase("A1", "A1")]
         [TestCase("A3", "A")]
         [TestCase("C5", "B6,C5,C8")]
@@ -353,8 +330,8 @@ namespace AddressesAPI.Tests.V2.Gateways
             addresses.First().Should().BeEquivalentTo(savedAddress.ToDomain());
         }
 
-        [TestCase("Local")] //To be depreciated
-        [TestCase("local")] //To be depreciated
+        [TestCase("Local")]
+        [TestCase("local")]
         [TestCase("Hackney")]
         [TestCase("hackney")]
         public void CanSearchOnlyLocalHackneyAddressesCaseInsensitively(string gazetteer)
@@ -450,6 +427,87 @@ namespace AddressesAPI.Tests.V2.Gateways
 
             addresses.Count.Should().Be(4);
         }
+        #endregion
+
+        #region parentShells
+
+        [Test]
+        public void IfSetToExcludeParentShellsWillOnlyReturnsResultOfSearch()
+        {
+            var parentShell = TestEfDataHelper.InsertAddress(DatabaseContext);
+            var addressToMatch = TestEfDataHelper.InsertAddress(DatabaseContext,
+                request: new NationalAddress { ParentUPRN = parentShell.UPRN }
+            );
+            TestEfDataHelper.InsertAddress(DatabaseContext);
+
+            var request = new SearchParameters
+            {
+                Page = 1,
+                PageSize = 50,
+                Format = GlobalConstants.Format.Detailed,
+                Gazetteer = GlobalConstants.Gazetteer.Both,
+                Postcode = addressToMatch.Postcode,
+                IncludeParentShells = false
+            };
+            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+
+            addresses.Count.Should().Be(1);
+            addresses.Should().ContainEquivalentOf(addressToMatch.ToDomain());
+        }
+
+        [Test]
+        public void IfSetToIncludeParentShellsIncludeImmediateParentShells()
+        {
+            var parentShell = TestEfDataHelper.InsertAddress(DatabaseContext);
+            var addressToMatch = TestEfDataHelper.InsertAddress(DatabaseContext,
+                request: new NationalAddress { ParentUPRN = parentShell.UPRN }
+            );
+            TestEfDataHelper.InsertAddress(DatabaseContext);
+
+            var request = new SearchParameters
+            {
+                Page = 1,
+                PageSize = 50,
+                Format = GlobalConstants.Format.Detailed,
+                Gazetteer = GlobalConstants.Gazetteer.Both,
+                Postcode = addressToMatch.Postcode,
+                IncludeParentShells = true
+            };
+            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+
+            addresses.Count.Should().Be(2);
+            addresses.Should().ContainEquivalentOf(addressToMatch.ToDomain());
+            addresses.Should().ContainEquivalentOf(parentShell.ToDomain());
+        }
+
+        [Test]
+        public void IfSetToIncludeParentShellsIncludeParentShellsOfParentsShells()
+        {
+            var grandParentShell = TestEfDataHelper.InsertAddress(DatabaseContext);
+            var parentShell = TestEfDataHelper.InsertAddress(DatabaseContext,
+                request: new NationalAddress { ParentUPRN = grandParentShell.UPRN });
+            var addressToMatch = TestEfDataHelper.InsertAddress(DatabaseContext,
+                request: new NationalAddress { ParentUPRN = parentShell.UPRN }
+            );
+            TestEfDataHelper.InsertAddress(DatabaseContext);
+
+            var request = new SearchParameters
+            {
+                Page = 1,
+                PageSize = 50,
+                Format = GlobalConstants.Format.Detailed,
+                Gazetteer = GlobalConstants.Gazetteer.Both,
+                Postcode = addressToMatch.Postcode,
+                IncludeParentShells = true
+            };
+            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+
+            addresses.Count.Should().Be(3);
+            addresses.Should().ContainEquivalentOf(addressToMatch.ToDomain());
+            addresses.Should().ContainEquivalentOf(parentShell.ToDomain());
+            addresses.Should().ContainEquivalentOf(grandParentShell.ToDomain());
+        }
+
         #endregion
 
         #region ordering

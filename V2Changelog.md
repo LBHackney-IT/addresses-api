@@ -1,6 +1,3 @@
-
-
-
 # Addresses
 ## Changes to the address response object
 These changes will be relevent to both address endpoints
@@ -83,6 +80,8 @@ Going forward they will look like:
 4. The `Approved Preferred` option of the `address_status` query parameter is changing to `Approved`. Making the new possible values:
    ```[ Approved, Historial, Alternative, Provisional ]```.
 5. There is a new query parameter `out_of_borough` which will toggle whether or not to include addresses which are outside of the borough of Hackney. The default setting for this parameter is `true` which will return all addresses, you can set `out_of_borough=false` if you wish to only receive addresses within Hackney.
+6. There is a new query parameter `include_parent_shells` which wll toggle whether or not to include the parent shells of addresses which are returned. If it is set to true, the endpoint will return all addresses which would be returned normally plus any parent shells and parents of parent shells and so on.
+An example of a parent shell would be a house converted into flats, each flat in the house would have it's own address (e.g. 1st Floor Flat, 5 Hackney Avenue) and then it's parent shell would be the address of the house (e.g. 5 Hackney Avenue).
 
 # Properties
 ## Get cross references for a propery

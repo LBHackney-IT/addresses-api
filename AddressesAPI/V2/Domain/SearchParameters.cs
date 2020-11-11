@@ -15,6 +15,7 @@ namespace AddressesAPI.V2.Domain
         public GlobalConstants.Format Format { get; set; }
         public IEnumerable<string> AddressStatus { get; set; }
         public bool OutOfBoroughAddress { get; set; }
+        public bool IncludeParentShells { get; set; }
         public int Page { get; set; }
         public int PageSize { get; set; }
     }

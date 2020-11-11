@@ -60,12 +60,13 @@ namespace AddressesAPI.V2.Boundary.Requests
         /// ALL (default)
         /// </summary>
         [FromQuery(Name = "usage_primary")]
-        public string usagePrimary { get; set; }
+        public string UsagePrimary { get; set; }
 
         /// <summary>
         /// Identifies land and property usage according to this system of classification: https://www.geoplace.co.uk/documents/10181/38204/Appendix+C+-+Classifications/ ; this is a textual description
         /// </summary>
-        public string usageCode { get; set; }
+        [FromQuery(Name = "usage_code")]
+        public string UsageCode { get; set; }
 
         /// <summary>
         /// Allows a switch between simple and detailed address
@@ -83,7 +84,7 @@ namespace AddressesAPI.V2.Boundary.Requests
         public string AddressStatus { get; set; }
 
         /// <summary>
-        ///  	wether or not out of borough addresses
+        ///  	whether or not out of borough addresses
         ///that are present in the local gazetteer
         ///for services reasons should be returned.
         ///If yes, the local gazetteer version takes
@@ -92,6 +93,13 @@ namespace AddressesAPI.V2.Boundary.Requests
         /// </summary>
         [FromQuery(Name = "out_of_borough")]
         public bool OutOfBoroughAddress { get; set; } = true;
+
+        /// <summary>
+        /// Whether or not to include parent shells of addresses which match
+        /// the search criteria, or just return the addresses themselves.
+        /// </summary>
+        [FromQuery(Name = "include_parent_shells")]
+        public bool IncludeParentShells { get; set; } = false;
 
         /// <summary>
         /// Page defaults to 1 as paging is 1 index based not 0 index based
