@@ -62,12 +62,12 @@ module "postgres_db_production" {
   subnet_ids           = data.aws_subnet_ids.production.ids
   db_engine            = "postgres"
   db_engine_version    = "11.8"
-  db_instance_class    = "db.t2.micro"
+  db_instance_class    = "db.t3.micro"
   db_allocated_storage = 100
   maintenance_window   = "sun:10:00-sun:10:30"
   db_username          = data.aws_ssm_parameter.addresses_postgres_username.value
   db_password          = data.aws_ssm_parameter.addresses_postgres_db_password.value
-  storage_encrypted    = false
+  storage_encrypted    = true
   multi_az             = true //only true if production deployment
   publicly_accessible  = false
   project_name         = "platform apis"
