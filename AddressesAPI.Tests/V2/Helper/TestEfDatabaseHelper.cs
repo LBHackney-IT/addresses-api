@@ -44,19 +44,21 @@ namespace AddressesAPI.Tests.V2.Helper
 
         public static CrossReference InsertCrossReference(AddressesContext context, long uprn, CrossReference record = null)
         {
-            if (record == null)
-            {
-                var fixture = new Fixture();
-                record = fixture.Build<CrossReference>()
-                    .With(cr => cr.UPRN, uprn)
-                    .Create();
-            }
+            var fixture = new Fixture();
+            var randomCrossReference = fixture.Build<CrossReference>()
+                .With(cr => cr.UPRN, uprn)
+                .Create();
 
-            record.UPRN = uprn;
-            context.AddressCrossReferences.Add(record);
+            if (record?.UPRN != null && record.UPRN != 0) randomCrossReference.UPRN = record.UPRN;
+            if (record?.CrossRefKey != null) randomCrossReference.CrossRefKey = record.CrossRefKey;
+            if (record?.Code != null) randomCrossReference.Code = record.Code;
+            if (record?.Name != null) randomCrossReference.Name = record.Name;
+            if (record?.Value != null) randomCrossReference.Value = record.Value;
+            if (record?.EndDate != null) randomCrossReference.EndDate = record.EndDate;
+
+            context.AddressCrossReferences.Add(randomCrossReference);
             context.SaveChanges();
-
-            return record;
+            return randomCrossReference;
         }
 
         private static string ReplaceEmptyStringWithNull(string request)

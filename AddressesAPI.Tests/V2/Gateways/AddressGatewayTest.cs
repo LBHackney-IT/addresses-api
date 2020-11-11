@@ -427,6 +427,37 @@ namespace AddressesAPI.Tests.V2.Gateways
 
             addresses.Count.Should().Be(4);
         }
+
+        [Test]
+        public void WillSearchForAddressesUsingACrossReference()
+        {
+            TestEfDataHelper.InsertAddress(DatabaseContext);
+
+            var uprn = _faker.Random.Long(10000000, 99999999);
+
+            var savedAddress = TestEfDataHelper.InsertAddress(DatabaseContext,
+                request: new NationalAddress { UPRN = uprn }
+            );
+
+            TestEfDataHelper.InsertCrossReference(DatabaseContext, uprn,
+                new CrossReference { Code = "TAXES", Value = "TestValue" }
+            );
+
+            var request = new SearchParameters
+            {
+                Page = 1,
+                PageSize = 50,
+                Format = GlobalConstants.Format.Detailed,
+                Gazetteer = GlobalConstants.Gazetteer.Both,
+                CrossRefCode = "TAXES",
+                CrossRefValue = "TestValue"
+            };
+
+            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+
+            addresses.Count.Should().Be(1);
+            addresses.First().Should().BeEquivalentTo(savedAddress.ToDomain());
+        }
         #endregion
 
         #region parentShells
