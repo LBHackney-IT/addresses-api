@@ -71,7 +71,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
             var uprn = _faker.Random.Int();
             TestEfDataHelper.InsertCrossReference(DatabaseContext, uprn);
 
-            var url = new Uri($"api/v2/properties/1937dhhu/crossreferences", UriKind.Relative);
+            var url = new Uri("api/v2/properties/1937dhhu/crossreferences", UriKind.Relative);
             var response = await Client.GetAsync(url).ConfigureAwait(true);
             response.StatusCode.Should().Be(400);
 

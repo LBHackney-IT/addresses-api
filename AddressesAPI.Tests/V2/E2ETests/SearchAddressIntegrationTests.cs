@@ -149,34 +149,55 @@ namespace AddressesAPI.Tests.V2.E2ETests
         [Test]
         public async Task CanQueryForNoOutOfBoroughAddresses()
         {
-            var hackneyOutOfBorough = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress
-            {
-                Postcode = "N1 3JH",
-                Gazetteer = "Hackney",
-                NeverExport = true
-            });
+            var hackneyOutOfBorough = TestEfDataHelper.InsertAddress(DatabaseContext,
+                request: new NationalAddress { Postcode = "N1 3JH", Gazetteer = "Hackney", NeverExport = true });
 
-            var hackneyInBorough = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress
-            {
-                Postcode = "N1 7YH",
-                Gazetteer = "Hackney",
-                NeverExport = false
-            });
+            var hackneyInBorough = TestEfDataHelper.InsertAddress(DatabaseContext,
+                request: new NationalAddress { Postcode = "N1 7YH", Gazetteer = "Hackney", NeverExport = false });
 
-            var nationalAddress = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress
-            {
-                Postcode = "N1 7UK",
-                Gazetteer = "National"
-            });
+            var nationalAddress = TestEfDataHelper.InsertAddress(DatabaseContext,
+                request: new NationalAddress { Postcode = "N1 7UK", Gazetteer = "National" });
 
             var queryString = "postcode=N1&format=Detailed&gazetteer=Both&out_of_borough=false";
+            var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
+            response.StatusCode.Should().Be(200);
+            var returnedAddress = await response.ConvertToSearchAddressResponseObject().ConfigureAwait(true);
+            returnedAddress.Data.Addresses.Count.Should().Be(1);
+            returnedAddress.Data.Addresses.First().AddressKey.Should().Be(hackneyInBorough.AddressKey);
+        }
+
+        [Test]
+        public async Task CanIncludeParentShellsInARequest()
+        {
+            var blockAddressKey = _faker.Random.String2(14);
+            var blockOfFlats = new NationalAddress
+            {
+                UPRN = _faker.Random.Int(1, 287987129),
+            };
+            TestEfDataHelper.InsertAddress(DatabaseContext, blockAddressKey, blockOfFlats);
+
+            var flatAddressKey = _faker.Random.String2(14);
+            var flat = new NationalAddress
+            {
+                ParentUPRN = blockOfFlats.UPRN,
+            };
+            var flatRecord = TestEfDataHelper.InsertAddress(DatabaseContext, flatAddressKey, flat);
+
+            AddSomeRandomAddressToTheDatabase();
+
+            var queryString = $"UPRN={flatRecord.UPRN}&Format=Detailed&include_parent_shells=true";
 
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);
 
-            var returnedAddress = await response.ConvertToSearchAddressResponseObject().ConfigureAwait(true);
-            returnedAddress.Data.Addresses.Count.Should().Be(1);
-            returnedAddress.Data.Addresses.First().AddressKey.Should().Be(hackneyInBorough.AddressKey);
+            var returnedAddress = await response.ConvertToSearchAddressResponseObject()
+                .ConfigureAwait(true);
+            returnedAddress.Data.Addresses.Count.Should().Be(2);
+
+            var returnedUprns = returnedAddress.Data.Addresses
+                .Select(x => x.UPRN).ToList();
+            returnedUprns.Should().Contain(blockOfFlats.UPRN);
+            returnedUprns.Should().Contain(flatRecord.UPRN);
         }
 
         [Test]
@@ -209,7 +230,9 @@ namespace AddressesAPI.Tests.V2.E2ETests
             {
                 var addressKey = _faker.Random.String2(14);
                 var randomAddress = _fixture.Build<NationalAddress>()
-                    .With(a => a.Gazetteer, gazetteer).Create();
+                    .With(a => a.Gazetteer, gazetteer)
+                    .Without(a => a.ParentUPRN)
+                    .Create();
                 TestEfDataHelper.InsertAddress(DatabaseContext, addressKey, randomAddress);
             }
         }

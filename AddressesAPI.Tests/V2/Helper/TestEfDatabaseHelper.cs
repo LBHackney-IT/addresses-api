@@ -19,8 +19,8 @@ namespace AddressesAPI.Tests.V2.Helper
             }
             if (request?.BuildingNumber != null) randomAddressRecord.BuildingNumber = request.BuildingNumber;
             if (request?.Street != null) randomAddressRecord.Street = request.Street;
-            if (request?.UPRN != null) randomAddressRecord.UPRN = request.UPRN;
-            if (request?.USRN != null) randomAddressRecord.USRN = request.USRN;
+            if (request?.UPRN != null && request.UPRN != 0) randomAddressRecord.UPRN = request.UPRN;
+            if (request?.USRN != null && request.USRN != 0) randomAddressRecord.USRN = request.USRN;
             if (request?.UsagePrimary != null) randomAddressRecord.UsagePrimary = request.UsagePrimary;
             if (request?.UsageCode != null) randomAddressRecord.UsageCode = request.UsageCode;
             if (request?.Gazetteer != null) randomAddressRecord.Gazetteer = request.Gazetteer;
@@ -35,6 +35,7 @@ namespace AddressesAPI.Tests.V2.Helper
             if (request?.Line2 != null) randomAddressRecord.Line2 = request.Line2;
             if (request?.Line3 != null) randomAddressRecord.Line3 = request.Line3;
             if (request?.Line4 != null) randomAddressRecord.Line4 = request.Line4;
+            randomAddressRecord.ParentUPRN = (request?.ParentUPRN).GetValueOrDefault() == 0 ? null : request.ParentUPRN;
 
             context.NationalAddresses.Add(randomAddressRecord);
             context.SaveChanges();

@@ -54,6 +54,8 @@ namespace AddressesAPI.Tests.V2.UseCase
                 PageSize = _faker.Random.Int(10, 40),
                 UPRN = _faker.Random.Long(0, 9999999999),
                 USRN = _faker.Random.Int(0, 9999999),
+                IncludeParentShells = _faker.Random.Bool(),
+                OutOfBoroughAddress = _faker.Random.Bool()
             };
             _fakeGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(
                     x => x.Format == GlobalConstants.Format.Detailed
@@ -63,11 +65,13 @@ namespace AddressesAPI.Tests.V2.UseCase
                          && x.Street == request.Street
                          && x.Uprn == request.UPRN
                          && x.Usrn == request.USRN
-                         && x.AddressStatus == new []{"approved"}
+                         && x.AddressStatus.SequenceEqual(new[] { "approved" })
                          && x.BuildingNumber == request.BuildingNumber
                          && x.PageSize == request.PageSize
                          && x.UsageCode == request.UsageCode
-                         && x.UsagePrimary == request.UsagePrimary)))
+                         && x.UsagePrimary == request.UsagePrimary
+                         && x.IncludeParentShells == request.IncludeParentShells
+                         && x.OutOfBoroughAddress == request.OutOfBoroughAddress)))
                 .Returns((new List<Address>(), 1)).Verifiable();
 
             _classUnderTest.ExecuteAsync(request);

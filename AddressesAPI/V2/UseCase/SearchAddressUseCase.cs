@@ -62,7 +62,8 @@ namespace AddressesAPI.V2.UseCase
                 PageSize = request.PageSize,
                 UsageCode = request.UsageCode,
                 UsagePrimary = request.UsagePrimary,
-                OutOfBoroughAddress = request.OutOfBoroughAddress
+                OutOfBoroughAddress = request.OutOfBoroughAddress,
+                IncludeParentShells = request.IncludeParentShells
             };
         }
     }
