@@ -429,17 +429,29 @@ namespace AddressesAPI.Tests.V2.Gateways
         }
 
         [Test]
-        public void WillSearchForAddressesUsingACrossReference()
+        public void WillSearchForAllAddressesUsingForACrossReference()
         {
             TestEfDataHelper.InsertAddress(DatabaseContext);
 
-            var uprn = _faker.Random.Long(10000000, 99999999);
+            //--- Cross reference for address one
+            var uprnOne = _faker.Random.Long(10000000, 99999999);
 
-            var savedAddress = TestEfDataHelper.InsertAddress(DatabaseContext,
-                request: new NationalAddress { UPRN = uprn }
+            var addressOne = TestEfDataHelper.InsertAddress(DatabaseContext,
+                request: new NationalAddress { UPRN = uprnOne }
             );
 
-            TestEfDataHelper.InsertCrossReference(DatabaseContext, uprn,
+            TestEfDataHelper.InsertCrossReference(DatabaseContext, uprnOne,
+                new CrossReference { Code = "TAXES", Value = "TestValue" }
+            );
+
+            //--- Cross reference for address two
+            var uprnTwo = _faker.Random.Long(10000000, 99999999);
+
+            var addressTwo = TestEfDataHelper.InsertAddress(DatabaseContext,
+                request: new NationalAddress { UPRN = uprnTwo }
+            );
+
+            TestEfDataHelper.InsertCrossReference(DatabaseContext, uprnTwo,
                 new CrossReference { Code = "TAXES", Value = "TestValue" }
             );
 
@@ -455,8 +467,9 @@ namespace AddressesAPI.Tests.V2.Gateways
 
             var (addresses, _) = _classUnderTest.SearchAddresses(request);
 
-            addresses.Count.Should().Be(1);
-            addresses.First().Should().BeEquivalentTo(savedAddress.ToDomain());
+            addresses.Count.Should().Be(2);
+            addresses.Should().ContainEquivalentOf(addressOne.ToDomain());
+            addresses.Should().ContainEquivalentOf(addressTwo.ToDomain());
         }
         #endregion
 
