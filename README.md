@@ -41,6 +41,19 @@ make migrate-dev-database && make seed-dev-database
 
 This will run migrations on the development database and then seed it with data. This data can then be retrieved by calling the endpoints locally.
 
+#### Setting up the development elasticsearch instance
+
+In your terminal run:
+```sh
+make seed-es-data
+```
+
+If you changed the elasticsearch seed files, then you can run
+```sh
+make remove-es-data
+```
+to remove the docker container and volume. Then next time you start and seed the `dev-elasticsearch` container it will have the new data loaded.
+
 ### Running the tests
 
 You can run the tests in a container:
