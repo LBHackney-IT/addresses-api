@@ -432,7 +432,7 @@ namespace AddressesAPI.Tests.V2.Gateways
         #region parentShells
 
         [Test]
-        public void IfSetToExcludeParentShellsWillOnlyReturnsResultOfSearch()
+        public void IfSetToExcludeParentShellsWillOnlyReturnsResultsOfSearch()
         {
             var parentShell = TestEfDataHelper.InsertAddress(DatabaseContext);
             var addressToMatch = TestEfDataHelper.InsertAddress(DatabaseContext,
@@ -506,6 +506,32 @@ namespace AddressesAPI.Tests.V2.Gateways
             addresses.Should().ContainEquivalentOf(addressToMatch.ToDomain());
             addresses.Should().ContainEquivalentOf(parentShell.ToDomain());
             addresses.Should().ContainEquivalentOf(grandParentShell.ToDomain());
+        }
+
+        [TestCase("E8 7JH")]
+        [TestCase("N1 5TH")]
+        public void IfSetToExcludeParentShellsWillNotReturnAnyParentShells(string postcode)
+        {
+            var parentShell = TestEfDataHelper.InsertAddress(DatabaseContext,
+                request: new NationalAddress { PropertyShell = true, Postcode = postcode }
+            );
+            var notAParentShell = TestEfDataHelper.InsertAddress(DatabaseContext,
+                request: new NationalAddress { PropertyShell = false, Postcode = postcode }
+            );
+
+            var request = new SearchParameters
+            {
+                Page = 1,
+                PageSize = 50,
+                Format = GlobalConstants.Format.Detailed,
+                Gazetteer = GlobalConstants.Gazetteer.Both,
+                Postcode = postcode,
+                IncludeParentShells = false
+            };
+            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+
+            addresses.Count.Should().Be(1);
+            addresses.Should().ContainEquivalentOf(notAParentShell.ToDomain());
         }
 
         #endregion
