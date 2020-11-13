@@ -129,6 +129,7 @@ namespace AddressesAPI.V2.Gateways
                         (Expression<Func<Address, bool>>) (x =>
                             EF.Functions.ILike(x.UsageCode, $"%{u}%")))
                     .ToArray())
+                .Where(a => request.IncludeParentShells || !a.PropertyShell)
                 .Where(a => request.Gazetteer == GlobalConstants.Gazetteer.Both
                             || EF.Functions.ILike(a.Gazetteer, request.Gazetteer.ToString())
                             || request.Gazetteer == GlobalConstants.Gazetteer.Hackney

@@ -36,6 +36,7 @@ namespace AddressesAPI.Tests.V2.Helper
             if (request?.Line3 != null) randomAddressRecord.Line3 = request.Line3;
             if (request?.Line4 != null) randomAddressRecord.Line4 = request.Line4;
             randomAddressRecord.ParentUPRN = (request?.ParentUPRN).GetValueOrDefault() == 0 ? null : request.ParentUPRN;
+            randomAddressRecord.PropertyShell = request?.PropertyShell ?? false;
 
             context.NationalAddresses.Add(randomAddressRecord);
             context.SaveChanges();
