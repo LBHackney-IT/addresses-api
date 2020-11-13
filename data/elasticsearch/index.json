@@ -1,0 +1,15 @@
+{
+  "mappings" : {
+    "properties": {
+      "postcode": {
+        "type": "keyword"
+      },
+      "uprn": {
+        "type": "keyword"
+      },
+      "street": {
+        "type": "text"
+      }
+    }
+  }
+}
