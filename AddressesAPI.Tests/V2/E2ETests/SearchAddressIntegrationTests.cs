@@ -38,7 +38,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
                 new NationalAddress { Postcode = postcode });
             AddSomeRandomAddressToTheDatabase();
 
-            var queryString = $"postcode={postcode}&address_status={record.AddressStatus}&format=Detailed";
+            var queryString = $"postcode={postcode}&address_status={record.AddressStatus}&format=Detailed&address_scope=national";
 
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);
@@ -58,7 +58,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
             var record = TestEfDataHelper.InsertAddress(DatabaseContext, addressKey, queryParameters);
             AddSomeRandomAddressToTheDatabase();
 
-            var queryString = $"uprn={queryParameters.UPRN}&address_status={record.AddressStatus}&format=Detailed";
+            var queryString = $"uprn={queryParameters.UPRN}&address_status={record.AddressStatus}&format=Detailed&address_scope=national";
 
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);
@@ -80,7 +80,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
             TestEfDataHelper.InsertAddress(DatabaseContext, addressKey, queryParameters);
             AddSomeRandomAddressToTheDatabase();
 
-            var queryString = $"USRN={queryParameters.USRN}&address_status=Historical&Format=Detailed";
+            var queryString = $"USRN={queryParameters.USRN}&address_status=Historical&Format=Detailed&address_scope=national";
 
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);
@@ -107,7 +107,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
             };
             TestEfDataHelper.InsertAddress(DatabaseContext, addressKey, addressDetails);
             AddSomeRandomAddressToTheDatabase();
-            var queryString = $"uprn={addressDetails.UPRN}&address_status=Historical&format=Simple";
+            var queryString = $"uprn={addressDetails.UPRN}&address_status=Historical&format=Simple&address_scope=national";
 
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);
@@ -124,19 +124,19 @@ namespace AddressesAPI.Tests.V2.E2ETests
         }
 
         [Test]
-        public async Task SettingGazetteerToBothWillReturnNationalAddresses()
+        public async Task SettingAddressScopeToNationalWillReturnAllAddresses()
         {
             var addressKey = _faker.Random.String2(14);
-            var queryParameters = new NationalAddress
+            var dbOptions = new NationalAddress
             {
                 UPRN = _faker.Random.Int(),
                 Gazetteer = "National"
             };
-            var record = TestEfDataHelper.InsertAddress(DatabaseContext, addressKey, queryParameters);
+            var record = TestEfDataHelper.InsertAddress(DatabaseContext, addressKey, dbOptions);
 
             AddSomeRandomAddressToTheDatabase(count: 3);
             AddSomeRandomAddressToTheDatabase(count: 3, gazetteer: "National");
-            var queryString = $"uprn={queryParameters.UPRN}&address_status={record.AddressStatus}&format=Detailed&gazetteer=Both";
+            var queryString = $"uprn={dbOptions.UPRN}&address_status={record.AddressStatus}&format=Detailed&address_scope=national";
 
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);
@@ -146,8 +146,10 @@ namespace AddressesAPI.Tests.V2.E2ETests
             returnedAddress.Data.Addresses.First().AddressKey.Should().Be(addressKey);
         }
 
-        [Test]
-        public async Task CanQueryForNoOutOfBoroughAddresses()
+        [TestCase("hackneyborough")]
+        [TestCase("hackney borough")]
+        [TestCase("Hackney Borough")]
+        public async Task SettingAddressScopeToHackneyBoroughWillOnlyReturnAddressesInHackney(string addressScope)
         {
             var hackneyOutOfBorough = TestEfDataHelper.InsertAddress(DatabaseContext,
                 request: new NationalAddress { Postcode = "N1 3JH", Gazetteer = "Hackney", NeverExport = true });
@@ -158,7 +160,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
             var nationalAddress = TestEfDataHelper.InsertAddress(DatabaseContext,
                 request: new NationalAddress { Postcode = "N1 7UK", Gazetteer = "National" });
 
-            var queryString = "postcode=N1&format=Detailed&gazetteer=Both&out_of_borough=false";
+            var queryString = $"postcode=N1&format=Detailed&address_scope={addressScope}";
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);
             var returnedAddress = await response.ConvertToSearchAddressResponseObject().ConfigureAwait(true);
@@ -185,7 +187,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
 
             AddSomeRandomAddressToTheDatabase();
 
-            var queryString = $"UPRN={flatRecord.UPRN}&Format=Detailed&include_parent_shells=true";
+            var queryString = $"UPRN={flatRecord.UPRN}&Format=Detailed&include_parent_shells=true&address_scope=national";
 
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);
@@ -210,8 +212,8 @@ namespace AddressesAPI.Tests.V2.E2ETests
 
         [TestCase("page_size=100", "PageSize", "PageSize cannot exceed 50")]
         [TestCase("postcode=12376", "Postcode", "Must provide at least the first part of the postcode.")]
-        [TestCase("Gazetteer=Both&street=hackneyroad", "", "You must provide at least one of (uprn, usrn, postcode), when gazetteer is 'both'.")]
-        [TestCase("Gazetteer=Local", "", "You must provide at least one of (uprn, usrn, postcode, street, usagePrimary, usageCode), when gazeteer is 'local'.")]
+        [TestCase("address_scope=national&street=hackneyroad", "", "You must provide at least one of (uprn, usrn, postcode), when address_scope is 'national'.")]
+        [TestCase("address_scope=hackneygazetteer", "", "You must provide at least one of (uprn, usrn, postcode, street, usagePrimary, usageCode), when address_scope is 'hackney borough' or 'hackney gazetteer'.")]
         public async Task ValidationErrors(string queryString, string fieldName, string message)
         {
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
@@ -241,7 +243,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
 
             AddSomeRandomAddressToTheDatabase();
 
-            var queryString = $"cross_ref_code={crossReferenceOne.Code}&cross_ref_value={crossReferenceOne.Value}&postcode=N1&format=Detailed";
+            var queryString = $"cross_ref_code={crossReferenceOne.Code}&cross_ref_value={crossReferenceOne.Value}&postcode=N1&format=Detailed&address_scope=national";
 
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);

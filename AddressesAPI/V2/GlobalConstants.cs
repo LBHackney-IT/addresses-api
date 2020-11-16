@@ -7,6 +7,13 @@ namespace AddressesAPI.V2
 
         public const int Offset = 0;
 
+        public enum AddressScope
+        {
+            HackneyBorough,
+            HackneyGazetteer,
+            National
+        }
+
         public enum Format
         {
             Simple,

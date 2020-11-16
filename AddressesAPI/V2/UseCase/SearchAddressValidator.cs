@@ -18,9 +18,9 @@ namespace AddressesAPI.V2.UseCase
                 .Must(CanBeAnyCombinationOfAllowedAddressStatuses)
                 .WithMessage("Value for the parameter is not valid.");
 
-            RuleFor(r => r.Gazetteer)
-                .Must(gazetteer => gazetteer.ToLower() == "local" || Enum.TryParse<GlobalConstants.Gazetteer>(gazetteer, true, out _))
-                .WithMessage("Value for the parameter is not valid. It should be either Hackney or Both.");
+            RuleFor(r => r.AddressScope)
+                .Must(addressScope => Enum.TryParse<GlobalConstants.AddressScope>(addressScope?.Replace(" ", ""), true, out _))
+                .WithMessage("Value for the parameter is not valid. It should be either Hackney Borough, Hackney Gazetteer or National.");
 
             RuleFor(r => r.Format)
                 .Must(format => Enum.TryParse<GlobalConstants.Format>(format, true, out _))
@@ -34,12 +34,12 @@ namespace AddressesAPI.V2.UseCase
                 .WithMessage("Must provide at least the first part of the postcode.");
 
             RuleFor(r => r)
-                .Must(CheckForAtLeastOneMandatoryFilterPropertyWithGazetteerLocal)
-                .WithMessage("You must provide at least one of (uprn, usrn, postcode, street, usagePrimary, usageCode), when gazeteer is 'local'.");
+                .Must(CheckForAtLeastOneMandatoryFilterPropertyWithHackneyGazetteer)
+                .WithMessage("You must provide at least one of (uprn, usrn, postcode, street, usagePrimary, usageCode), when address_scope is 'hackney borough' or 'hackney gazetteer'.");
 
             RuleFor(r => r)
-                .Must(CheckForAtLeastOneMandatoryFilterPropertyWithGazetteerBoth)
-                .WithMessage("You must provide at least one of (uprn, usrn, postcode), when gazetteer is 'both'.");
+                .Must(CheckForAtLeastOneMandatoryFilterPropertyWithNationalGazetteer)
+                .WithMessage("You must provide at least one of (uprn, usrn, postcode), when address_scope is 'national'.");
 
             RuleFor(r => r)
                 .Must(CheckCrossReferenceCodeWhenGivenHasAValue)
@@ -66,9 +66,9 @@ namespace AddressesAPI.V2.UseCase
             return !invalidParameters.Any();
         }
 
-        private static bool CheckForAtLeastOneMandatoryFilterPropertyWithGazetteerLocal(SearchAddressRequest request)
+        private static bool CheckForAtLeastOneMandatoryFilterPropertyWithHackneyGazetteer(SearchAddressRequest request)
         {
-            return request.Gazetteer == GlobalConstants.Gazetteer.Both.ToString()
+            return request.AddressScope.Equals(GlobalConstants.AddressScope.National.ToString(), StringComparison.InvariantCultureIgnoreCase)
                    || request.UPRN != null
                    || request.USRN != null
                    || request.Postcode != null
@@ -77,9 +77,9 @@ namespace AddressesAPI.V2.UseCase
                    || request.UsageCode != null;
         }
 
-        private static bool CheckForAtLeastOneMandatoryFilterPropertyWithGazetteerBoth(SearchAddressRequest request)
+        private static bool CheckForAtLeastOneMandatoryFilterPropertyWithNationalGazetteer(SearchAddressRequest request)
         {
-            return request.Gazetteer != GlobalConstants.Gazetteer.Both.ToString()
+            return !request.AddressScope.Equals(GlobalConstants.AddressScope.National.ToString(), StringComparison.InvariantCultureIgnoreCase)
                    || request.UPRN != null
                    || request.USRN != null
                    || request.Postcode != null;

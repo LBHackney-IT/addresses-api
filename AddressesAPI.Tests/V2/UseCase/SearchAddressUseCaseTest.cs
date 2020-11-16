@@ -43,7 +43,7 @@ namespace AddressesAPI.Tests.V2.UseCase
             var request = new SearchAddressRequest
             {
                 Postcode = "RM3 0FS",
-                Gazetteer = "Local",
+                AddressScope = "HackneyGazetteer",
                 Format = "Detailed",
                 Page = _faker.Random.Int(),
                 Street = _faker.Address.StreetAddress(),
@@ -55,13 +55,13 @@ namespace AddressesAPI.Tests.V2.UseCase
                 UPRN = _faker.Random.Long(0, 9999999999),
                 USRN = _faker.Random.Int(0, 9999999),
                 IncludeParentShells = _faker.Random.Bool(),
-                OutOfBoroughAddress = _faker.Random.Bool(),
                 CrossRefCode = "123DEF",
                 CrossRefValue = "20000"
             };
             _fakeGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(
                     x => x.Format == GlobalConstants.Format.Detailed
                          && x.Gazetteer == GlobalConstants.Gazetteer.Hackney
+                         && x.OutOfBoroughAddress
                          && x.Page == request.Page
                          && x.Postcode == request.Postcode
                          && x.Street == request.Street
@@ -73,11 +73,31 @@ namespace AddressesAPI.Tests.V2.UseCase
                          && x.UsageCode == request.UsageCode
                          && x.UsagePrimary == request.UsagePrimary
                          && x.IncludeParentShells == request.IncludeParentShells
-                         && x.OutOfBoroughAddress == request.OutOfBoroughAddress
                          && x.CrossRefCode == request.CrossRefCode
                          && x.CrossRefValue == request.CrossRefValue)))
                 .Returns((new List<Address>(), 1)).Verifiable();
 
+            _classUnderTest.ExecuteAsync(request);
+            _fakeGateway.Verify();
+        }
+
+        [TestCase("HackneyBorough", GlobalConstants.Gazetteer.Hackney, false)]
+        [TestCase("hackney borough", GlobalConstants.Gazetteer.Hackney, false)]
+        [TestCase("HackneyGazetteer", GlobalConstants.Gazetteer.Hackney, true)]
+        [TestCase("hackney gazetteer", GlobalConstants.Gazetteer.Hackney, true)]
+        [TestCase("National", GlobalConstants.Gazetteer.Both, true)]
+        public void ExecuteAsync_CorrectlyMapsAddressScopeToGazetteerAndOutOfBorough(string addressScope,
+            GlobalConstants.Gazetteer expectedGazetteer, bool expectedOutOfBorough)
+        {
+            SetupValidatorToReturnValid();
+            var request = new SearchAddressRequest
+            {
+                Postcode = "E8",
+                AddressScope = addressScope
+            };
+            _fakeGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(i =>
+                    i.Gazetteer.Equals(expectedGazetteer) && i.OutOfBoroughAddress.Equals(expectedOutOfBorough))))
+                .Returns((null, 0)).Verifiable();
             _classUnderTest.ExecuteAsync(request);
             _fakeGateway.Verify();
         }
@@ -95,22 +115,6 @@ namespace AddressesAPI.Tests.V2.UseCase
             _fakeGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(i =>
                     i.AddressStatus.SequenceEqual(expectedList))))
                 .Returns((null, 0)).Verifiable();
-            _classUnderTest.ExecuteAsync(request);
-            _fakeGateway.Verify();
-        }
-
-        [Test]
-        public void GivenLocalGazetteer_WhenExecute_InterpretsThisAsHackneyGazetteer()
-        {
-            SetupValidatorToReturnValid();
-            var request = new SearchAddressRequest
-            {
-                Gazetteer = "Local"
-            };
-            _fakeGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(i =>
-                    i.Gazetteer == GlobalConstants.Gazetteer.Hackney)))
-                .Returns((new List<Address>(), 1)).Verifiable();
-
             _classUnderTest.ExecuteAsync(request);
             _fakeGateway.Verify();
         }

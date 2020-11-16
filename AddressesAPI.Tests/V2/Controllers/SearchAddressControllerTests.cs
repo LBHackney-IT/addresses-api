@@ -34,9 +34,9 @@ namespace AddressesAPI.Tests.V2.Controllers
         }
 
 
-        [TestCase("RM3 0FS", GlobalConstants.Gazetteer.Hackney)]
-        [TestCase("IG11 7QD", GlobalConstants.Gazetteer.Both)]
-        public void GivenValidSearchAddressRequest_WhenCallingGet_ThenShouldReturnAPIResponseListOfAddresses(string postcode, GlobalConstants.Gazetteer gazetteer)
+        [TestCase("RM3 0FS", GlobalConstants.AddressScope.HackneyBorough)]
+        [TestCase("IG11 7QD", GlobalConstants.AddressScope.National)]
+        public void GivenValidSearchAddressRequest_WhenCallingGet_ThenShouldReturnAPIResponseListOfAddresses(string postcode, GlobalConstants.AddressScope addressScope)
         {
             //arrange
             _mock.Setup(s => s.ExecuteAsync(It.IsAny<SearchAddressRequest>()))
@@ -48,7 +48,7 @@ namespace AddressesAPI.Tests.V2.Controllers
             var request = new SearchAddressRequest
             {
                 Postcode = postcode,
-                Gazetteer = gazetteer.ToString()
+                AddressScope = addressScope.ToString()
             };
             //act
             var response = _classUnderTest.GetAddresses(request);
