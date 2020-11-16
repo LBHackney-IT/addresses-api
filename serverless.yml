@@ -26,6 +26,7 @@ functions:
       artifact: ./AddressesAPI/bin/release/netcoreapp3.1/addresses-api.zip
     environment:
       CONNECTION_STRING: Host=${ssm:/addresses-api/${self:provider.stage}/postgres-hostname};Port=${ssm:/addresses-api/${self:provider.stage}/postgres-port};Database=addresses_api;Username=${ssm:/addresses-api/${self:provider.stage}/postgres-username};Password=${ssm:/addresses-api/${self:provider.stage}/postgres-password}
+      ELASTICSEARCH_DOMAIN_URL: ${ssm:/addresses-api/${self:provider.stage}/elasticsearch-domain}
     events:
       - http:
           path: /{proxy+}
@@ -137,6 +138,7 @@ custom:
     production:
       securityGroupIds:
         - sg-0559e24a4d1ee0ddc
+        - sg-0942a8227a2ecc6f8
       subnetIds:
         - subnet-01d3657f97a243261
         - subnet-0b7b8fea07efabf34

@@ -1,10 +1,46 @@
+using System;
+using System.Threading.Tasks;
 using AddressesAPI.Infrastructure;
 using AutoFixture;
+using Nest;
+using static Elasticsearch.Net.Refresh;
 
 namespace AddressesAPI.Tests.V2.Helper
 {
     public static class TestEfDataHelper
     {
+        public static async Task<NationalAddress> InsertAddressToPgAndEs(AddressesContext context, ElasticClient elasticClient, string key = null,
+            NationalAddress request = null)
+        {
+            var address = InsertAddress(context, key, request);
+            var queryableAddress = new QueryableAddress
+            {
+                id = address.AddressKey,
+                Gazetteer = address.Gazetteer,
+                Line1 = address.Line1,
+                Line2 = address.Line2,
+                Line3 = address.Line3,
+                Line4 = address.Line4,
+                Postcode = address.Postcode,
+                Street = address.Street,
+                Town = address.Town,
+                AddressKey = address.AddressKey,
+                AddressStatus = address.AddressStatus,
+                BuildingNumber = address.BuildingNumber,
+                PropertyShell = address.PropertyShell,
+                UsageCode = address.UsageCode,
+                UsagePrimary = address.UsagePrimary,
+                AddressChangeDate = address.AddressChangeDate,
+                OutOfBoroughAddress = address.NeverExport,
+                UPRN = address.UPRN,
+                USRN = address.USRN,
+                ParentUPRN = address.ParentUPRN
+            };
+
+            await elasticClient.IndexAsync(queryableAddress, i => i.Refresh(WaitFor))
+                .ConfigureAwait(true);
+            return address;
+        }
         public static NationalAddress InsertAddress(AddressesContext context, string key = null, NationalAddress request = null)
         {
             var fixture = new Fixture();
