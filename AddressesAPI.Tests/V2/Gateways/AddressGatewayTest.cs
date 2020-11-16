@@ -481,6 +481,35 @@ namespace AddressesAPI.Tests.V2.Gateways
         }
 
         [Test]
+        public void IfSetToIncludeParentShellsWillIncludeParentShellsInTotalCount()
+        {
+            var parentShell = TestEfDataHelper.InsertAddress(DatabaseContext);
+            var addressOneToMatch = TestEfDataHelper.InsertAddress(DatabaseContext,
+                request: new NationalAddress { ParentUPRN = parentShell.UPRN }
+            );
+            var parentShellTwo = TestEfDataHelper.InsertAddress(DatabaseContext);
+            var addressTwoToMatch = TestEfDataHelper.InsertAddress(DatabaseContext,
+                request: new NationalAddress { ParentUPRN = parentShellTwo.UPRN, Postcode = addressOneToMatch.Postcode }
+            );
+
+            TestEfDataHelper.InsertAddress(DatabaseContext);
+
+            var request = new SearchParameters
+            {
+                Page = 1,
+                PageSize = 2,
+                Format = GlobalConstants.Format.Detailed,
+                Gazetteer = GlobalConstants.Gazetteer.Both,
+                Postcode = addressOneToMatch.Postcode,
+                IncludeParentShells = true
+            };
+            var (addresses, totalCount) = _classUnderTest.SearchAddresses(request);
+
+            addresses.Count.Should().Be(2);
+            totalCount.Should().Be(4);
+        }
+
+        [Test]
         public void IfSetToIncludeParentShellsIncludeParentShellsOfParentsShells()
         {
             var grandParentShell = TestEfDataHelper.InsertAddress(DatabaseContext);
