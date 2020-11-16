@@ -18,6 +18,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Nest;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -119,6 +120,23 @@ namespace AddressesAPI
             RegisterV2Gateways(services);
             RegisterV1UseCases(services);
             RegisterV2UseCases(services);
+
+            ConfigureElasticsearch(services);
+        }
+
+        private static void ConfigureElasticsearch(IServiceCollection services)
+        {
+            var url = Environment.GetEnvironmentVariable("ELASTICSEARCH_DOMAIN_URL") ?? "http://localhost:9202";
+            var defaultIndex = "addresses";
+
+            var settings = new ConnectionSettings(new Uri(url))
+                .DefaultIndex(defaultIndex)
+                .DefaultMappingFor<QueryableAddress>(m => m
+                    .PropertyName(p => p.AddressKey, "AddressKey")
+                );
+            var esClient = new ElasticClient(settings);
+
+            services.AddSingleton<IElasticClient>(esClient);
         }
 
         private static void ConfigureDbContext(IServiceCollection services)
