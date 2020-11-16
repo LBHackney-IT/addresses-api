@@ -99,8 +99,24 @@ namespace AddressesAPI.V2.Gateways
                 .ThenBy(a => a.UnitName);
         }
 
+        private List<long> GetMatchingCrossReferenceUprns(string code, string value)
+        {
+            return _addressesContext.AddressCrossReferences
+                .Where(cr => cr.Code == code)
+                .Where(cr => cr.Value == value)
+                .Select(cr => cr.UPRN)
+                .ToList();
+        }
+
+
         private IQueryable<Address> CompileBaseSearchQuery(SearchParameters request)
         {
+            var queryByCrossReference = string.IsNullOrWhiteSpace(request.CrossRefCode) && string.IsNullOrWhiteSpace(request.CrossRefValue);
+
+            var addresses = queryByCrossReference
+                ? _addressesContext.Addresses
+                : _addressesContext.Addresses.Where(a => GetMatchingCrossReferenceUprns(request.CrossRefCode, request.CrossRefValue).Contains(a.UPRN));
+
             var postcodeSearchTerm = request.Postcode == null ? null : $"{request.Postcode.Replace(" ", "")}%";
             var buildingNumberSearchTerm = GenerateSearchTerm(request.BuildingNumber);
             var streetSearchTerm = GenerateSearchTerm(request.Street);
@@ -111,7 +127,7 @@ namespace AddressesAPI.V2.Gateways
             var usageSearchTerms = request.UsagePrimary?.Split(',').ToList();
             var usageCodeSearchTerms = request.UsageCode?.Split(',').ToList();
 
-            var queryResults = _addressesContext.Addresses
+            var queryResults = addresses
                 .Where(a => string.IsNullOrWhiteSpace(request.Postcode)
                             || EF.Functions.ILike(a.Postcode.Replace(" ", ""), postcodeSearchTerm))
                 .Where(a => string.IsNullOrWhiteSpace(request.BuildingNumber)

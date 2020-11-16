@@ -102,6 +102,18 @@ namespace AddressesAPI.V2.Boundary.Requests
         public bool IncludeParentShells { get; set; } = false;
 
         /// <summary>
+        /// Filter addresses by a specific cross reference. Must be used together with `cross_ref_value`.
+        /// </summary>
+        [FromQuery(Name = "cross_ref_code")]
+        public string CrossRefCode { get; set; }
+
+        /// <summary>
+        /// Filter addresses by a specific cross reference. Must be used together with `cross_ref_code`.
+        /// </summary>
+        [FromQuery(Name = "cross_ref_value")]
+        public string CrossRefValue { get; set; }
+
+        /// <summary>
         /// Page defaults to 1 as paging is 1 index based not 0 index based
         /// </summary>
         public int Page { get; set; } = 1;

@@ -41,6 +41,10 @@ namespace AddressesAPI.V2.UseCase
                 .Must(CheckForAtLeastOneMandatoryFilterPropertyWithGazetteerBoth)
                 .WithMessage("You must provide at least one of (uprn, usrn, postcode), when gazetteer is 'both'.");
 
+            RuleFor(r => r)
+                .Must(CheckCrossReferenceCodeWhenGivenHasAValue)
+                .WithMessage("You must provide both the code and a value, when searching by a cross reference");
+
             RuleFor(r => r.RequestFields)
                 .Must(CheckForInvalidProperties)
                 .WithMessage("Invalid properties have been provided.");
@@ -53,9 +57,11 @@ namespace AddressesAPI.V2.UseCase
                 return true; // returning true, because there can't be any invalid parameter names, when there no parameters provided.
             }
 
+            var removeQueryUnderscores = requestFields.Select(x => x.Replace("_", "")).ToList();
+
             var allProperties = typeof(SearchAddressRequest).GetProperties().Where(prop => prop.Name != "Errors" && prop.Name != "RequestFields").Select(prop => prop.Name).ToList();
 
-            var invalidParameters = requestFields.Except(allProperties, StringComparer.OrdinalIgnoreCase);
+            var invalidParameters = removeQueryUnderscores.Except(allProperties, StringComparer.OrdinalIgnoreCase);
 
             return !invalidParameters.Any();
         }
@@ -77,6 +83,14 @@ namespace AddressesAPI.V2.UseCase
                    || request.UPRN != null
                    || request.USRN != null
                    || request.Postcode != null;
+        }
+
+        private static bool CheckCrossReferenceCodeWhenGivenHasAValue(SearchAddressRequest request)
+        {
+            var bothAreNull = string.IsNullOrWhiteSpace(request.CrossRefCode) && string.IsNullOrWhiteSpace(request.CrossRefValue);
+            var bothAreGiven = request.CrossRefCode != null && request.CrossRefValue != null;
+
+            return bothAreNull || bothAreGiven;
         }
 
         private static bool CanBeAnyCombinationOfAllowedAddressStatuses(string addressStatus)

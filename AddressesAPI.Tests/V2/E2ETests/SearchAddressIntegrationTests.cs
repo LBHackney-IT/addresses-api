@@ -223,6 +223,34 @@ namespace AddressesAPI.Tests.V2.E2ETests
             );
         }
 
+        [Test]
+        public async Task SearchAddressReturnsAnAddressMatchingASpecificCrossReference()
+        {
+            var uprnOne = _faker.Random.Int();
+            var uprnTwo = _faker.Random.Int();
+
+            var crossReferenceOne = new CrossReference { Code = "000ABC", Value = "100000" };
+            var crossReferenceTwo = new CrossReference { Code = "123XYZ", Value = "100000" };
+
+            var record = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress { UPRN = uprnOne, Postcode = "N1 7UK" });
+            TestEfDataHelper.InsertCrossReference(DatabaseContext, uprnOne, crossReferenceOne);
+
+
+            TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress { UPRN = uprnTwo, Postcode = "N1 7UK" });
+            TestEfDataHelper.InsertCrossReference(DatabaseContext, uprnTwo, crossReferenceTwo);
+
+            AddSomeRandomAddressToTheDatabase();
+
+            var queryString = $"cross_ref_code={crossReferenceOne.Code}&cross_ref_value={crossReferenceOne.Value}&postcode=N1&format=Detailed";
+
+            var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
+            response.StatusCode.Should().Be(200);
+
+            var returnedAddress = await response.ConvertToSearchAddressResponseObject().ConfigureAwait(true);
+            returnedAddress.Data.Addresses.Count.Should().Be(1);
+            returnedAddress.Data.Addresses.First().AddressKey.Should().Be(record.AddressKey);
+        }
+
         private void AddSomeRandomAddressToTheDatabase(int? count = null, string gazetteer = "Local")
         {
             var number = count ?? _faker.Random.Int(2, 7);

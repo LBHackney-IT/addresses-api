@@ -427,6 +427,50 @@ namespace AddressesAPI.Tests.V2.Gateways
 
             addresses.Count.Should().Be(4);
         }
+
+        [Test]
+        public void WillSearchForAllAddressesUsingForACrossReference()
+        {
+            TestEfDataHelper.InsertAddress(DatabaseContext);
+
+            //--- Cross reference for address one
+            var uprnOne = _faker.Random.Long(10000000, 99999999);
+
+            var addressOne = TestEfDataHelper.InsertAddress(DatabaseContext,
+                request: new NationalAddress { UPRN = uprnOne }
+            );
+
+            TestEfDataHelper.InsertCrossReference(DatabaseContext, uprnOne,
+                new CrossReference { Code = "TAXES", Value = "TestValue" }
+            );
+
+            //--- Cross reference for address two
+            var uprnTwo = _faker.Random.Long(10000000, 99999999);
+
+            var addressTwo = TestEfDataHelper.InsertAddress(DatabaseContext,
+                request: new NationalAddress { UPRN = uprnTwo }
+            );
+
+            TestEfDataHelper.InsertCrossReference(DatabaseContext, uprnTwo,
+                new CrossReference { Code = "TAXES", Value = "TestValue" }
+            );
+
+            var request = new SearchParameters
+            {
+                Page = 1,
+                PageSize = 50,
+                Format = GlobalConstants.Format.Detailed,
+                Gazetteer = GlobalConstants.Gazetteer.Both,
+                CrossRefCode = "TAXES",
+                CrossRefValue = "TestValue"
+            };
+
+            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+
+            addresses.Count.Should().Be(2);
+            addresses.Should().ContainEquivalentOf(addressOne.ToDomain());
+            addresses.Should().ContainEquivalentOf(addressTwo.ToDomain());
+        }
         #endregion
 
         #region parentShells
