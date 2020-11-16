@@ -90,6 +90,7 @@ custom:
     staging:
       securityGroupIds:
         - sg-0721d1d066b247b8f
+        - sg-0828e84a9e427392a
       subnetIds:
         - subnet-06d3de1bd9181b0d7
         - subnet-0ed7d7713d1127656
