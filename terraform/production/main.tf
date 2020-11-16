@@ -27,22 +27,23 @@ terraform {
     key     = "services/addresses-api/state"
   }
 }
-
-/*    POSTGRES SET UP    */
+/*    VPC SET UP    */
 
 data "aws_vpc" "production_vpc" {
-  tags = {
-    Name = "vpc-production-apis-production"
-  }
+    tags = {
+        Name = "vpc-production-apis-production"
+    }
 }
 
 data "aws_subnet_ids" "production" {
-  vpc_id = data.aws_vpc.production_vpc.id
-  filter {
-    name   = "tag:Type"
-    values = ["private"]
-  }
+    vpc_id = data.aws_vpc.production_vpc.id
+    filter {
+        name   = "tag:Type"
+        values = ["private"]
+    }
 }
+
+/*    POSTGRES SET UP    */
 
 data "aws_ssm_parameter" "addresses_postgres_db_password" {
   name = "/addresses-api/production/postgres-password"
@@ -71,4 +72,23 @@ module "postgres_db_production" {
   multi_az             = true //only true if production deployment
   publicly_accessible  = false
   project_name         = "platform apis"
+}
+
+/*    ELASTICSEARCH SETUP    */
+
+module "elasticsearch_db_staging" {
+    source = "github.com/LBHackney-IT/aws-hackney-common-terraform.git//modules/database/elasticsearch"
+    vpc_id= data.aws_vpc.production_vpc.id
+    environment_name= "production"
+    port= 443
+    domain_name= "addresses-api-es"
+    subnet_ids= [tolist(data.aws_subnet_ids.production.ids)[0]]
+    project_name= "addresses-api"
+    es_version= "7.8"
+    encrypt_at_rest= "true"
+    instance_type= "t3.small.elasticsearch"
+    ebs_enabled= "true"
+    ebs_volume_size= "10"
+    region= data.aws_region.current.name
+    account_id= data.aws_caller_identity.current.account_id
 }
