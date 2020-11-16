@@ -34,7 +34,7 @@ namespace AddressesAPI.V2.Gateways
                 baseAddresses = GetParentShells(baseQuery, baseAddresses);
             }
 
-            var totalCount = baseQuery.Count();
+            var totalCount = baseAddresses.Count();
 
             var addresses = PageAddresses(OrderAddresses(baseAddresses), request.PageSize, request.Page)
                 .Select(
