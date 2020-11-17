@@ -129,7 +129,7 @@ module "elasticsearch_dms_setup_staging" {
   source_endpoint_ssl_mode   = "none"
 
   //dms task set up
-  migration_type               = "full-load"
+  migration_type               = "full-load-and-cdc"
   replication_task_indentifier = "addresses-api-es-dms-task"
   task_settings                = file("${path.module}/task_settings.json")
   task_table_mappings          = file("${path.module}/selection_rules.json")
