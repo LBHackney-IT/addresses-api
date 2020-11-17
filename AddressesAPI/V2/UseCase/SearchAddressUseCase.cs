@@ -45,13 +45,14 @@ namespace AddressesAPI.V2.UseCase
 
         private static SearchParameters MapRequestToSearchParameters(SearchAddressRequest request)
         {
-            var gazetteer = request.Gazetteer.ToLower() == "local"
-                ? GlobalConstants.Gazetteer.Hackney
-                : Enum.Parse<GlobalConstants.Gazetteer>(request.Gazetteer, true);
+            var addressScope = Enum.Parse<GlobalConstants.AddressScope>(request.AddressScope.Replace(" ", ""), true);
+
             return new SearchParameters
             {
                 Format = Enum.Parse<GlobalConstants.Format>(request.Format, true),
-                Gazetteer = gazetteer,
+                Gazetteer = addressScope != GlobalConstants.AddressScope.National
+                    ? GlobalConstants.Gazetteer.Hackney
+                    : GlobalConstants.Gazetteer.Both,
                 Page = request.Page == 0 ? 1 : request.Page,
                 Postcode = request.Postcode,
                 Street = request.Street,
@@ -62,7 +63,7 @@ namespace AddressesAPI.V2.UseCase
                 PageSize = request.PageSize,
                 UsageCode = request.UsageCode,
                 UsagePrimary = request.UsagePrimary,
-                OutOfBoroughAddress = request.OutOfBoroughAddress,
+                OutOfBoroughAddress = addressScope != GlobalConstants.AddressScope.HackneyBorough,
                 IncludeParentShells = request.IncludeParentShells,
                 CrossRefCode = request.CrossRefCode,
                 CrossRefValue = request.CrossRefValue

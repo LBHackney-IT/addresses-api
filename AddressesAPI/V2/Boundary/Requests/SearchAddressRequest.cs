@@ -32,9 +32,10 @@ namespace AddressesAPI.V2.Boundary.Requests
         public string Street { get; set; }
 
         /// <summary>
-        /// LOCAL/NATIONAL/BOTH (Defaults to LOCAL)
+        /// Hackney Borough/Hackney Gazetteer/National (Defaults to Hackney Borough)
         /// </summary>
-        public string Gazetteer { get; set; } = GlobalConstants.Gazetteer.Both.ToString();
+        [FromQuery(Name = "address_scope")]
+        public string AddressScope { get; set; } = GlobalConstants.AddressScope.HackneyBorough.ToString();
 
         /// <summary>
         /// Filter by UPRN (unique property reference number - unique identifier of the BLPU (Basic Land and Property Unit); a UPRN can have more than one LPI/address. )
@@ -82,17 +83,6 @@ namespace AddressesAPI.V2.Boundary.Requests
         /// </summary>
         [FromQuery(Name = "address_status")]
         public string AddressStatus { get; set; }
-
-        /// <summary>
-        ///  	whether or not out of borough addresses
-        ///that are present in the local gazetteer
-        ///for services reasons should be returned.
-        ///If yes, the local gazetteer version takes
-        ///precedence over the national gazetteer
-        ///version.
-        /// </summary>
-        [FromQuery(Name = "out_of_borough")]
-        public bool OutOfBoroughAddress { get; set; } = true;
 
         /// <summary>
         /// Whether or not to include parent shells of addresses which match

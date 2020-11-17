@@ -12,11 +12,13 @@ namespace AddressesAPI.Tests.V2.UseCase
     {
         private SearchAddressValidator _classUnderTest;
         private string _localGazetteer;
+        private string _nationalGazetteer;
 
         [SetUp]
         public void SetUp()
         {
-            _localGazetteer = GlobalConstants.Gazetteer.Hackney.ToString();
+            _localGazetteer = GlobalConstants.AddressScope.HackneyGazetteer.ToString();
+            _nationalGazetteer = GlobalConstants.AddressScope.National.ToString();
             _classUnderTest = new SearchAddressValidator();
         }
 
@@ -261,101 +263,106 @@ namespace AddressesAPI.Tests.V2.UseCase
         #region Request object validation
 
         [TestCase(12345)]
-        public void GivenARequestWithOnlyUPRN_IfGazetteerIsLocal_WhenCallingValidation_ItReturnsNoError(int uprn)
+        public void GivenARequestWithOnlyUPRN_IfAddressScopeIsHackneyGazetteer_WhenCallingValidation_ItReturnsNoError(int uprn)
         {
-            var request = new SearchAddressRequest() { UPRN = uprn, Gazetteer = _localGazetteer };
+            var request = new SearchAddressRequest() { UPRN = uprn, AddressScope = _localGazetteer };
             _classUnderTest.TestValidate(request).ShouldNotHaveError();
         }
 
         [TestCase(12345)]
-        public void GivenARequestWithOnlyUPRN_IfGazetteerIsBoth_WhenCallingValidation_ItReturnsNoError(int uprn)
+        public void GivenARequestWithOnlyUPRN_IfAddressScopeIsHackneyNational_WhenCallingValidation_ItReturnsNoError(int uprn)
         {
-            var request = new SearchAddressRequest() { UPRN = uprn };
+            var request = new SearchAddressRequest() { UPRN = uprn, AddressScope = _nationalGazetteer };
             _classUnderTest.TestValidate(request).ShouldNotHaveError();
         }
 
         [TestCase(12345)]
-        public void GivenARequestWithOnlyUSRN_IfGazetteerIsLocal_WhenCallingValidation_ItReturnsNoError(int usrn)
+        public void GivenARequestWithOnlyUSRN_IfAddressScopeIsHackneyGazetteer_WhenCallingValidation_ItReturnsNoError(int usrn)
         {
-            var request = new SearchAddressRequest() { USRN = usrn, Gazetteer = _localGazetteer };
+            var request = new SearchAddressRequest() { USRN = usrn, AddressScope = _localGazetteer };
             _classUnderTest.TestValidate(request).ShouldNotHaveError();
         }
 
         [TestCase(12345)]
-        public void GivenARequestWithOnlyUSRN_IfGazetteerIsBoth_WhenCallingValidation_ItReturnsNoError(int usrn)
+        public void GivenARequestWithOnlyUSRN_IfAddressScopeIsNational_WhenCallingValidation_ItReturnsNoError(int usrn)
         {
-            var request = new SearchAddressRequest() { USRN = usrn };
+            var request = new SearchAddressRequest() { USRN = usrn, AddressScope = _nationalGazetteer };
             _classUnderTest.TestValidate(request).ShouldNotHaveError();
         }
 
         [TestCase("SW1A 1AA")]
-        public void GivenARequestWithOnlyAPostCode_IfGazetteerIsLocal_WhenCallingValidation_ItReturnsNoError(string postcode)
+        public void GivenARequestWithOnlyAPostCode_IfAddressScopeIsHackneyGazetteer_WhenCallingValidation_ItReturnsNoError(string postcode)
         {
-            var request = new SearchAddressRequest() { Postcode = postcode, Gazetteer = _localGazetteer };
+            var request = new SearchAddressRequest() { Postcode = postcode, AddressScope = _localGazetteer };
             _classUnderTest.TestValidate(request).ShouldNotHaveError();
         }
 
         [TestCase("SW1A 1AA")]
-        public void GivenARequestWithOnlyAPostCode_IfGazetteerIsBoth_WhenCallingValidation_ItReturnsNoError(string postcode)
+        public void GivenARequestWithOnlyAPostCode_IfAddressScopeIsNational_WhenCallingValidation_ItReturnsNoError(string postcode)
         {
-            var request = new SearchAddressRequest() { Postcode = postcode };
+            var request = new SearchAddressRequest() { Postcode = postcode, AddressScope = _nationalGazetteer };
             _classUnderTest.TestValidate(request).ShouldNotHaveError();
         }
 
         [TestCase("Sesame street")]
-        public void GivenARequestWithOnlyAStreet_IfGazetteerIsLocal_WhenCallingValidation_ItReturnsNoError(string street)
+        public void GivenARequestWithOnlyAStreet_IfAddressScopeIsHackneyGazetteer_WhenCallingValidation_ItReturnsNoError(string street)
         {
-            var request = new SearchAddressRequest() { Street = street, Gazetteer = _localGazetteer };
+            var request = new SearchAddressRequest() { Street = street, AddressScope = _localGazetteer };
             _classUnderTest.TestValidate(request).ShouldNotHaveError();
         }
 
         [TestCase("Sesame street")]
-        public void GivenARequestWithOnlyAStreet_IfGazetteerIsBoth_WhenCallingValidation_ItReturnsAnError(string street)
+        public void GivenARequestWithOnlyAStreet_IfAddressScopeIsNational_WhenCallingValidation_ItReturnsAnError(string street)
         {
-            var request = new SearchAddressRequest() { Street = street };
-            _classUnderTest.TestValidate(request).ShouldHaveError().WithErrorMessage("You must provide at least one of (uprn, usrn, postcode), when gazetteer is 'both'.");
+            var request = new SearchAddressRequest() { Street = street, AddressScope = _nationalGazetteer };
+            _classUnderTest.TestValidate(request).ShouldHaveError().WithErrorMessage(
+                "You must provide at least one of (uprn, usrn, postcode), when address_scope is 'national'.");
         }
 
         [TestCase("someValue")]
-        public void GivenARequestWithOnlyUsagePrimary_IfGazetteerIsLocal_WhenCallingValidation_ItReturnsNoError(string usagePrimary)
+        public void GivenARequestWithOnlyUsagePrimary_IfAddressScopeIsHackneyGazetteer_WhenCallingValidation_ItReturnsNoError(string usagePrimary)
         {
-            var request = new SearchAddressRequest() { UsagePrimary = usagePrimary, Gazetteer = _localGazetteer };
+            var request = new SearchAddressRequest() { UsagePrimary = usagePrimary, AddressScope = _localGazetteer };
             _classUnderTest.TestValidate(request).ShouldNotHaveError();
         }
 
         [TestCase("someValue")]
-        public void GivenARequestWithOnlyUsagePrimary_IfGazetteerIsBoth_WhenCallingValidation_ItReturnsAnError(string usagePrimary)
+        public void GivenARequestWithOnlyUsagePrimary_IfAddressScopeIsNational_WhenCallingValidation_ItReturnsAnError(string usagePrimary)
         {
-            var request = new SearchAddressRequest() { UsagePrimary = usagePrimary };
-            _classUnderTest.TestValidate(request).ShouldHaveError().WithErrorMessage("You must provide at least one of (uprn, usrn, postcode), when gazetteer is 'both'.");
+            var request = new SearchAddressRequest() { UsagePrimary = usagePrimary, AddressScope = _nationalGazetteer };
+            _classUnderTest.TestValidate(request).ShouldHaveError().WithErrorMessage(
+                "You must provide at least one of (uprn, usrn, postcode), when address_scope is 'national'.");
         }
 
         [TestCase("otherValue")]
-        public void GivenARequestWithOnlyUsageCode_IfGazetteerIsLocal_WhenCallingValidation_ItReturnsNoError(string usageCode)
+        public void GivenARequestWithOnlyUsageCode_IfAddressScopeIsHackneyGazetteer_WhenCallingValidation_ItReturnsNoError(string usageCode)
         {
-            var request = new SearchAddressRequest() { UsageCode = usageCode, Gazetteer = _localGazetteer };
+            var request = new SearchAddressRequest() { UsageCode = usageCode, AddressScope = _localGazetteer };
             _classUnderTest.TestValidate(request).ShouldNotHaveError();
         }
 
         [TestCase("otherValue")]
-        public void GivenARequestWithOnlyUsageCode_IfGazetteerIsBoth_WhenCallingValidation_ItReturnsAnError(string usageCode)
+        public void GivenARequestWithOnlyUsageCode_IfAddressScopeIsNational_WhenCallingValidation_ItReturnsAnError(string usageCode)
         {
-            var request = new SearchAddressRequest() { UsageCode = usageCode };
-            _classUnderTest.TestValidate(request).ShouldHaveError().WithErrorMessage("You must provide at least one of (uprn, usrn, postcode), when gazetteer is 'both'.");
+            var request = new SearchAddressRequest() { UsageCode = usageCode, AddressScope = _nationalGazetteer };
+            _classUnderTest.TestValidate(request).ShouldHaveError().WithErrorMessage(
+                "You must provide at least one of (uprn, usrn, postcode), when address_scope is 'national'.");
         }
 
         [TestCase("12345")]
-        public void GivenARequestWithNoMandatoryFields_IfGazetteerIsLocal_WhenCallingValidation_ItReturnsAnError(string buildingNumber)
+        public void GivenARequestWithNoMandatoryFields_IfAddressScopeIsHackneyGazetteer_WhenCallingValidation_ItReturnsAnError(string buildingNumber)
         {
-            var request = new SearchAddressRequest() { BuildingNumber = buildingNumber, Gazetteer = _localGazetteer };
-            _classUnderTest.TestValidate(request).ShouldHaveError().WithErrorMessage("You must provide at least one of (uprn, usrn, postcode, street, usagePrimary, usageCode), when gazeteer is 'local'.");
+            var request = new SearchAddressRequest() { BuildingNumber = buildingNumber, AddressScope = _localGazetteer };
+            _classUnderTest.TestValidate(request).ShouldHaveError().WithErrorMessage(
+                "You must provide at least one of (uprn, usrn, postcode, street, usagePrimary, usageCode), when address_scope is 'hackney borough' or 'hackney gazetteer'.");
         }
 
         [TestCase("12345")]
-        public void GivenARequestWithNoMandatoryFields_IfGazetteerIsBoth_WhenCallingValidation_ItReturnsAnError(string buildingNumber)
+        public void GivenARequestWithNoMandatoryFields_IfAddressScopeIsNational_WhenCallingValidation_ItReturnsAnError(string buildingNumber)
         {
-            var request = new SearchAddressRequest() { BuildingNumber = buildingNumber };
-            _classUnderTest.TestValidate(request).ShouldHaveError().WithErrorMessage("You must provide at least one of (uprn, usrn, postcode), when gazetteer is 'both'.");
+            var request = new SearchAddressRequest() { BuildingNumber = buildingNumber, AddressScope = _nationalGazetteer };
+            _classUnderTest.TestValidate(request).ShouldHaveError().WithErrorMessage(
+                "You must provide at least one of (uprn, usrn, postcode), when address_scope is 'national'.");
         }
 
         [TestCase("TESTCD", "E5 9TT")]
@@ -399,21 +406,27 @@ namespace AddressesAPI.Tests.V2.UseCase
         [TestCase("finsburypark")]
         [TestCase("haringay")]
         [TestCase("dalston")]
-        [TestCase("National")]
-        public void GivenAnIncorrectGazetteer_WhenValidating_ItReturnsAnError(string gazetteer)
+        [TestCase("Both")]
+        [TestCase("Hackney")]
+        public void GivenAnIncorrectAddressScope_WhenValidating_ItReturnsAnError(string addressScope)
         {
-            var request = new SearchAddressRequest { Gazetteer = gazetteer };
-            _classUnderTest.ShouldHaveValidationErrorFor(x => x.Gazetteer, request)
-                .WithErrorMessage("Value for the parameter is not valid. It should be either Hackney or Both.");
+            var request = new SearchAddressRequest { AddressScope = addressScope };
+            _classUnderTest.ShouldHaveValidationErrorFor(x => x.AddressScope, request)
+                .WithErrorMessage("Value for the parameter is not valid. It should be either Hackney Borough, Hackney Gazetteer or National.");
         }
 
-        [TestCase("Hackney")]
-        [TestCase("Local")] // To be depreciated
-        [TestCase("Both")]
-        public void GivenACorrectGazetteer_WhenValidating_ItReturnsNoErrors(string gazetteer)
+        [TestCase("hackney borough")]
+        [TestCase("hackneyborough")]
+        [TestCase("Hackney Borough")]
+        [TestCase("hackney gazetteer")]
+        [TestCase("hackneygazetteer")]
+        [TestCase("Hackney Gazetteer")]
+        [TestCase("national")]
+        [TestCase("National")]
+        public void GivenACorrectAddressScope_WhenValidating_ItReturnsNoErrors(string addressScope)
         {
-            var request = new SearchAddressRequest { Gazetteer = gazetteer };
-            _classUnderTest.ShouldNotHaveValidationErrorFor(x => x.Gazetteer, request);
+            var request = new SearchAddressRequest { AddressScope = addressScope };
+            _classUnderTest.ShouldNotHaveValidationErrorFor(x => x.AddressScope, request);
         }
 
         #endregion
