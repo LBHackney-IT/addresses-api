@@ -22,29 +22,9 @@
       "rule-action": "include"
     },
     {
-      "rule-type": "selection",
+      "rule-type": "transformation",
       "rule-id": "3",
       "rule-name": "3",
-      "object-locator": {
-        "schema-name": "%",
-        "table-name": "national_address"
-      },
-      "rule-action": "exclude"
-    },
-    {
-      "rule-type": "selection",
-      "rule-id": "4",
-      "rule-name": "4",
-      "object-locator": {
-        "schema-name": "%",
-        "table-name": "hackney_address"
-      },
-      "rule-action": "exclude"
-    },
-    {
-      "rule-type": "transformation",
-      "rule-id": "5",
-      "rule-name": "5",
       "rule-action": "remove-column",
       "rule-target": "column",
       "object-locator": {
