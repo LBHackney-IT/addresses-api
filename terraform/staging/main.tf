@@ -100,8 +100,8 @@ module "elasticsearch_db_staging" {
     account_id= data.aws_caller_identity.current.account_id
 }
 
-data "aws_ssm_parameter" "addresses_elasticsearch_vpc_endpoint" {
-  name = "/addresses-api/staging/elasticsearch_vpc_endpoint"
+data "aws_ssm_parameter" "addresses_elasticsearch_domain" {
+  name = "/addresses-api/staging/elasticsearch-domain"
 }
 
 /*    DMS SETUP    */
@@ -115,7 +115,7 @@ module "elasticsearch_dms_setup_staging" {
   target_endpoint_identifier = "target-addresses-es"
   target_db_engine_name      = "elasticsearch"
   target_db_port             = 443
-  target_db_server           = data.aws_ssm_parameter.addresses_elasticsearch_vpc_endpoint.value
+  target_db_server           = data.aws_ssm_parameter.addresses_elasticsearch_domain.value
   target_endpoint_ssl_mode   = "none"
 
   //source db for dms endpoint
