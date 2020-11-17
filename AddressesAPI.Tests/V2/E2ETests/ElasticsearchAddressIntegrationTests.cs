@@ -47,25 +47,24 @@ namespace AddressesAPI.Tests.V2.E2ETests
             returnedAddress.Data.Addresses.First().AddressKey.Should().Be(recordOne.AddressKey);
             returnedAddress.Data.Addresses.Last().AddressKey.Should().Be(recordTwo.AddressKey);
         }
-        //
-        // [Ignore("Pending")]
-        // [Test]
-        // public async Task SearchAddressReturnsAnAddressWithMatchingPostcode()
-        // {
-        //     var addressKey = _faker.Random.String2(14);
-        //     var postcode = "E4 2JH";
-        //     var record = await TestEfDataHelper.InsertAddressToPgAndEs(DatabaseContext, ElasticsearchClient, addressKey,
-        //         new NationalAddress { Postcode = postcode });
-        //     AddSomeRandomAddressToTheDatabase();
-        //
-        //     var queryString = $"postcode={postcode}&address_status={record.AddressStatus}&format=Detailed";
-        //
-        //     var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
-        //     response.StatusCode.Should().Be(200);
-        //     var returnedAddress = await response.ConvertToSearchAddressResponseObject().ConfigureAwait(true);
-        //     returnedAddress.Data.Addresses.Count.Should().Be(1);
-        //     returnedAddress.Data.Addresses.First().AddressKey.Should().Be(addressKey);
-        // }
+
+        [Test]
+        public async Task SearchAddressReturnsAnAddressWithMatchingPostcode()
+        {
+            var addressKey = _faker.Random.String2(14);
+            var postcode = "E4 2JH";
+            var record = await TestEfDataHelper.InsertAddressToPgAndEs(DatabaseContext, ElasticsearchClient, addressKey,
+                new NationalAddress { Postcode = postcode }).ConfigureAwait(true);
+            await AddSomeRandomAddressToTheDatabase().ConfigureAwait(true);
+
+            var queryString = $"postcode={postcode}&address_status={record.AddressStatus}&format=Detailed";
+
+            var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
+            response.StatusCode.Should().Be(200);
+            var returnedAddress = await response.ConvertToSearchAddressResponseObject().ConfigureAwait(true);
+            returnedAddress.Data.Addresses.Count.Should().Be(1);
+            returnedAddress.Data.Addresses.First().AddressKey.Should().Be(addressKey);
+        }
         //
         // [Ignore("Pending")]
         // [Test]

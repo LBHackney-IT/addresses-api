@@ -9,5 +9,6 @@ namespace AddressesAPI.V2.Gateways
 
         (List<Address>, int) SearchAddresses(SearchParameters request);
 
+        List<Address> GetAddresses(List<string> addressKeys);
     }
 }

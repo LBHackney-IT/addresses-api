@@ -22,21 +22,24 @@ namespace AddressesAPI.Tests.V2.UseCase
     public class SearchAddressUseCaseTest
     {
         private ISearchAddressUseCase _classUnderTest;
-        private Mock<IAddressesGateway> _fakeGateway;
+        private Mock<IAddressesGateway> _addressGateway;
         private Mock<ISearchAddressValidator> _fakeValidator;
         private Faker _faker = new Faker();
         private Fixture _fixture = new Fixture();
+        private Mock<ISearchAddressesGateway> _searchAddressGateway;
 
         [SetUp]
         public void SetUp()
         {
-            _fakeGateway = new Mock<IAddressesGateway>();
+            _addressGateway = new Mock<IAddressesGateway>();
+            _searchAddressGateway = new Mock<ISearchAddressesGateway>();
             _fakeValidator = new Mock<ISearchAddressValidator>();
-            _classUnderTest = new SearchAddressUseCase(_fakeGateway.Object, _fakeValidator.Object);
+            _classUnderTest = new SearchAddressUseCase(
+                _addressGateway.Object, _fakeValidator.Object, _searchAddressGateway.Object);
         }
 
         [Test]
-        public void GivenValidInput_WhenExecute_WillPassAllSearchParametersToTheGateway()
+        public void GivenValidInput_WhenExecute_WillPassAllSearchParametersToTheSearchGateway()
         {
             SetupValidatorToReturnValid();
 
@@ -58,7 +61,7 @@ namespace AddressesAPI.Tests.V2.UseCase
                 CrossRefCode = "123DEF",
                 CrossRefValue = "20000"
             };
-            _fakeGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(
+            _searchAddressGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(
                     x => x.Format == GlobalConstants.Format.Detailed
                          && x.Gazetteer == GlobalConstants.Gazetteer.Hackney
                          && x.OutOfBoroughAddress
@@ -75,10 +78,10 @@ namespace AddressesAPI.Tests.V2.UseCase
                          && x.IncludeParentShells == request.IncludeParentShells
                          && x.CrossRefCode == request.CrossRefCode
                          && x.CrossRefValue == request.CrossRefValue)))
-                .Returns((new List<Address>(), 1)).Verifiable();
+                .Returns((new List<string>(), 1)).Verifiable();
 
             _classUnderTest.ExecuteAsync(request);
-            _fakeGateway.Verify();
+            _addressGateway.Verify();
         }
 
         [TestCase("HackneyBorough", GlobalConstants.Gazetteer.Hackney, false)]
@@ -95,11 +98,11 @@ namespace AddressesAPI.Tests.V2.UseCase
                 Postcode = "E8",
                 AddressScope = addressScope
             };
-            _fakeGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(i =>
+            _searchAddressGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(i =>
                     i.Gazetteer.Equals(expectedGazetteer) && i.OutOfBoroughAddress.Equals(expectedOutOfBorough))))
                 .Returns((null, 0)).Verifiable();
             _classUnderTest.ExecuteAsync(request);
-            _fakeGateway.Verify();
+            _addressGateway.Verify();
         }
 
         [TestCase("approved,historical", new[] { "approved", "historical" })]
@@ -112,11 +115,11 @@ namespace AddressesAPI.Tests.V2.UseCase
                 Postcode = "E8",
                 AddressStatus = addressQuery
             };
-            _fakeGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(i =>
+            _searchAddressGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(i =>
                     i.AddressStatus.SequenceEqual(expectedList))))
                 .Returns((null, 0)).Verifiable();
             _classUnderTest.ExecuteAsync(request);
-            _fakeGateway.Verify();
+            _addressGateway.Verify();
         }
 
         [Test]
@@ -124,7 +127,7 @@ namespace AddressesAPI.Tests.V2.UseCase
         {
             SetupValidatorToReturnValid();
             //arrange
-            _fakeGateway.Setup(s => s.SearchAddresses(It.IsAny<SearchParameters>()))
+            _addressGateway.Setup(s => s.SearchAddresses(It.IsAny<SearchParameters>()))
                 .Returns((null, 0));
 
             //act
@@ -145,7 +148,7 @@ namespace AddressesAPI.Tests.V2.UseCase
             {
                 Postcode = postcode
             };
-            _fakeGateway.Setup(s =>
+            _addressGateway.Setup(s =>
                     s.SearchAddresses(It.Is<SearchParameters>(i => i.Postcode.Equals(postcode))))
                 .Returns((addresses, 1));
 
@@ -164,7 +167,7 @@ namespace AddressesAPI.Tests.V2.UseCase
             var numberOfAddressesInPage = _faker.Random.Int(3, 30);
             var addresses = _fixture.CreateMany<Address>(numberOfAddressesInPage).ToList();
 
-            _fakeGateway.Setup(s =>
+            _addressGateway.Setup(s =>
                     s.SearchAddresses(It.IsAny<SearchParameters>()))
                 .Returns((addresses, totalCount));
 
@@ -187,7 +190,7 @@ namespace AddressesAPI.Tests.V2.UseCase
             _classUnderTest.ExecuteAsync(request);
 
             //assert
-            _fakeGateway.Verify(s => s.SearchAddresses(
+            _addressGateway.Verify(s => s.SearchAddresses(
                 It.Is<SearchParameters>(i => i.Page.Equals(1))));
         }
 

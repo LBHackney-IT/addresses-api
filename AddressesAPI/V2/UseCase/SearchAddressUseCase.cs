@@ -14,10 +14,13 @@ namespace AddressesAPI.V2.UseCase
     {
         private readonly IAddressesGateway _addressGateway;
         private readonly ISearchAddressValidator _requestValidator;
+        private readonly ISearchAddressesGateway _searchAddressesGateway;
 
-        public SearchAddressUseCase(IAddressesGateway addressesGateway, ISearchAddressValidator requestValidator)
+        public SearchAddressUseCase(IAddressesGateway addressesGateway, ISearchAddressValidator requestValidator,
+            ISearchAddressesGateway searchAddressesGateway)
         {
             _addressGateway = addressesGateway;
+            _searchAddressesGateway = searchAddressesGateway;
             _requestValidator = requestValidator;
         }
 
@@ -29,7 +32,8 @@ namespace AddressesAPI.V2.UseCase
                 throw new BadRequestException(validation);
             }
             var searchParameters = MapRequestToSearchParameters(request);
-            var (results, totalCount) = _addressGateway.SearchAddresses(searchParameters);
+            var (addressKeys, totalCount) = _searchAddressesGateway.SearchAddresses(searchParameters);
+            var results = _addressGateway.GetAddresses(addressKeys);
 
             if (results == null)
                 return new SearchAddressResponse();

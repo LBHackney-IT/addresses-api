@@ -78,7 +78,7 @@ namespace AddressesAPI.V2.Controllers
         [Route("elasticsearch")]
         public IActionResult GetAddressesWithEs([FromQuery] SearchAddressRequest request)
         {
-            var gateway = new ElasticGateway(_esClient, _addressContext);
+            var gateway = new ElasticGateway(_esClient);
             var usecase = new SearchAddressUseCase(gateway, _searchAddressValidator);
             if (!ModelState.IsValid)
             {
