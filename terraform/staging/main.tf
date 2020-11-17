@@ -32,17 +32,17 @@ terraform {
 /*    VPC SET UP    */
 
 data "aws_vpc" "staging_vpc" {
-    tags = {
-        Name = "vpc-staging-apis-staging"
-    }
+  tags = {
+    Name = "vpc-staging-apis-staging"
+  }
 }
 
 data "aws_subnet_ids" "staging" {
-    vpc_id = data.aws_vpc.staging_vpc.id
-    filter {
-        name   = "tag:Type"
-        values = ["private"]
-    }
+  vpc_id = data.aws_vpc.staging_vpc.id
+  filter {
+    name   = "tag:Type"
+    values = ["private"]
+  }
 }
 
 /*    POSTGRES SET UP    */
@@ -53,6 +53,10 @@ data "aws_ssm_parameter" "addresses_postgres_db_password" {
 
 data "aws_ssm_parameter" "addresses_postgres_username" {
   name = "/addresses-api/staging/postgres-username"
+}
+
+data "aws_ssm_parameter" "addresses_postgres_hostname" {
+  name = "/addresses-api/staging/postgres-hostname"
 }
 
 module "postgres_db_staging" {
@@ -94,4 +98,40 @@ module "elasticsearch_db_staging" {
     ebs_volume_size= "10"
     region= data.aws_region.current.name
     account_id= data.aws_caller_identity.current.account_id
+}
+
+data "aws_ssm_parameter" "addresses_elasticsearch_domain" {
+  name = "/addresses-api/staging/elasticsearch-domain"
+}
+
+/*    DMS SETUP    */
+module "elasticsearch_dms_setup_staging" {
+  source           = "github.com/LBHackney-IT/aws-dms-terraform.git//dms_setup_existing_instance"
+  environment_name = "staging"
+  project_name     = "addresses-api"
+
+  //target db for dms endpoint
+  target_db_name             = "addresses-api-es"
+  target_endpoint_identifier = "target-addresses-es"
+  target_db_engine_name      = "elasticsearch"
+  target_db_port             = 443
+  target_db_server           = data.aws_ssm_parameter.addresses_elasticsearch_domain.value
+  target_endpoint_ssl_mode   = "none"
+
+  //source db for dms endpoint
+  source_db_name             = "addresses_api"
+  source_endpoint_identifier = "source-addresses-postgres"
+  source_db_engine_name      = "postgres"
+  source_db_port             = 5502
+  source_db_username         = data.aws_ssm_parameter.addresses_postgres_username.value
+  source_db_password         = data.aws_ssm_parameter.addresses_postgres_db_password.value
+  source_db_server           = data.aws_ssm_parameter.addresses_postgres_hostname.value
+  source_endpoint_ssl_mode   = "none"
+
+  //dms task set up
+  migration_type               = "full-load-and-cdc"
+  replication_task_indentifier = "addresses-api-es-dms-task"
+  task_settings                = file("${path.module}/task_settings.json")
+  task_table_mappings          = file("${path.module}/selection_rules.json")
+  replication_instance_arn     = "arn:aws:dms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rep:DNTOW6TGQEGCAOWQMZYHQRTWAA"
 }
