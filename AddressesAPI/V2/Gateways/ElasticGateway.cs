@@ -9,33 +9,23 @@ using Address = AddressesAPI.V2.Domain.Address;
 
 namespace AddressesAPI.V2.Gateways
 {
-    public class ElasticGateway : IAddressesGateway
+    public class ElasticGateway : ISearchAddressesGateway
     {
         private IElasticClient _esClient;
-        private AddressesContext _addressContext;
 
-        public ElasticGateway(IElasticClient esClient, AddressesContext addressesContext)
+        public ElasticGateway(IElasticClient esClient)
         {
             _esClient = esClient;
-            _addressContext = addressesContext;
         }
 
-        public (List<Address>, int) SearchAddresses(SearchParameters request)
+        public (List<string>, int) SearchAddresses(SearchParameters request)
         {
             var documents = _esClient
                 .Search<QueryableAddress>(s => s.Size(2000)).Documents;
             var addressKeys = documents
-                .Select(a => a.AddressKey);
-            var addresses = _addressContext.Addresses
-                .Where(a => addressKeys.Contains(a.AddressKey))
-                .Select(a => a.ToDomain())
-                .ToList();
-            return (addresses, documents.Count);
-        }
-
-        Address IAddressesGateway.GetSingleAddress(string addressKey)
-        {
-            return new Address();
+                .Select(a => a.AddressKey).ToList();
+            var totalCount = documents.Count;
+            return (addressKeys, totalCount);
         }
     }
 }

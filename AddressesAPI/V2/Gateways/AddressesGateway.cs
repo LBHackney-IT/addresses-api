@@ -45,6 +45,11 @@ namespace AddressesAPI.V2.Gateways
             return (addresses, totalCount);
         }
 
+        public List<Domain.Address> GetAddresses(List<string> addressKeys)
+        {
+            throw new NotImplementedException();
+        }
+
         private IQueryable<Address> GetParentShells(IQueryable<Address> baseQuery, IQueryable<Address> baseAddresses)
         {
             var childShells = baseQuery;
