@@ -60,7 +60,6 @@ namespace AddressesAPI.Infrastructure
         [MaxLength(100)]
         public string Line4 { get; set; }
 
-        public bool NeverExport { get; set; }
         public short? PaonStartNumber { get; set; }
         public string UnitNumber { get; set; }
         public string UnitName { get; set; }

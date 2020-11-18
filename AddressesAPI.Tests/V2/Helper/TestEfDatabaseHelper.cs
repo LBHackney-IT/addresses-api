@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using AddressesAPI.Infrastructure;
 using AutoFixture;
@@ -95,7 +94,7 @@ namespace AddressesAPI.Tests.V2.Helper
             if (request?.UsagePrimary != null) randomAddressRecord.UsagePrimary = request.UsagePrimary;
             if (request?.UsageCode != null) randomAddressRecord.UsageCode = request.UsageCode;
             if (request?.Gazetteer != null) randomAddressRecord.Gazetteer = request.Gazetteer;
-            if (request?.NeverExport != null) randomAddressRecord.NeverExport = request.NeverExport;
+            if (request?.OutOfBoroughAddress != null) randomAddressRecord.OutOfBoroughAddress = request.OutOfBoroughAddress;
             if (request?.Town != null) randomAddressRecord.Town = request.Town;
             if (request?.Street != null) randomAddressRecord.Street = request.Street;
             if (request?.PaonStartNumber != null) randomAddressRecord.PaonStartNumber = request.PaonStartNumber;
