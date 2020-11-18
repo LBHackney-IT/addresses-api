@@ -11,9 +11,8 @@ namespace AddressesAPI.Tests
         private readonly string _esDomainUri = "http://localhost:9202";
         protected ElasticClient ElasticsearchClient { get; private set; }
 
-
         [SetUp]
-        public void RunBeforeAnyTests()
+        public void SetupElasticsearchClient()
         {
             ElasticsearchClient = SetupElasticsearchConnection();
             DeleteAddressesIndex(ElasticsearchClient);
@@ -31,6 +30,7 @@ namespace AddressesAPI.Tests
             var settings = new ConnectionSettings(new Uri(_esDomainUri))
                 .DefaultIndex("addresses")
                 .PrettyJson()
+                .DisableDirectStreaming()
                 .ThrowExceptions();
             return new ElasticClient(settings);
         }
@@ -61,6 +61,11 @@ namespace AddressesAPI.Tests
                     )
                 )
             );
+        }
+
+        public static void EmptyAddressesIndex(ElasticClient client)
+        {
+            client.DeleteByQuery<QueryableAddress>(q => q.MatchAll());
         }
 
 

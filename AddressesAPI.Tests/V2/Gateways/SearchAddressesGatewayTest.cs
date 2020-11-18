@@ -6,12 +6,10 @@ using AddressesAPI.Infrastructure;
 using AddressesAPI.Tests.V2.Helper;
 using AddressesAPI.V2;
 using AddressesAPI.V2.Domain;
-using AddressesAPI.V2.Factories;
 using AddressesAPI.V2.Gateways;
 using Bogus;
 using FluentAssertions;
 using NUnit.Framework;
-using Address = AddressesAPI.V2.Domain.Address;
 
 namespace AddressesAPI.Tests.V2.Gateways
 {
@@ -313,7 +311,6 @@ namespace AddressesAPI.Tests.V2.Gateways
             {
                 Page = 1,
                 PageSize = 50,
-                Format = GlobalConstants.Format.Detailed,
                 Gazetteer = GlobalConstants.Gazetteer.Hackney,
             };
             var (addresses, _) = _classUnderTest.SearchAddresses(request);
@@ -326,10 +323,10 @@ namespace AddressesAPI.Tests.V2.Gateways
         public async Task WillFilterHackneyAddressByOutOfBoroughAddresses()
         {
             var outOfBorough = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
-                addressConfig: new QueryableAddress { NeverExport = true, Gazetteer = "Hackney" }
+                addressConfig: new QueryableAddress { OutOfBoroughAddress = true, Gazetteer = "Hackney" }
             ).ConfigureAwait(true);
             var hackneyAddress = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
-                addressConfig: new QueryableAddress { NeverExport = false, Gazetteer = "Hackney" }
+                addressConfig: new QueryableAddress { OutOfBoroughAddress = false, Gazetteer = "Hackney" }
             ).ConfigureAwait(true);
             var request = new SearchParameters
             {
@@ -348,10 +345,10 @@ namespace AddressesAPI.Tests.V2.Gateways
         public async Task WillFilterOutAllQueryableAddressesWhenQueryingForNoOutOfBoroughAddresses()
         {
             var outOfBorough1 = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
-                addressConfig: new QueryableAddress { NeverExport = true, Gazetteer = "National" }
+                addressConfig: new QueryableAddress { OutOfBoroughAddress = true, Gazetteer = "National" }
             ).ConfigureAwait(true);
             var outOfBorough2 = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
-                addressConfig: new QueryableAddress { NeverExport = false, Gazetteer = "National" }
+                addressConfig: new QueryableAddress { OutOfBoroughAddress = false, Gazetteer = "National" }
             ).ConfigureAwait(true);
             var request = new SearchParameters
             {
@@ -369,16 +366,16 @@ namespace AddressesAPI.Tests.V2.Gateways
         public async Task IfOutOfBoroughFlagIsTrueReturnsAllAddresses()
         {
             await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
-                addressConfig: new QueryableAddress { NeverExport = true, Gazetteer = "Hackney" }
+                addressConfig: new QueryableAddress { OutOfBoroughAddress = true, Gazetteer = "Hackney" }
             ).ConfigureAwait(true);
             await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
-                addressConfig: new QueryableAddress { NeverExport = false, Gazetteer = "Hackney" }
+                addressConfig: new QueryableAddress { OutOfBoroughAddress = false, Gazetteer = "Hackney" }
             ).ConfigureAwait(true);
             await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
-                addressConfig: new QueryableAddress { NeverExport = false, Gazetteer = "National" }
+                addressConfig: new QueryableAddress { OutOfBoroughAddress = false, Gazetteer = "National" }
             ).ConfigureAwait(true);
             await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
-                addressConfig: new QueryableAddress { NeverExport = true, Gazetteer = "National" }
+                addressConfig: new QueryableAddress { OutOfBoroughAddress = true, Gazetteer = "National" }
             ).ConfigureAwait(true);
             var request = new SearchParameters
             {
