@@ -33,7 +33,9 @@ namespace AddressesAPI.V2.UseCase
             }
             var searchParameters = MapRequestToSearchParameters(request);
             var (addressKeys, totalCount) = _searchAddressesGateway.SearchAddresses(searchParameters);
-            var results = _addressGateway.GetAddresses(addressKeys);
+
+            var format = Enum.Parse<GlobalConstants.Format>(request.Format, true);
+            var results = _addressGateway.GetAddresses(addressKeys, format);
 
             if (results == null)
                 return new SearchAddressResponse();
@@ -53,7 +55,6 @@ namespace AddressesAPI.V2.UseCase
 
             return new SearchParameters
             {
-                Format = Enum.Parse<GlobalConstants.Format>(request.Format, true),
                 Gazetteer = addressScope != GlobalConstants.AddressScope.National
                     ? GlobalConstants.Gazetteer.Hackney
                     : GlobalConstants.Gazetteer.Both,

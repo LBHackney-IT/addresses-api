@@ -27,10 +27,12 @@ namespace AddressesAPI.Tests
         private IDbContextTransaction _transaction;
         private DbContextOptionsBuilder _builder;
         private string _esDomainUri = "http://localhost:9202";
+        private ElasticsearchTests _elasticserachTests;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
+            _elasticserachTests = new ElasticsearchTests();
             ConnectToPostgresDbUsingEf();
         }
 
@@ -44,8 +46,8 @@ namespace AddressesAPI.Tests
             DatabaseContext = new AddressesContext(_builder.Options);
             DatabaseContext.Database.Migrate();
             _transaction = DatabaseContext.Database.BeginTransaction();
-            SetupElasticsearchConnection();
-            EmptyAddressIndexInElasticsearch();
+            ElasticsearchClient = _elasticserachTests.SetupElasticsearchConnection();
+            ElasticsearchTests.DeleteAddressesIndex(ElasticsearchClient);
         }
 
         [TearDown]
@@ -54,33 +56,12 @@ namespace AddressesAPI.Tests
             Client.Dispose();
             _factory.Dispose();
             RollbackEfTransaction();
-            EmptyAddressIndexInElasticsearch();
+            ElasticsearchTests.DeleteAddressesIndex(ElasticsearchClient);
         }
         private void RollbackEfTransaction()
         {
             _transaction.Rollback();
             _transaction.Dispose();
-        }
-
-        private void SetupElasticsearchConnection()
-        {
-            var settings = new ConnectionSettings(new Uri(_esDomainUri))
-                .DefaultIndex("addresses")
-                .DefaultMappingFor<QueryableAddress>(m => m
-                    .PropertyName(p => p.AddressKey, "AddressKey")
-                );
-            ElasticsearchClient = new ElasticClient(settings);
-        }
-
-        private void EmptyAddressIndexInElasticsearch()
-        {
-            var toDelete = ElasticsearchClient.
-                Search<QueryableAddress>(s => s.Size(100)).Documents;
-
-            foreach (var address in toDelete)
-            {
-                ElasticsearchClient.Delete(new DeleteRequest("addresses", address.AddressKey));
-            }
         }
 
         private void ConnectToPostgresDbUsingEf()

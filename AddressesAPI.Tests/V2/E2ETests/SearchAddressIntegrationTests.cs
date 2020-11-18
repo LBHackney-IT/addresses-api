@@ -21,7 +21,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
         public async Task SearchAddressReturns200()
         {
             var addressKey = "eytshdnshsuahs";
-            TestEfDataHelper.InsertAddress(DatabaseContext, addressKey);
+            TestEfDataHelper.InsertAddressInDb(DatabaseContext, addressKey);
 
             var queryString = "postcode=E8";
 
@@ -34,7 +34,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
         {
             var addressKey = _faker.Random.String2(14);
             var postcode = "E4 2JH";
-            var record = TestEfDataHelper.InsertAddress(DatabaseContext, addressKey,
+            var record = TestEfDataHelper.InsertAddressInDb(DatabaseContext, addressKey,
                 new NationalAddress { Postcode = postcode });
             AddSomeRandomAddressToTheDatabase();
 
@@ -55,7 +55,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
             {
                 UPRN = _faker.Random.Int(),
             };
-            var record = TestEfDataHelper.InsertAddress(DatabaseContext, addressKey, queryParameters);
+            var record = TestEfDataHelper.InsertAddressInDb(DatabaseContext, addressKey, queryParameters);
             AddSomeRandomAddressToTheDatabase();
 
             var queryString = $"uprn={queryParameters.UPRN}&address_status={record.AddressStatus}&format=Detailed&address_scope=national";
@@ -77,7 +77,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
                 USRN = _faker.Random.Int(),
                 AddressStatus = "Historical"
             };
-            TestEfDataHelper.InsertAddress(DatabaseContext, addressKey, queryParameters);
+            TestEfDataHelper.InsertAddressInDb(DatabaseContext, addressKey, queryParameters);
             AddSomeRandomAddressToTheDatabase();
 
             var queryString = $"USRN={queryParameters.USRN}&address_status=Historical&Format=Detailed&address_scope=national";
@@ -105,7 +105,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
                 Postcode = "E41JJ",
                 AddressStatus = "Historical"
             };
-            TestEfDataHelper.InsertAddress(DatabaseContext, addressKey, addressDetails);
+            TestEfDataHelper.InsertAddressInDb(DatabaseContext, addressKey, addressDetails);
             AddSomeRandomAddressToTheDatabase();
             var queryString = $"uprn={addressDetails.UPRN}&address_status=Historical&format=Simple&address_scope=national";
 
@@ -132,7 +132,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
                 UPRN = _faker.Random.Int(),
                 Gazetteer = "National"
             };
-            var record = TestEfDataHelper.InsertAddress(DatabaseContext, addressKey, dbOptions);
+            var record = TestEfDataHelper.InsertAddressInDb(DatabaseContext, addressKey, dbOptions);
 
             AddSomeRandomAddressToTheDatabase(count: 3);
             AddSomeRandomAddressToTheDatabase(count: 3, gazetteer: "National");
@@ -151,13 +151,13 @@ namespace AddressesAPI.Tests.V2.E2ETests
         [TestCase("Hackney Borough")]
         public async Task SettingAddressScopeToHackneyBoroughWillOnlyReturnAddressesInHackney(string addressScope)
         {
-            var hackneyOutOfBorough = TestEfDataHelper.InsertAddress(DatabaseContext,
+            var hackneyOutOfBorough = TestEfDataHelper.InsertAddressInDb(DatabaseContext,
                 request: new NationalAddress { Postcode = "N1 3JH", Gazetteer = "Hackney", NeverExport = true });
 
-            var hackneyInBorough = TestEfDataHelper.InsertAddress(DatabaseContext,
+            var hackneyInBorough = TestEfDataHelper.InsertAddressInDb(DatabaseContext,
                 request: new NationalAddress { Postcode = "N1 7YH", Gazetteer = "Hackney", NeverExport = false });
 
-            var nationalAddress = TestEfDataHelper.InsertAddress(DatabaseContext,
+            var nationalAddress = TestEfDataHelper.InsertAddressInDb(DatabaseContext,
                 request: new NationalAddress { Postcode = "N1 7UK", Gazetteer = "National" });
 
             var queryString = $"postcode=N1&format=Detailed&address_scope={addressScope}";
@@ -176,14 +176,14 @@ namespace AddressesAPI.Tests.V2.E2ETests
             {
                 UPRN = _faker.Random.Int(1, 287987129),
             };
-            TestEfDataHelper.InsertAddress(DatabaseContext, blockAddressKey, blockOfFlats);
+            TestEfDataHelper.InsertAddressInDb(DatabaseContext, blockAddressKey, blockOfFlats);
 
             var flatAddressKey = _faker.Random.String2(14);
             var flat = new NationalAddress
             {
                 ParentUPRN = blockOfFlats.UPRN,
             };
-            var flatRecord = TestEfDataHelper.InsertAddress(DatabaseContext, flatAddressKey, flat);
+            var flatRecord = TestEfDataHelper.InsertAddressInDb(DatabaseContext, flatAddressKey, flat);
 
             AddSomeRandomAddressToTheDatabase();
 
@@ -237,12 +237,12 @@ namespace AddressesAPI.Tests.V2.E2ETests
             var hackneyBoroughOne = new NationalAddress { UPRN = uprnOne, Gazetteer = "Hackney", NeverExport = false };
             var hackneyBoroughTwo = new NationalAddress { UPRN = uprnTwo, Gazetteer = "Hackney", NeverExport = false };
 
-            var record = TestEfDataHelper.InsertAddress(DatabaseContext,
+            var record = TestEfDataHelper.InsertAddressInDb(DatabaseContext,
                 request: hackneyBoroughOne);
 
             TestEfDataHelper.InsertCrossReference(DatabaseContext, uprnOne, crossReferenceOne);
 
-            TestEfDataHelper.InsertAddress(DatabaseContext, request: hackneyBoroughTwo);
+            TestEfDataHelper.InsertAddressInDb(DatabaseContext, request: hackneyBoroughTwo);
             TestEfDataHelper.InsertCrossReference(DatabaseContext, uprnTwo, crossReferenceTwo);
 
             AddSomeRandomAddressToTheDatabase();
@@ -267,7 +267,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
                     .With(a => a.Gazetteer, gazetteer)
                     .Without(a => a.ParentUPRN)
                     .Create();
-                TestEfDataHelper.InsertAddress(DatabaseContext, addressKey, randomAddress);
+                TestEfDataHelper.InsertAddressInDb(DatabaseContext, addressKey, randomAddress);
             }
         }
 

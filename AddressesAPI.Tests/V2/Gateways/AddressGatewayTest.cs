@@ -30,7 +30,7 @@ namespace AddressesAPI.Tests.V2.Gateways
         public void ItWillGetADetailedAddressFromTheDatabase()
         {
             var addressKey = _faker.Random.String2(14);
-            var savedAddress = TestEfDataHelper.InsertAddress(DatabaseContext, addressKey);
+            var savedAddress = TestEfDataHelper.InsertAddressInDb(DatabaseContext, addressKey);
             var request = new SearchParameters
             {
                 Page = 1,
@@ -49,7 +49,7 @@ namespace AddressesAPI.Tests.V2.Gateways
         public void ItWillGetASimpleAddressFromTheDatabase()
         {
             var addressKey = _faker.Random.String2(14);
-            var savedAddress = TestEfDataHelper.InsertAddress(DatabaseContext, addressKey);
+            var savedAddress = TestEfDataHelper.InsertAddressInDb(DatabaseContext, addressKey);
             var request = new SearchParameters
             {
                 Page = 1,
@@ -82,11 +82,11 @@ namespace AddressesAPI.Tests.V2.Gateways
         [TestCase("E7 4TT", "e7")]
         public void WillSearchPostcodeForAMatch(string savedPostcode, string postcodeSearch)
         {
-            var savedAddress = TestEfDataHelper.InsertAddress(DatabaseContext,
+            var savedAddress = TestEfDataHelper.InsertAddressInDb(DatabaseContext,
                 request: new NationalAddress { Postcode = savedPostcode }
                 );
             var randomPostcode = $"NW{_faker.Random.Int(1, 9)} {_faker.Random.Int(1, 9)}TY";
-            TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress
+            TestEfDataHelper.InsertAddressInDb(DatabaseContext, request: new NationalAddress
             {
                 Postcode = randomPostcode
             });
@@ -108,7 +108,7 @@ namespace AddressesAPI.Tests.V2.Gateways
         [TestCase("SW1 7YU", "W1 7")]
         public void WillOnlyGetPostcodesWhichMatchAtTheStart(string savedPostcode, string postcodeSearch)
         {
-            var savedAddress = TestEfDataHelper.InsertAddress(DatabaseContext,
+            var savedAddress = TestEfDataHelper.InsertAddressInDb(DatabaseContext,
                 request: new NationalAddress { Postcode = savedPostcode }
             );
             var request = new SearchParameters
@@ -128,10 +128,10 @@ namespace AddressesAPI.Tests.V2.Gateways
         [TestCase("123383833", "383")]
         public void WillSearchBuildingsNumbersForAMatch(string savedBuildingNumber, string buildingNumberSearch)
         {
-            var savedAddress = TestEfDataHelper.InsertAddress(DatabaseContext,
+            var savedAddress = TestEfDataHelper.InsertAddressInDb(DatabaseContext,
                 request: new NationalAddress { BuildingNumber = savedBuildingNumber }
             );
-            TestEfDataHelper.InsertAddress(DatabaseContext);
+            TestEfDataHelper.InsertAddressInDb(DatabaseContext);
             var request = new SearchParameters
             {
                 Page = 1,
@@ -153,10 +153,10 @@ namespace AddressesAPI.Tests.V2.Gateways
         [TestCase("yellow street", "YELLOWstreet")]
         public void WillSearchStreetForAMatch(string savedStreet, string streetSearch)
         {
-            var savedAddress = TestEfDataHelper.InsertAddress(DatabaseContext,
+            var savedAddress = TestEfDataHelper.InsertAddressInDb(DatabaseContext,
                 request: new NationalAddress { Street = savedStreet }
             );
-            TestEfDataHelper.InsertAddress(DatabaseContext);
+            TestEfDataHelper.InsertAddressInDb(DatabaseContext);
             var request = new SearchParameters
             {
                 Page = 1,
@@ -183,11 +183,11 @@ namespace AddressesAPI.Tests.V2.Gateways
         [TestCase("Provisional", new[] { "Historical", "provisional" })]
         public void WillSearchForAddressesWithStatus(string savedStatus, IEnumerable<string> statusSearchTerm)
         {
-            var savedAddress = TestEfDataHelper.InsertAddress(DatabaseContext,
+            var savedAddress = TestEfDataHelper.InsertAddressInDb(DatabaseContext,
                 request: new NationalAddress { AddressStatus = savedStatus }
             );
 
-            TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress
+            TestEfDataHelper.InsertAddressInDb(DatabaseContext, request: new NationalAddress
             {
                 AddressStatus = savedStatus == "Provisional" ? "Alternative" : "Provisional"
             });
@@ -208,9 +208,9 @@ namespace AddressesAPI.Tests.V2.Gateways
         [Test]
         public void IfNoAddressStatusSearchGivenDefaultsToApprovedPreferred()
         {
-            var savedAddress = TestEfDataHelper.InsertAddress(DatabaseContext);
+            var savedAddress = TestEfDataHelper.InsertAddressInDb(DatabaseContext);
 
-            TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress { AddressStatus = "Historical" });
+            TestEfDataHelper.InsertAddressInDb(DatabaseContext, request: new NationalAddress { AddressStatus = "Historical" });
             var request = new SearchParameters
             {
                 Page = 1,
@@ -228,10 +228,10 @@ namespace AddressesAPI.Tests.V2.Gateways
         public void WillSearchUprnsForAMatch()
         {
             var uprn = _faker.Random.Number(10000000, 99999999);
-            var savedAddress = TestEfDataHelper.InsertAddress(DatabaseContext,
+            var savedAddress = TestEfDataHelper.InsertAddressInDb(DatabaseContext,
                 request: new NationalAddress { UPRN = uprn }
             );
-            TestEfDataHelper.InsertAddress(DatabaseContext);
+            TestEfDataHelper.InsertAddressInDb(DatabaseContext);
             var request = new SearchParameters
             {
                 Page = 1,
@@ -250,10 +250,10 @@ namespace AddressesAPI.Tests.V2.Gateways
         public void WillSearchUsrnsForAMatch()
         {
             var uprn = _faker.Random.Number(10000000, 99999999);
-            var savedAddress = TestEfDataHelper.InsertAddress(DatabaseContext,
+            var savedAddress = TestEfDataHelper.InsertAddressInDb(DatabaseContext,
                 request: new NationalAddress { USRN = uprn }
             );
-            TestEfDataHelper.InsertAddress(DatabaseContext);
+            TestEfDataHelper.InsertAddressInDb(DatabaseContext);
             var request = new SearchParameters
             {
                 Page = 1,
@@ -281,10 +281,10 @@ namespace AddressesAPI.Tests.V2.Gateways
         [TestCase("Military", "Military,Dual Use")]
         public void WillSearchForAnAddressesPrimaryUsage(string savedUsage, string usageSearchTerm)
         {
-            var savedAddress = TestEfDataHelper.InsertAddress(DatabaseContext,
+            var savedAddress = TestEfDataHelper.InsertAddressInDb(DatabaseContext,
                 request: new NationalAddress { UsagePrimary = savedUsage }
             );
-            TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress
+            TestEfDataHelper.InsertAddressInDb(DatabaseContext, request: new NationalAddress
             {
                 UsagePrimary = savedUsage == "Commercial" ? "Military" : "Commercial"
             });
@@ -308,11 +308,11 @@ namespace AddressesAPI.Tests.V2.Gateways
         [TestCase("A2", "a2,C5")]
         public void WillSearchForAnAddressesUsageCodeFromAList(string savedUsage, string usageSearchTerm)
         {
-            var savedAddress = TestEfDataHelper.InsertAddress(DatabaseContext,
+            var savedAddress = TestEfDataHelper.InsertAddressInDb(DatabaseContext,
                 request: new NationalAddress { UsageCode = savedUsage }
             );
 
-            TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress
+            TestEfDataHelper.InsertAddressInDb(DatabaseContext, request: new NationalAddress
             {
                 UsageCode = "B7"
             });
@@ -336,10 +336,10 @@ namespace AddressesAPI.Tests.V2.Gateways
         [TestCase("hackney")]
         public void CanSearchOnlyLocalHackneyAddressesCaseInsensitively(string gazetteer)
         {
-            var savedAddress = TestEfDataHelper.InsertAddress(DatabaseContext,
+            var savedAddress = TestEfDataHelper.InsertAddressInDb(DatabaseContext,
                 request: new NationalAddress { Gazetteer = gazetteer }
             );
-            TestEfDataHelper.InsertAddress(DatabaseContext,
+            TestEfDataHelper.InsertAddressInDb(DatabaseContext,
                 request: new NationalAddress { Gazetteer = "National" }
             );
             var request = new SearchParameters
@@ -358,10 +358,10 @@ namespace AddressesAPI.Tests.V2.Gateways
         [Test]
         public void WillFilterHackneyAddressByOutOfBoroughAddresses()
         {
-            var outOfBorough = TestEfDataHelper.InsertAddress(DatabaseContext,
+            var outOfBorough = TestEfDataHelper.InsertAddressInDb(DatabaseContext,
                 request: new NationalAddress { NeverExport = true, Gazetteer = "Hackney" }
             );
-            var hackneyAddress = TestEfDataHelper.InsertAddress(DatabaseContext,
+            var hackneyAddress = TestEfDataHelper.InsertAddressInDb(DatabaseContext,
                 request: new NationalAddress { NeverExport = false, Gazetteer = "Hackney" }
             );
             var request = new SearchParameters
@@ -381,10 +381,10 @@ namespace AddressesAPI.Tests.V2.Gateways
         [Test]
         public void WillFilterOutAllNationalAddressesWhenQueryingForNoOutOfBoroughAddresses()
         {
-            var outOfBorough1 = TestEfDataHelper.InsertAddress(DatabaseContext,
+            var outOfBorough1 = TestEfDataHelper.InsertAddressInDb(DatabaseContext,
                 request: new NationalAddress { NeverExport = true, Gazetteer = "National" }
             );
-            var outOfBorough2 = TestEfDataHelper.InsertAddress(DatabaseContext,
+            var outOfBorough2 = TestEfDataHelper.InsertAddressInDb(DatabaseContext,
                 request: new NationalAddress { NeverExport = false, Gazetteer = "National" }
             );
             var request = new SearchParameters
@@ -403,16 +403,16 @@ namespace AddressesAPI.Tests.V2.Gateways
         [Test]
         public void IfOutOfBoroughFlagIsTrueReturnsAllAddresses()
         {
-            TestEfDataHelper.InsertAddress(DatabaseContext,
+            TestEfDataHelper.InsertAddressInDb(DatabaseContext,
                 request: new NationalAddress { NeverExport = true, Gazetteer = "Hackney" }
             );
-            TestEfDataHelper.InsertAddress(DatabaseContext,
+            TestEfDataHelper.InsertAddressInDb(DatabaseContext,
                 request: new NationalAddress { NeverExport = false, Gazetteer = "Hackney" }
             );
-            TestEfDataHelper.InsertAddress(DatabaseContext,
+            TestEfDataHelper.InsertAddressInDb(DatabaseContext,
                 request: new NationalAddress { NeverExport = false, Gazetteer = "National" }
             );
-            TestEfDataHelper.InsertAddress(DatabaseContext,
+            TestEfDataHelper.InsertAddressInDb(DatabaseContext,
                 request: new NationalAddress { NeverExport = true, Gazetteer = "National" }
             );
             var request = new SearchParameters
@@ -431,12 +431,12 @@ namespace AddressesAPI.Tests.V2.Gateways
         [Test]
         public void WillSearchForAllAddressesUsingForACrossReference()
         {
-            TestEfDataHelper.InsertAddress(DatabaseContext);
+            TestEfDataHelper.InsertAddressInDb(DatabaseContext);
 
             //--- Cross reference for address one
             var uprnOne = _faker.Random.Long(10000000, 99999999);
 
-            var addressOne = TestEfDataHelper.InsertAddress(DatabaseContext,
+            var addressOne = TestEfDataHelper.InsertAddressInDb(DatabaseContext,
                 request: new NationalAddress { UPRN = uprnOne }
             );
 
@@ -447,7 +447,7 @@ namespace AddressesAPI.Tests.V2.Gateways
             //--- Cross reference for address two
             var uprnTwo = _faker.Random.Long(10000000, 99999999);
 
-            var addressTwo = TestEfDataHelper.InsertAddress(DatabaseContext,
+            var addressTwo = TestEfDataHelper.InsertAddressInDb(DatabaseContext,
                 request: new NationalAddress { UPRN = uprnTwo }
             );
 
@@ -478,11 +478,11 @@ namespace AddressesAPI.Tests.V2.Gateways
         [Test]
         public void IfSetToExcludeParentShellsWillOnlyReturnsResultsOfSearch()
         {
-            var parentShell = TestEfDataHelper.InsertAddress(DatabaseContext);
-            var addressToMatch = TestEfDataHelper.InsertAddress(DatabaseContext,
+            var parentShell = TestEfDataHelper.InsertAddressInDb(DatabaseContext);
+            var addressToMatch = TestEfDataHelper.InsertAddressInDb(DatabaseContext,
                 request: new NationalAddress { ParentUPRN = parentShell.UPRN }
             );
-            TestEfDataHelper.InsertAddress(DatabaseContext);
+            TestEfDataHelper.InsertAddressInDb(DatabaseContext);
 
             var request = new SearchParameters
             {
@@ -502,11 +502,11 @@ namespace AddressesAPI.Tests.V2.Gateways
         [Test]
         public void IfSetToIncludeParentShellsIncludeImmediateParentShells()
         {
-            var parentShell = TestEfDataHelper.InsertAddress(DatabaseContext);
-            var addressToMatch = TestEfDataHelper.InsertAddress(DatabaseContext,
+            var parentShell = TestEfDataHelper.InsertAddressInDb(DatabaseContext);
+            var addressToMatch = TestEfDataHelper.InsertAddressInDb(DatabaseContext,
                 request: new NationalAddress { ParentUPRN = parentShell.UPRN }
             );
-            TestEfDataHelper.InsertAddress(DatabaseContext);
+            TestEfDataHelper.InsertAddressInDb(DatabaseContext);
 
             var request = new SearchParameters
             {
@@ -527,16 +527,16 @@ namespace AddressesAPI.Tests.V2.Gateways
         [Test]
         public void IfSetToIncludeParentShellsWillIncludeParentShellsInTotalCount()
         {
-            var parentShell = TestEfDataHelper.InsertAddress(DatabaseContext);
-            var addressOneToMatch = TestEfDataHelper.InsertAddress(DatabaseContext,
+            var parentShell = TestEfDataHelper.InsertAddressInDb(DatabaseContext);
+            var addressOneToMatch = TestEfDataHelper.InsertAddressInDb(DatabaseContext,
                 request: new NationalAddress { ParentUPRN = parentShell.UPRN }
             );
-            var parentShellTwo = TestEfDataHelper.InsertAddress(DatabaseContext);
-            var addressTwoToMatch = TestEfDataHelper.InsertAddress(DatabaseContext,
+            var parentShellTwo = TestEfDataHelper.InsertAddressInDb(DatabaseContext);
+            var addressTwoToMatch = TestEfDataHelper.InsertAddressInDb(DatabaseContext,
                 request: new NationalAddress { ParentUPRN = parentShellTwo.UPRN, Postcode = addressOneToMatch.Postcode }
             );
 
-            TestEfDataHelper.InsertAddress(DatabaseContext);
+            TestEfDataHelper.InsertAddressInDb(DatabaseContext);
 
             var request = new SearchParameters
             {
@@ -556,13 +556,13 @@ namespace AddressesAPI.Tests.V2.Gateways
         [Test]
         public void IfSetToIncludeParentShellsIncludeParentShellsOfParentsShells()
         {
-            var grandParentShell = TestEfDataHelper.InsertAddress(DatabaseContext);
-            var parentShell = TestEfDataHelper.InsertAddress(DatabaseContext,
+            var grandParentShell = TestEfDataHelper.InsertAddressInDb(DatabaseContext);
+            var parentShell = TestEfDataHelper.InsertAddressInDb(DatabaseContext,
                 request: new NationalAddress { ParentUPRN = grandParentShell.UPRN });
-            var addressToMatch = TestEfDataHelper.InsertAddress(DatabaseContext,
+            var addressToMatch = TestEfDataHelper.InsertAddressInDb(DatabaseContext,
                 request: new NationalAddress { ParentUPRN = parentShell.UPRN }
             );
-            TestEfDataHelper.InsertAddress(DatabaseContext);
+            TestEfDataHelper.InsertAddressInDb(DatabaseContext);
 
             var request = new SearchParameters
             {
@@ -585,10 +585,10 @@ namespace AddressesAPI.Tests.V2.Gateways
         [TestCase("N1 5TH")]
         public void IfSetToExcludeParentShellsWillNotReturnAnyParentShells(string postcode)
         {
-            var parentShell = TestEfDataHelper.InsertAddress(DatabaseContext,
+            var parentShell = TestEfDataHelper.InsertAddressInDb(DatabaseContext,
                 request: new NationalAddress { PropertyShell = true, Postcode = postcode }
             );
-            var notAParentShell = TestEfDataHelper.InsertAddress(DatabaseContext,
+            var notAParentShell = TestEfDataHelper.InsertAddressInDb(DatabaseContext,
                 request: new NationalAddress { PropertyShell = false, Postcode = postcode }
             );
 
@@ -614,9 +614,9 @@ namespace AddressesAPI.Tests.V2.Gateways
         [Test]
         public void WillFirstlyOrderByTown()
         {
-            var addressOne = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress { Town = "town a" });
-            var addressTwo = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress { Town = "town b" });
-            var addressThree = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress { Town = "hackney" });
+            var addressOne = TestEfDataHelper.InsertAddressInDb(DatabaseContext, request: new NationalAddress { Town = "town a" });
+            var addressTwo = TestEfDataHelper.InsertAddressInDb(DatabaseContext, request: new NationalAddress { Town = "town b" });
+            var addressThree = TestEfDataHelper.InsertAddressInDb(DatabaseContext, request: new NationalAddress { Town = "hackney" });
 
             var request = new SearchParameters
             {
@@ -636,9 +636,9 @@ namespace AddressesAPI.Tests.V2.Gateways
         [Test]
         public void WillSecondlyOrderByPostcodePresence()
         {
-            var addressOne = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress { Town = "town a", Postcode = "" });
-            var addressTwo = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress { Town = "town a", Postcode = "E3 4TT" });
-            var addressThree = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress { Town = "town b" });
+            var addressOne = TestEfDataHelper.InsertAddressInDb(DatabaseContext, request: new NationalAddress { Town = "town a", Postcode = "" });
+            var addressTwo = TestEfDataHelper.InsertAddressInDb(DatabaseContext, request: new NationalAddress { Town = "town a", Postcode = "E3 4TT" });
+            var addressThree = TestEfDataHelper.InsertAddressInDb(DatabaseContext, request: new NationalAddress { Town = "town b" });
 
             var request = new SearchParameters
             {
@@ -658,9 +658,9 @@ namespace AddressesAPI.Tests.V2.Gateways
         [Test]
         public void WillThirdlyOrderByStreet()
         {
-            var addressOne = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress { Town = "town b" });
-            var addressTwo = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress { Town = "town a", Postcode = "", Street = "B Street" });
-            var addressThree = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress { Town = "town a", Postcode = "", Street = "A Street" });
+            var addressOne = TestEfDataHelper.InsertAddressInDb(DatabaseContext, request: new NationalAddress { Town = "town b" });
+            var addressTwo = TestEfDataHelper.InsertAddressInDb(DatabaseContext, request: new NationalAddress { Town = "town a", Postcode = "", Street = "B Street" });
+            var addressThree = TestEfDataHelper.InsertAddressInDb(DatabaseContext, request: new NationalAddress { Town = "town a", Postcode = "", Street = "A Street" });
             var request = new SearchParameters
             {
                 Page = 1,
@@ -679,21 +679,21 @@ namespace AddressesAPI.Tests.V2.Gateways
         [Test]
         public void WillFourthlyOrderByPresenceAndOrderOfPaonStartNumber()
         {
-            var addressOne = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress
+            var addressOne = TestEfDataHelper.InsertAddressInDb(DatabaseContext, request: new NationalAddress
             {
                 Town = "town a",
                 Postcode = "",
                 Street = "B Street",
                 PaonStartNumber = 3
             });
-            var addressTwo = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress
+            var addressTwo = TestEfDataHelper.InsertAddressInDb(DatabaseContext, request: new NationalAddress
             {
                 Town = "town a",
                 Postcode = "",
                 Street = "B Street",
                 PaonStartNumber = 0
             });
-            var addressThree = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress
+            var addressThree = TestEfDataHelper.InsertAddressInDb(DatabaseContext, request: new NationalAddress
             {
                 Town = "town a",
                 Postcode = "",
@@ -718,7 +718,7 @@ namespace AddressesAPI.Tests.V2.Gateways
         [Test]
         public void WillFifthlyOrderByPresenceAndOrderOfBuildingNumber()
         {
-            var addressOne = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress
+            var addressOne = TestEfDataHelper.InsertAddressInDb(DatabaseContext, request: new NationalAddress
             {
                 Town = "town a",
                 Postcode = "",
@@ -726,7 +726,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 PaonStartNumber = 1,
                 BuildingNumber = ""
             });
-            var addressTwo = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress
+            var addressTwo = TestEfDataHelper.InsertAddressInDb(DatabaseContext, request: new NationalAddress
             {
                 Town = "town a",
                 Postcode = "",
@@ -734,7 +734,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 PaonStartNumber = 1,
                 BuildingNumber = "78"
             });
-            var addressThree = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress
+            var addressThree = TestEfDataHelper.InsertAddressInDb(DatabaseContext, request: new NationalAddress
             {
                 Town = "town a",
                 Postcode = "",
@@ -760,7 +760,7 @@ namespace AddressesAPI.Tests.V2.Gateways
         [Test]
         public void WillSixthOrderByPresenceAndOrderOfUnitNumber()
         {
-            var addressOne = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress
+            var addressOne = TestEfDataHelper.InsertAddressInDb(DatabaseContext, request: new NationalAddress
             {
                 Town = "town a",
                 Postcode = "",
@@ -769,7 +769,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 BuildingNumber = "78",
                 UnitNumber = "43"
             });
-            var addressTwo = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress
+            var addressTwo = TestEfDataHelper.InsertAddressInDb(DatabaseContext, request: new NationalAddress
             {
                 Town = "town a",
                 Postcode = "",
@@ -778,7 +778,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 BuildingNumber = "78",
                 UnitNumber = ""
             });
-            var addressThree = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress
+            var addressThree = TestEfDataHelper.InsertAddressInDb(DatabaseContext, request: new NationalAddress
             {
                 Town = "town a",
                 Postcode = "",
@@ -805,7 +805,7 @@ namespace AddressesAPI.Tests.V2.Gateways
         [Test]
         public void WillInTheSeventhCaseOrderByPresenceAndOrderOfUnitName()
         {
-            var addressOne = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress
+            var addressOne = TestEfDataHelper.InsertAddressInDb(DatabaseContext, request: new NationalAddress
             {
                 Town = "town a",
                 Postcode = "",
@@ -815,7 +815,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 UnitNumber = "43",
                 UnitName = "J name"
             });
-            var addressTwo = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress
+            var addressTwo = TestEfDataHelper.InsertAddressInDb(DatabaseContext, request: new NationalAddress
             {
                 Town = "town a",
                 Postcode = "",
@@ -825,7 +825,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 UnitNumber = "43",
                 UnitName = "A name"
             });
-            var addressThree = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress
+            var addressThree = TestEfDataHelper.InsertAddressInDb(DatabaseContext, request: new NationalAddress
             {
                 Town = "town a",
                 Postcode = "",
@@ -947,7 +947,7 @@ namespace AddressesAPI.Tests.V2.Gateways
             var records = new List<NationalAddress>();
             for (var i = 0; i < count; i++)
             {
-                records.Add(TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress
+                records.Add(TestEfDataHelper.InsertAddressInDb(DatabaseContext, request: new NationalAddress
                 {
                     Town = towns.ElementAt(i),
                     Postcode = postcodes.ElementAt(i),
@@ -1012,13 +1012,98 @@ namespace AddressesAPI.Tests.V2.Gateways
         #endregion
         #endregion
 
+        #region GetAddresses
+
+        [Test]
+        public void GivenAnAddressKey_GetAddresses_GetsTheAddressDetails()
+        {
+            var addressKey = _faker.Random.String2(14);
+            var savedAddress = TestEfDataHelper.InsertAddressInDb(DatabaseContext, addressKey);
+
+            var addresses = _classUnderTest.GetAddresses(new List<string>{addressKey}, GlobalConstants.Format.Detailed);
+
+            addresses.Count.Should().Be(1);
+            addresses.First().AddressKey.Should().Be(addressKey);
+            addresses.First().Should().BeEquivalentTo(savedAddress.ToDomain());
+        }
+
+        [Test]
+        public void GivenAnAddressKey_GetAddresses_OnlyGetsAddressesForTheKeys()
+        {
+            var addressKey = _faker.Random.String2(14);
+            var savedAddress = TestEfDataHelper.InsertAddressInDb(DatabaseContext, addressKey);
+            TestEfDataHelper.InsertAddressInDb(DatabaseContext);
+
+            var addresses = _classUnderTest.GetAddresses(new List<string>{addressKey}, GlobalConstants.Format.Detailed);
+
+            addresses.Count.Should().Be(1);
+            addresses.First().AddressKey.Should().Be(addressKey);
+            addresses.First().Should().BeEquivalentTo(savedAddress.ToDomain());
+        }
+
+        [Test]
+        public void GivenSomeAddressKeys_GetAddresses_RetainsTheOrderOfAddresses()
+        {
+            var addressKeys = new List<string>
+            {
+                _faker.Random.String2(14), _faker.Random.String2(14), _faker.Random.String2(14)
+            };
+            var thirdAddress = TestEfDataHelper.InsertAddressInDb(DatabaseContext, addressKeys.ElementAt(2));
+            var firstAddress = TestEfDataHelper.InsertAddressInDb(DatabaseContext, addressKeys.ElementAt(0));
+            var secondAddress = TestEfDataHelper.InsertAddressInDb(DatabaseContext, addressKeys.ElementAt(1));
+
+            var addresses = _classUnderTest.GetAddresses(addressKeys, GlobalConstants.Format.Detailed);
+
+            addresses.ElementAt(0).Should().BeEquivalentTo(firstAddress.ToDomain());
+            addresses.ElementAt(1).Should().BeEquivalentTo(secondAddress.ToDomain());
+            addresses.ElementAt(2).Should().BeEquivalentTo(thirdAddress.ToDomain());
+        }
+
+
+        [Test]
+        public void GetAddresses_WillGetADetailedAddressFromTheDatabase()
+        {
+            var addressKey = _faker.Random.String2(14);
+            var savedAddress = TestEfDataHelper.InsertAddressInDb(DatabaseContext, addressKey);
+
+            var addresses = _classUnderTest.GetAddresses(new List<string>{addressKey}, GlobalConstants.Format.Detailed);
+
+            addresses.Count.Should().Be(1);
+            addresses.First().AddressKey.Should().Be(addressKey);
+            addresses.First().Should().BeEquivalentTo(savedAddress.ToDomain());
+        }
+
+        [Test]
+        public void GetAddresses_WillGetASimpleAddressFromTheDatabase()
+        {
+            var addressKey = _faker.Random.String2(14);
+            var savedAddress = TestEfDataHelper.InsertAddressInDb(DatabaseContext, addressKey);
+
+            var addresses = _classUnderTest.GetAddresses(new List<string>{addressKey}, GlobalConstants.Format.Simple);
+
+            var expectedAddress = new Address
+            {
+                Line1 = savedAddress.Line1,
+                Line2 = savedAddress.Line2,
+                Line3 = savedAddress.Line3,
+                Line4 = savedAddress.Line4,
+                Town = savedAddress.Town,
+                UPRN = savedAddress.UPRN,
+                Postcode = savedAddress.Postcode
+            };
+
+            addresses.Count.Should().Be(1);
+            addresses.First().Should().BeEquivalentTo(expectedAddress);
+        }
+
+        #endregion
         #region GetSingleAddress
 
         [Test]
         public void ItWillReturnADetailedRecordForASingleAddressRetrievedUsingTheAddressKey()
         {
             var addressKey = _faker.Random.String2(14);
-            var savedAddress = TestEfDataHelper.InsertAddress(DatabaseContext, addressKey);
+            var savedAddress = TestEfDataHelper.InsertAddressInDb(DatabaseContext, addressKey);
 
             var retrievedRecord = _classUnderTest.GetSingleAddress(addressKey);
 

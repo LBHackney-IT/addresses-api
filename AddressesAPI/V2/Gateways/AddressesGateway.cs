@@ -45,9 +45,16 @@ namespace AddressesAPI.V2.Gateways
             return (addresses, totalCount);
         }
 
-        public List<Domain.Address> GetAddresses(List<string> addressKeys)
+        public List<Domain.Address> GetAddresses(List<string> addressKeys, GlobalConstants.Format format)
         {
-            throw new NotImplementedException();
+            var addresses = _addressesContext.Addresses
+                .Where(a => addressKeys.Contains(a.AddressKey));
+
+            return addressKeys
+                .Select(a => addresses.FirstOrDefault(ad => ad.AddressKey == a))
+                .Where(a => a != null)
+                .Select(a => format == GlobalConstants.Format.Simple ? a.ToSimpleDomain() : a.ToDomain())
+                .ToList();
         }
 
         private IQueryable<Address> GetParentShells(IQueryable<Address> baseQuery, IQueryable<Address> baseAddresses)
