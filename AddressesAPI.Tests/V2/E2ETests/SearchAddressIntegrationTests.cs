@@ -245,9 +245,11 @@ namespace AddressesAPI.Tests.V2.E2ETests
 
             var record = await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient,
                 request: hackneyBoroughOne).ConfigureAwait(true);
+
             TestEfDataHelper.InsertCrossReference(DatabaseContext, uprnOne, crossReferenceOne);
 
-            await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, request: hackneyBoroughTwo).ConfigureAwait(true);
+            await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, request: hackneyBoroughTwo)
+                .ConfigureAwait(true);
             TestEfDataHelper.InsertCrossReference(DatabaseContext, uprnTwo, crossReferenceTwo);
 
             await AddSomeRandomAddressToTheDatabase().ConfigureAwait(true);

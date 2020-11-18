@@ -1,17 +1,10 @@
 using System;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using AddressesAPI.Infrastructure;
-using AddressesAPI.V1.Boundary.Responses;
-using AddressesAPI.V1.Boundary.Responses.Metadata;
-using Elasticsearch.Net;
-using FluentAssertions.Common;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Nest;
-using Newtonsoft.Json;
 using Npgsql;
 using NUnit.Framework;
 
