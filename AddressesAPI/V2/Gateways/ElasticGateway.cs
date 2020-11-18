@@ -20,11 +20,22 @@ namespace AddressesAPI.V2.Gateways
 
         public (List<string>, int) SearchAddresses(SearchParameters request)
         {
-            var documents = _esClient
-                .Search<QueryableAddress>(s => s.Size(2000)).Documents;
-            var addressKeys = documents
+            var searchResponse = _esClient.Search<QueryableAddress>(s =>
+                s.Query(q =>
+                        q.Wildcard(m =>
+                    {
+                        var postcodeSearchTerm = request.Postcode?.Replace(" ", "").ToLower();
+                        return m
+                            .Field("postcode")
+                            .Value($"{postcodeSearchTerm}*");
+                    })
+                )
+                .Size(50)
+            );
+
+            var addressKeys = searchResponse.Documents
                 .Select(a => a.AddressKey).ToList();
-            var totalCount = documents.Count;
+            var totalCount = searchResponse.Documents.Count;
             return (addressKeys, totalCount);
         }
     }

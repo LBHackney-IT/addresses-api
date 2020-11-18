@@ -21,7 +21,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
         public async Task SearchAddressReturns200()
         {
             var addressKey = "eytshdnshsuahs";
-            await TestEfDataHelper.InsertAddressToPgAndEs(DatabaseContext, ElasticsearchClient, addressKey).ConfigureAwait(true);
+            await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, addressKey).ConfigureAwait(true);
 
             var queryString = "postcode=E8";
 
@@ -32,9 +32,9 @@ namespace AddressesAPI.Tests.V2.E2ETests
         [Test]
         public async Task SearchAddressReturnsAllAddresses()
         {
-            var recordOne = await TestEfDataHelper.InsertAddressToPgAndEs(DatabaseContext, ElasticsearchClient, request:
+            var recordOne = await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, request:
                 new NationalAddress { Postcode = "E8 5TH" }).ConfigureAwait(true);
-            var recordTwo = await TestEfDataHelper.InsertAddressToPgAndEs(DatabaseContext, ElasticsearchClient, request:
+            var recordTwo = await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, request:
                 new NationalAddress { Postcode = "E8 6YR" }).ConfigureAwait(true);
 
             var queryString = "postcode=E8&format=Detailed";
@@ -53,7 +53,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
         {
             var addressKey = _faker.Random.String2(14);
             var postcode = "E4 2JH";
-            var record = await TestEfDataHelper.InsertAddressToPgAndEs(DatabaseContext, ElasticsearchClient, addressKey,
+            var record = await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, addressKey,
                 new NationalAddress { Postcode = postcode }).ConfigureAwait(true);
             await AddSomeRandomAddressToTheDatabase().ConfigureAwait(true);
 
@@ -260,7 +260,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
                     .With(a => a.Gazetteer, gazetteer)
                     .Without(a => a.ParentUPRN)
                     .Create();
-                await TestEfDataHelper.InsertAddressToPgAndEs(DatabaseContext, ElasticsearchClient, addressKey, randomAddress).ConfigureAwait(true);
+                await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, addressKey, randomAddress).ConfigureAwait(true);
             }
         }
 

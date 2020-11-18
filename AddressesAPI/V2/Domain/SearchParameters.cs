@@ -12,6 +12,7 @@ namespace AddressesAPI.V2.Domain
         public int? Usrn { get; set; }
         public string UsagePrimary { get; set; }
         public string UsageCode { get; set; }
+        //To remove from here
         public GlobalConstants.Format Format { get; set; }
         public IEnumerable<string> AddressStatus { get; set; }
         public bool OutOfBoroughAddress { get; set; }

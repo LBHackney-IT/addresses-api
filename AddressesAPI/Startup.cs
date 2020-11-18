@@ -133,7 +133,7 @@ namespace AddressesAPI
                 .DefaultIndex(defaultIndex)
                 .DefaultMappingFor<QueryableAddress>(m => m
                     .PropertyName(p => p.AddressKey, "AddressKey")
-                );
+                ).PrettyJson().ThrowExceptions();
             var esClient = new ElasticClient(settings);
 
             services.AddSingleton<IElasticClient>(esClient);

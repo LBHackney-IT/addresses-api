@@ -47,7 +47,6 @@ namespace AddressesAPI.Tests.V2.UseCase
             {
                 Postcode = "RM3 0FS",
                 AddressScope = "HackneyGazetteer",
-                Format = "Detailed",
                 Page = _faker.Random.Int(),
                 Street = _faker.Address.StreetAddress(),
                 UsageCode = _faker.Random.String2(4),
@@ -62,8 +61,8 @@ namespace AddressesAPI.Tests.V2.UseCase
                 CrossRefValue = "20000"
             };
             _searchAddressGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(
-                    x => x.Format == GlobalConstants.Format.Detailed
-                         && x.Gazetteer == GlobalConstants.Gazetteer.Hackney
+                    x =>
+                         x.Gazetteer == GlobalConstants.Gazetteer.Hackney
                          && x.OutOfBoroughAddress
                          && x.Page == request.Page
                          && x.Postcode == request.Postcode
@@ -123,11 +122,11 @@ namespace AddressesAPI.Tests.V2.UseCase
         }
 
         [Test]
-        public void GivenValidInput_WhenGatewayRespondsWithNull_ThenResponseShouldBeNull()
+        public void GivenValidInput_WhenSearchGatewayRespondsWithNull_ThenResponseShouldBeNull()
         {
             SetupValidatorToReturnValid();
             //arrange
-            _addressGateway.Setup(s => s.SearchAddresses(It.IsAny<SearchParameters>()))
+            _searchAddressGateway.Setup(s => s.SearchAddresses(It.IsAny<SearchParameters>()))
                 .Returns((null, 0));
 
             //act
@@ -136,21 +135,25 @@ namespace AddressesAPI.Tests.V2.UseCase
             response.Addresses.Should().BeNull();
         }
 
-        [Test]
-        public void GivenValidInput_WhenExecute_ThenAddressDetailsShouldBeReturned()
+        [TestCase(GlobalConstants.Format.Simple)]
+        [TestCase(GlobalConstants.Format.Detailed)]
+        public void GivenValidInput_Execute_ShouldRetrieveAddressDetailsFromTheGateway(GlobalConstants.Format format)
         {
             SetupValidatorToReturnValid();
 
             var addresses = _fixture.CreateMany<Address>().ToList();
-
+            var addressKeyList = _fixture.CreateMany<string>().ToList();
             var postcode = "RM3 0FS";
             var request = new SearchAddressRequest
             {
-                Postcode = postcode
+                Postcode = postcode,
+                Format = format.ToString()
             };
-            _addressGateway.Setup(s =>
+            _searchAddressGateway.Setup(s =>
                     s.SearchAddresses(It.Is<SearchParameters>(i => i.Postcode.Equals(postcode))))
-                .Returns((addresses, 1));
+                .Returns((addressKeyList, 1));
+            _addressGateway.Setup(s => s.GetAddresses(addressKeyList, format))
+                .Returns(addresses);
 
             var response = _classUnderTest.ExecuteAsync(request);
 
@@ -166,10 +169,13 @@ namespace AddressesAPI.Tests.V2.UseCase
             var totalCount = _faker.Random.Int(30, 200);
             var numberOfAddressesInPage = _faker.Random.Int(3, 30);
             var addresses = _fixture.CreateMany<Address>(numberOfAddressesInPage).ToList();
+            var addressKeyList = _fixture.CreateMany<string>().ToList();
 
-            _addressGateway.Setup(s =>
+            _searchAddressGateway.Setup(s =>
                     s.SearchAddresses(It.IsAny<SearchParameters>()))
-                .Returns((addresses, totalCount));
+                .Returns((addressKeyList, totalCount));
+            _addressGateway.Setup(s => s.GetAddresses(addressKeyList, GlobalConstants.Format.Simple))
+                .Returns(addresses);
 
             var response = _classUnderTest.ExecuteAsync(new SearchAddressRequest());
 
@@ -190,7 +196,7 @@ namespace AddressesAPI.Tests.V2.UseCase
             _classUnderTest.ExecuteAsync(request);
 
             //assert
-            _addressGateway.Verify(s => s.SearchAddresses(
+            _searchAddressGateway.Verify(s => s.SearchAddresses(
                 It.Is<SearchParameters>(i => i.Page.Equals(1))));
         }
 
