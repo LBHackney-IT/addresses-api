@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using AddressesAPI.V2;
 using AddressesAPI.V2.Boundary.Requests;
 using AddressesAPI.V2.UseCase;
+using FluentAssertions;
 using FluentValidation.TestHelper;
 using NUnit.Framework;
 
@@ -365,19 +366,36 @@ namespace AddressesAPI.Tests.V2.UseCase
                 "You must provide at least one of (uprn, usrn, postcode), when address_scope is 'national'.");
         }
 
-        [TestCase("TESTCD", "E5 9TT")]
-        public void GivenARequestWithACrossRefCode_ButNoCrossRefValueIsProvided_WhenCallingValidation_ItReturnsAnError(string queryParameter1, string postcode)
+        [Test]
+        public void GivenARequestWithCrossReference_WithoutAPostcodeOrUPRN_WhenCallingValidation_ItReturnsNoErrors()
         {
-            var request = new SearchAddressRequest() { Postcode = postcode, CrossRefCode = queryParameter1 };
-            _classUnderTest.TestValidate(request).ShouldHaveError().WithErrorMessage("You must provide both the code and a value, when searching by a cross reference");
+            const string code = "TESTCT";
+            const string referenceValue = "900000";
+
+            var request = new SearchAddressRequest() { CrossRefCode = code, CrossRefValue = referenceValue };
+            _classUnderTest.TestValidate(request).ShouldNotHaveError();
         }
 
-        [TestCase("123XYZ", "450000", "E5 9TT")]
-        [TestCase(null, null, "E5 9TT")]
-        public void GivenARequestWithCrossRefCodeAndACrossRefValue_BothPresentOrBothAbsent_WhenCallingValidation_ItReturnsNoError(string crossRefCode, string value, string postcode)
+        [Test]
+        public void GivenARequestForCrossReferenceWithEitherParameterForCodeOrValueMissing_WhenCallingValidation_ItReturnsAnErrorRelatingToCrossReference()
         {
-            var request = new SearchAddressRequest() { Postcode = postcode, CrossRefCode = crossRefCode, CrossRefValue = value };
-            _classUnderTest.TestValidate(request).ShouldNotHaveError();
+            const string code = "HELLO";
+            const string referenceValue = "1234GHIJK";
+
+            var requestOne = new SearchAddressRequest() { CrossRefCode = code };
+            _classUnderTest.TestValidate(requestOne).ShouldHaveError().WithErrorMessage("You must provide both the code and a value, when searching by a cross reference");
+
+            var requestTwo = new SearchAddressRequest() { CrossRefValue = referenceValue };
+            _classUnderTest.TestValidate(requestTwo).ShouldHaveError().WithErrorMessage("You must provide both the code and a value, when searching by a cross reference");
+        }
+
+        [TestCase("123XYZ", "450000")]
+        [TestCase(null, null)]
+        public void GivenARequestWithCrossRefCodeAndACrossRefValue_BothPresentOrBothAbsent_WhenCallingValidation_ItReturnsNoErrorRelatingToCrossReference(string crossRefCode, string value)
+        {
+            var request = new SearchAddressRequest() { CrossRefCode = crossRefCode, CrossRefValue = value };
+
+            _classUnderTest.TestValidate(request).Result.Errors.Should().NotContain("You must provide both the code and a value, when searching by a cross reference");
         }
 
         #endregion
