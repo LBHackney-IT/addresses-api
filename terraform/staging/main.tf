@@ -84,20 +84,20 @@ module "postgres_db_staging" {
 /*    ELASTICSEARCH SETUP    */
 
 module "elasticsearch_db_staging" {
-    source = "github.com/LBHackney-IT/aws-hackney-common-terraform.git//modules/database/elasticsearch"
-    vpc_id= data.aws_vpc.staging_vpc.id
-    environment_name= "staging"
-    port= 443
-    domain_name= "addresses-api-es"
-    subnet_ids= [tolist(data.aws_subnet_ids.staging.ids)[0]]
-    project_name= "addresses-api"
-    es_version= "7.8"
-    encrypt_at_rest= "false"
-    instance_type= "t2.small.elasticsearch"
-    ebs_enabled= "true"
-    ebs_volume_size= "10"
-    region= data.aws_region.current.name
-    account_id= data.aws_caller_identity.current.account_id
+  source           = "github.com/LBHackney-IT/aws-hackney-common-terraform.git//modules/database/elasticsearch"
+  vpc_id           = data.aws_vpc.staging_vpc.id
+  environment_name = "staging"
+  port             = 443
+  domain_name      = "addresses-api-es"
+  subnet_ids       = [tolist(data.aws_subnet_ids.staging.ids)[0]]
+  project_name     = "addresses-api"
+  es_version       = "7.8"
+  encrypt_at_rest  = "false"
+  instance_type    = "t2.small.elasticsearch"
+  ebs_enabled      = "true"
+  ebs_volume_size  = "10"
+  region           = data.aws_region.current.name
+  account_id       = data.aws_caller_identity.current.account_id
 }
 
 data "aws_ssm_parameter" "addresses_elasticsearch_domain" {
@@ -105,33 +105,49 @@ data "aws_ssm_parameter" "addresses_elasticsearch_domain" {
 }
 
 /*    DMS SETUP    */
-module "elasticsearch_dms_setup_staging" {
-  source           = "github.com/LBHackney-IT/aws-dms-terraform.git//dms_setup_existing_instance"
-  environment_name = "staging"
-  project_name     = "addresses-api"
+resource "aws_dms_endpoint" "address_elasticsearch" {
+  endpoint_id   = "target-addresses-es"
+  endpoint_type = "target"
+  engine_name   = "elasticsearch"
+  port          = 443
+  ssl_mode      = "none"
 
-  //target db for dms endpoint
-  target_db_name             = "addresses-api-es"
-  target_endpoint_identifier = "target-addresses-es"
-  target_db_engine_name      = "elasticsearch"
-  target_db_port             = 443
-  target_db_server           = data.aws_ssm_parameter.addresses_elasticsearch_domain.value
-  target_endpoint_ssl_mode   = "none"
+  elasticsearch_settings {
+    endpoint_uri            = data.aws_ssm_parameter.addresses_elasticsearch_domain.value
+    service_access_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/DMS_Elasticsearch_Addresses"
+  }
 
-  //source db for dms endpoint
-  source_db_name             = "addresses_api"
-  source_endpoint_identifier = "source-addresses-postgres"
-  source_db_engine_name      = "postgres"
-  source_db_port             = 5502
-  source_db_username         = data.aws_ssm_parameter.addresses_postgres_username.value
-  source_db_password         = data.aws_ssm_parameter.addresses_postgres_db_password.value
-  source_db_server           = data.aws_ssm_parameter.addresses_postgres_hostname.value
-  source_endpoint_ssl_mode   = "none"
+  tags = {
+    Name         = "target-addresses-es",
+    Environment  = "staging",
+    project_name = "addresses-api"
+  }
+}
 
-  //dms task set up
-  migration_type               = "full-load-and-cdc"
+module "source_db_endpoint" {
+  source                  = "github.com/LBHackney-IT/aws-dms-terraform.git//dms_endpoint"
+  database_name           = "addresses_api"
+  dms_endpoint_identifier = "source-addresses-postgres"
+  endpoint_type           = "source"
+  engine_name             = "postgres"
+  database_port           = 5502
+  db_server               = data.aws_ssm_parameter.addresses_postgres_hostname.value
+  ssl_mode                = "none"
+  environment_name        = "staging"
+  project_name            = "addresses-api"
+  db_username             = data.aws_ssm_parameter.addresses_postgres_username.value
+  db_password             = data.aws_ssm_parameter.addresses_postgres_db_password.value
+}
+
+module "address-es-dms" {
+  source                       = "github.com/LBHackney-IT/aws-dms-terraform.git//dms_replication_task"
+  environment_name             = "staging"
+  project_name                 = "addresses-api"
+  migration_type               = "full-load"
+  replication_instance_arn     = "arn:aws:dms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rep:DNTOW6TGQEGCAOWQMZYHQRTWAA"
   replication_task_indentifier = "addresses-api-es-dms-task"
   task_settings                = file("${path.module}/task_settings.json")
+  source_endpoint_arn          = module.source_db_endpoint.dms_endpoint_arn
+  target_endpoint_arn          = aws_dms_endpoint.address_elasticsearch.endpoint_arn
   task_table_mappings          = file("${path.module}/selection_rules.json")
-  replication_instance_arn     = "arn:aws:dms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rep:DNTOW6TGQEGCAOWQMZYHQRTWAA"
 }
