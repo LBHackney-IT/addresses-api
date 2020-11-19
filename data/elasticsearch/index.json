@@ -1,14 +1,160 @@
 {
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "whitespace_removed": {
+          "tokenizer": "keyword",
+          "filter": [
+            "lowercase"
+          ],
+          "char_filter": [
+            "remove_whitespace"
+          ]
+        }
+      },
+      "char_filter": {
+        "remove_whitespace": {
+          "type": "pattern_replace",
+          "pattern": " ",
+          "replacement": ""
+        }
+      }
+    }
+  },
   "mappings" : {
-    "properties": {
-      "postcode": {
-        "type": "keyword"
+    "properties" : {
+      "addressChangeDate" : {
+        "type" : "integer"
       },
-      "uprn": {
-        "type": "keyword"
+      "addressKey" : {
+        "type" : "text",
+        "fields" : {
+          "keyword" : {
+            "type" : "keyword",
+            "ignore_above" : 256
+          }
+        }
       },
-      "street": {
-        "type": "text"
+      "addressStatus" : {
+        "type" : "text",
+        "fields" : {
+          "keyword" : {
+            "type" : "keyword",
+            "ignore_above" : 256
+          }
+        }
+      },
+      "buildingNumber" : {
+        "type" : "keyword"
+      },
+      "gazetteer" : {
+        "type" : "text",
+        "fields" : {
+          "keyword" : {
+            "type" : "keyword",
+            "ignore_above" : 256
+          }
+        }
+      },
+      "id" : {
+        "type" : "text",
+        "fields" : {
+          "keyword" : {
+            "type" : "keyword",
+            "ignore_above" : 256
+          }
+        }
+      },
+      "line1" : {
+        "type" : "text",
+        "fields" : {
+          "keyword" : {
+            "type" : "keyword",
+            "ignore_above" : 256
+          }
+        }
+      },
+      "line2" : {
+        "type" : "text",
+        "fields" : {
+          "keyword" : {
+            "type" : "keyword",
+            "ignore_above" : 256
+          }
+        }
+      },
+      "line3" : {
+        "type" : "text",
+        "fields" : {
+          "keyword" : {
+            "type" : "keyword",
+            "ignore_above" : 256
+          }
+        }
+      },
+      "line4" : {
+        "type" : "text",
+        "fields" : {
+          "keyword" : {
+            "type" : "keyword",
+            "ignore_above" : 256
+          }
+        }
+      },
+      "outOfBoroughAddress" : {
+        "type" : "boolean"
+      },
+      "paonStartNumber" : {
+        "type" : "keyword"
+      },
+      "parentUPRN" : {
+        "type" : "long"
+      },
+      "postcode" : {
+        "type" : "text",
+        "analyzer" : "whitespace_removed",
+        "fielddata" : true
+      },
+      "propertyShell" : {
+        "type" : "boolean"
+      },
+      "street" : {
+        "type" : "text",
+        "analyzer" : "whitespace_removed",
+        "fielddata" : true
+      },
+      "town" : {
+        "type" : "keyword"
+      },
+      "uPRN" : {
+        "type" : "long"
+      },
+      "uSRN" : {
+        "type" : "integer"
+      },
+      "unitName" : {
+        "type" : "keyword"
+      },
+      "unitNumber" : {
+        "type" : "keyword"
+      },
+      "usageCode" : {
+        "type" : "text",
+        "fields" : {
+          "keyword" : {
+            "type" : "keyword",
+            "ignore_above" : 256
+          }
+        }
+      },
+      "usagePrimary" : {
+        "type" : "text",
+        "fields" : {
+          "keyword" : {
+            "type" : "keyword",
+            "ignore_above" : 256
+          }
+        }
       }
     }
   }

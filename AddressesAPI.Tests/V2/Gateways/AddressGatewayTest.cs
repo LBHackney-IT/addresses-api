@@ -1012,6 +1012,36 @@ namespace AddressesAPI.Tests.V2.Gateways
         #endregion
         #endregion
 
+        #region GetMatchingCrossReferenceUprns
+
+        [TestCase("TAXES", "TestValue")]
+        [TestCase("Parkin", "A72927GH")]
+        public void WillReturnAllUprnsForACrossReference(string code, string value)
+        {
+            TestEfDataHelper.InsertAddressInDb(DatabaseContext);
+
+            //--- First cross reference
+            var uprnOne = _faker.Random.Long(10000000, 99999999);
+
+            TestEfDataHelper.InsertCrossReference(DatabaseContext, uprnOne,
+                new CrossReference { Code = code, Value = value }
+            );
+
+            //--- Second Cross reference
+            var uprnTwo = _faker.Random.Long(10000000, 99999999);
+
+            TestEfDataHelper.InsertCrossReference(DatabaseContext, uprnTwo,
+                new CrossReference { Code = code, Value = value }
+            );
+
+            var uprns = _classUnderTest.GetMatchingCrossReferenceUprns(code, value);
+
+            uprns.Count.Should().Be(2);
+            uprns.Should().ContainEquivalentOf(uprnOne);
+            uprns.Should().ContainEquivalentOf(uprnTwo);
+        }
+        #endregion
+
         #region GetAddresses
 
         [Test]

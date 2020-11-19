@@ -111,7 +111,7 @@ namespace AddressesAPI.V2.Gateways
                 .ThenBy(a => a.UnitName);
         }
 
-        private List<long> GetMatchingCrossReferenceUprns(string code, string value)
+        public List<long> GetMatchingCrossReferenceUprns(string code, string value)
         {
             return _addressesContext.AddressCrossReferences
                 .Where(cr => cr.Code == code)
