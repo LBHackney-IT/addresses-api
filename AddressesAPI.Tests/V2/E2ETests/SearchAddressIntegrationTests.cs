@@ -226,7 +226,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
         }
 
         [Test]
-        public async Task SearchAddressReturnsAnAddressMatchingASpecificCrossReference()
+        public async Task SearchAddressReturnsAddressesInHackneyBoroughForAGivenCrossReference()
         {
             var uprnOne = _faker.Random.Int();
             var uprnTwo = _faker.Random.Int();
@@ -234,16 +234,20 @@ namespace AddressesAPI.Tests.V2.E2ETests
             var crossReferenceOne = new CrossReference { Code = "000ABC", Value = "100000" };
             var crossReferenceTwo = new CrossReference { Code = "123XYZ", Value = "100000" };
 
-            var record = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress { UPRN = uprnOne, Postcode = "N1 7UK" });
+            var hackneyBoroughOne = new NationalAddress { UPRN = uprnOne, Gazetteer = "Hackney", NeverExport = false };
+            var hackneyBoroughTwo = new NationalAddress { UPRN = uprnTwo, Gazetteer = "Hackney", NeverExport = false };
+
+            var record = TestEfDataHelper.InsertAddress(DatabaseContext,
+                request: hackneyBoroughOne);
+
             TestEfDataHelper.InsertCrossReference(DatabaseContext, uprnOne, crossReferenceOne);
 
-
-            TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress { UPRN = uprnTwo, Postcode = "N1 7UK" });
+            TestEfDataHelper.InsertAddress(DatabaseContext, request: hackneyBoroughTwo);
             TestEfDataHelper.InsertCrossReference(DatabaseContext, uprnTwo, crossReferenceTwo);
 
             AddSomeRandomAddressToTheDatabase();
 
-            var queryString = $"cross_ref_code={crossReferenceOne.Code}&cross_ref_value={crossReferenceOne.Value}&postcode=N1&format=Detailed&address_scope=national";
+            var queryString = $"cross_ref_code={crossReferenceOne.Code}&cross_ref_value={crossReferenceOne.Value}&format=Detailed";
 
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);

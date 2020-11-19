@@ -68,13 +68,20 @@ namespace AddressesAPI.V2.UseCase
 
         private static bool CheckForAtLeastOneMandatoryFilterPropertyWithHackneyGazetteer(SearchAddressRequest request)
         {
+            var crossReferenceParametersGiven = request.CrossRefCode != null && request.CrossRefValue != null;
+
+            if (crossReferenceParametersGiven)
+            {
+                return true;
+            }
+
             return request.AddressScope.Equals(GlobalConstants.AddressScope.National.ToString(), StringComparison.InvariantCultureIgnoreCase)
-                   || request.UPRN != null
-                   || request.USRN != null
-                   || request.Postcode != null
-                   || request.Street != null
-                   || request.UsagePrimary != null
-                   || request.UsageCode != null;
+                                              || request.UPRN != null
+                                              || request.USRN != null
+                                              || request.Postcode != null
+                                              || request.Street != null
+                                              || request.UsagePrimary != null
+                                              || request.UsageCode != null;
         }
 
         private static bool CheckForAtLeastOneMandatoryFilterPropertyWithNationalGazetteer(SearchAddressRequest request)
