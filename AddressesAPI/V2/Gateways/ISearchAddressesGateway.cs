@@ -5,6 +5,6 @@ namespace AddressesAPI.V2.Gateways
 {
     public interface ISearchAddressesGateway
     {
-        (List<string>, int) SearchAddresses(SearchParameters request);
+        (List<string>, long) SearchAddresses(SearchParameters request);
     }
 }

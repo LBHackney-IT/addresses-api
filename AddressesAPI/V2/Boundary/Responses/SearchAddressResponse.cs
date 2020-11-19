@@ -10,8 +10,8 @@ namespace AddressesAPI.V2.Boundary.Responses
         public List<AddressResponse> Addresses { get; set; }
 
         [JsonProperty("pageCount")]
-        public int PageCount { get; set; }
+        public long PageCount { get; set; }
         [JsonProperty("totalCount")]
-        public int TotalCount { get; set; }
+        public long TotalCount { get; set; }
     }
 }

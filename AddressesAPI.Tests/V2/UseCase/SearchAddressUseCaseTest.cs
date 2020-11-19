@@ -62,21 +62,21 @@ namespace AddressesAPI.Tests.V2.UseCase
             };
             _searchAddressGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(
                     x =>
-                         x.Gazetteer == GlobalConstants.Gazetteer.Hackney
-                         && x.OutOfBoroughAddress
-                         && x.Page == request.Page
-                         && x.Postcode == request.Postcode
-                         && x.Street == request.Street
-                         && x.Uprn == request.UPRN
-                         && x.Usrn == request.USRN
-                         && x.AddressStatus.SequenceEqual(new[] { "approved" })
-                         && x.BuildingNumber == request.BuildingNumber
-                         && x.PageSize == request.PageSize
-                         && x.UsageCode == request.UsageCode
-                         && x.UsagePrimary == request.UsagePrimary
-                         && x.IncludeParentShells == request.IncludeParentShells
-                         && x.CrossRefCode == request.CrossRefCode
-                         && x.CrossRefValue == request.CrossRefValue)))
+                        x.Gazetteer == GlobalConstants.Gazetteer.Hackney
+                        && x.OutOfBoroughAddress
+                        && x.Page == request.Page
+                        && x.Postcode == request.Postcode
+                        && x.Street == request.Street
+                        && x.Uprn == request.UPRN
+                        && x.Usrn == request.USRN
+                        && x.AddressStatus.SequenceEqual(new[] { "approved" })
+                        && x.BuildingNumber == request.BuildingNumber
+                        && x.PageSize == request.PageSize
+                        && x.UsageCode == request.UsageCode
+                        && x.UsagePrimary == request.UsagePrimary
+                        && x.IncludeParentShells == request.IncludeParentShells
+                        && x.CrossRefCode == request.CrossRefCode
+                        && x.CrossRefValue == request.CrossRefValue)))
                 .Returns((new List<string>(), 1)).Verifiable();
 
             _classUnderTest.ExecuteAsync(request);
