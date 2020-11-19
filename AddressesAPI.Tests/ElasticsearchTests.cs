@@ -4,10 +4,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using AddressesAPI.Infrastructure;
-using FluentAssertions;
 using Nest;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 
 namespace AddressesAPI.Tests
@@ -26,19 +23,6 @@ namespace AddressesAPI.Tests
             await CreateAddressesIndex().ConfigureAwait(true);
         }
 
-        private async Task CreateAddressesIndex()
-        {
-            var settingsDoc = await File.ReadAllTextAsync("./../../../../data/elasticsearch/index.json")
-                .ConfigureAwait(true);
-            var httpClient = new HttpClient();
-            var content = new StringContent(settingsDoc);
-            content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
-            await httpClient.PutAsync(new Uri(_esDomainUri + "/addresses"), content)
-                .ConfigureAwait(true);
-            content.Dispose();
-            httpClient.Dispose();
-        }
-
         [TearDown]
         public void RunAfterAnyTests()
         {
@@ -55,11 +39,18 @@ namespace AddressesAPI.Tests
             return new ElasticClient(settings);
         }
 
-        public static void EmptyAddressesIndex(ElasticClient client)
+        private async Task CreateAddressesIndex()
         {
-            client.DeleteByQuery<QueryableAddress>(q => q.MatchAll());
+            var settingsDoc = await File.ReadAllTextAsync("./../../../../data/elasticsearch/index.json")
+                .ConfigureAwait(true);
+            var httpClient = new HttpClient();
+            var content = new StringContent(settingsDoc);
+            content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
+            await httpClient.PutAsync(new Uri(_esDomainUri + "/addresses"), content)
+                .ConfigureAwait(true);
+            content.Dispose();
+            httpClient.Dispose();
         }
-
 
         public static void DeleteAddressesIndex(ElasticClient client)
         {

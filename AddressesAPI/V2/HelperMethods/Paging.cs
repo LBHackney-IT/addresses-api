@@ -2,7 +2,7 @@ namespace AddressesAPI.V2.HelperMethods
 {
     public static class Paging
     {
-        public static int CalculatePageCount(this int totalResultsCount, int pageSize)
+        public static long CalculatePageCount(this long totalResultsCount, int pageSize)
         {
             if (totalResultsCount == 0)
                 return 1;
