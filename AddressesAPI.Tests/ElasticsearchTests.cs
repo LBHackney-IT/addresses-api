@@ -1,6 +1,13 @@
 using System;
+using System.IO;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
 using AddressesAPI.Infrastructure;
+using FluentAssertions;
 using Nest;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 
 namespace AddressesAPI.Tests
@@ -12,11 +19,24 @@ namespace AddressesAPI.Tests
         protected ElasticClient ElasticsearchClient { get; private set; }
 
         [SetUp]
-        public void SetupElasticsearchClient()
+        public async Task SetupElasticsearchClient()
         {
             ElasticsearchClient = SetupElasticsearchConnection();
             DeleteAddressesIndex(ElasticsearchClient);
-            CreateAddressesIndex(ElasticsearchClient);
+            await CreateAddressesIndex().ConfigureAwait(true);
+        }
+
+        private async Task CreateAddressesIndex()
+        {
+            var settingsDoc = await File.ReadAllTextAsync("./../../../../data/elasticsearch/index.json")
+                .ConfigureAwait(true);
+            var httpClient = new HttpClient();
+            var content = new StringContent(settingsDoc);
+            content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
+            await httpClient.PutAsync(new Uri(_esDomainUri + "/addresses"), content)
+                .ConfigureAwait(true);
+            content.Dispose();
+            httpClient.Dispose();
         }
 
         [TearDown]
@@ -33,34 +53,6 @@ namespace AddressesAPI.Tests
                 .DisableDirectStreaming()
                 .ThrowExceptions();
             return new ElasticClient(settings);
-        }
-
-        private static void CreateAddressesIndex(ElasticClient client)
-        {
-            client.Indices.Create("addresses", c => c
-                .Settings(s => s
-                    .Analysis(a => a
-                        .CharFilters(cf => cf
-                            .PatternReplace("remove_whitespace", descriptor => descriptor.Pattern(" ").Replacement("")))
-                        .Analyzers(an => an
-                            .Custom("whitespace_removed", ca => ca
-                                .CharFilters("remove_whitespace")
-                                .Tokenizer("keyword")
-                                .Filters("lowercase")
-                            )
-                        )
-                    )
-                )
-                .Map<QueryableAddress>(mm => mm
-                    .AutoMap()
-                    .Properties(p => p
-                        .Text(t => t
-                            .Name(n => n.Postcode)
-                            .Analyzer("whitespace_removed")
-                        )
-                    )
-                )
-            );
         }
 
         public static void EmptyAddressesIndex(ElasticClient client)

@@ -98,6 +98,7 @@ namespace AddressesAPI.Tests.V2.Helper
             if (request?.Town != null) randomAddressRecord.Town = request.Town;
             if (request?.Street != null) randomAddressRecord.Street = request.Street;
             if (request?.PaonStartNumber != null) randomAddressRecord.PaonStartNumber = request.PaonStartNumber;
+            if (request?.PaonStartNumber == 0) randomAddressRecord.PaonStartNumber = null;
             if (request?.BuildingNumber != null)
                 randomAddressRecord.BuildingNumber = ReplaceEmptyStringWithNull(request.BuildingNumber);
             if (request?.UnitNumber != null) randomAddressRecord.UnitNumber = ReplaceEmptyStringWithNull(request.UnitNumber);

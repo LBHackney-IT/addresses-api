@@ -9,6 +9,7 @@ namespace AddressesAPI.V2.Domain
         public string Street { get; set; }
         public GlobalConstants.Gazetteer Gazetteer { get; set; }
         public long? Uprn { get; set; }
+        public List<long> CrossReferencedUprns { get; set; }
         public int? Usrn { get; set; }
         public string UsagePrimary { get; set; }
         public string UsageCode { get; set; }

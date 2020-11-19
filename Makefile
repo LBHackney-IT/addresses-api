@@ -30,7 +30,7 @@ seed-pg-data:
 .PHONY: seed-es-data
 seed-es-data:
 	curl http://localhost:9200/addresses --data-binary "@./data/elasticsearch/index.json" -X PUT -s -H "Content-Type: application/json"
-	curl http://localhost:9200/_bulk --data-binary "@./data/elasticsearch/data.json" -X POST -H "Content-Type: application/x-ndjson"
+	curl http://localhost:9200/_bulk --data-binary "@./data/elasticsearch/seed-data.json" -X POST -H "Content-Type: application/x-ndjson"
 
 .PHONY: lint
 lint:

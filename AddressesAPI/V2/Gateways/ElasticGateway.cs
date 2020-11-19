@@ -17,6 +17,8 @@ namespace AddressesAPI.V2.Gateways
 
         public (List<string>, int) SearchAddresses(SearchParameters request)
         {
+            var pageOffset = request.PageSize * (request.Page == 0 ? 0 : request.Page - 1);
+
             var searchResponse = _esClient.Search<QueryableAddress>(s =>
                 s.Query(q => SearchPostcodes(request, q)
                              && SearchBuildingNumbers(request, q)
@@ -26,8 +28,19 @@ namespace AddressesAPI.V2.Gateways
                              && SearchUprns(request, q)
                              && SearchUsrns(request, q)
                              && SearchGazetteer(request, q)
-                             && FilterOutOfBoroughAddresses(request, q))
-                .Size(50)
+                             && FilterOutOfBoroughAddresses(request, q)
+                             && SearchStreet(request, q)
+                             && SearchCrossReferencedUprns(request, q))
+                    .Sort(srt => srt
+                        .Ascending(f => f.Town)
+                        .Field(f => f.Field(n => n.Postcode).Missing("_last"))
+                        .Ascending(f => f.Street)
+                        .Field(f => f.Field(n => n.PaonStartNumber).Ascending().Missing("_last"))
+                        .Field(f => f.Field(n => n.BuildingNumber).Ascending().Missing("_last"))
+                        .Field(f => f.Field(n => n.UnitNumber).Ascending().Missing("_last"))
+                        .Field(f => f.Field(n => n.UnitName).Ascending().Missing("_last")))
+                    .Size(request.PageSize)
+                    .Skip(pageOffset)
             );
 
             var addressKeys = searchResponse.Documents
@@ -67,6 +80,16 @@ namespace AddressesAPI.V2.Gateways
             return searchPostcodes;
         }
 
+        private static QueryContainer SearchStreet(SearchParameters request, QueryContainerDescriptor<QueryableAddress> q)
+        {
+            if (string.IsNullOrWhiteSpace(request.Street)) return null;
+            var streetSearchTerm = request.Street?.Replace(" ", "").ToLower();
+
+            var searchStreet = q.Wildcard(m =>
+                m.Field(f => f.Street).Value($"*{streetSearchTerm}*"));
+            return searchStreet;
+        }
+
         private static QueryContainer SearchUsrns(SearchParameters request, QueryContainerDescriptor<QueryableAddress> q)
         {
             if (request.Usrn == null) return null;
@@ -83,6 +106,15 @@ namespace AddressesAPI.V2.Gateways
             return q.Term(t => t
                 .Field(f => f.UPRN)
                 .Value(request.Uprn));
+        }
+
+        private static QueryContainer SearchCrossReferencedUprns(SearchParameters request, QueryContainerDescriptor<QueryableAddress> q)
+        {
+            if (request.CrossReferencedUprns == null || request.CrossReferencedUprns.Count == 0) return null;
+
+            return q.Terms(t => t
+                .Field(f => f.UPRN)
+                .Terms(request.CrossReferencedUprns));
         }
 
         private static QueryContainer SearchUsagePrimary(SearchParameters request, QueryContainerDescriptor<QueryableAddress> q)

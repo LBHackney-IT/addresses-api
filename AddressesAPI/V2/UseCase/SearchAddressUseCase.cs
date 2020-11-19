@@ -32,6 +32,12 @@ namespace AddressesAPI.V2.UseCase
                 throw new BadRequestException(validation);
             }
             var searchParameters = MapRequestToSearchParameters(request);
+
+            if (request.CrossRefCode != null && request.CrossRefValue != null)
+            {
+                searchParameters.CrossReferencedUprns =
+                    _addressGateway.GetMatchingCrossReferenceUprns(request.CrossRefCode, request.CrossRefValue);
+            }
             var (addressKeys, totalCount) = _searchAddressesGateway.SearchAddresses(searchParameters);
 
             var format = Enum.Parse<GlobalConstants.Format>(request.Format, true);
@@ -70,8 +76,6 @@ namespace AddressesAPI.V2.UseCase
                 UsagePrimary = request.UsagePrimary,
                 OutOfBoroughAddress = addressScope != GlobalConstants.AddressScope.HackneyBorough,
                 IncludeParentShells = request.IncludeParentShells,
-                CrossRefCode = request.CrossRefCode,
-                CrossRefValue = request.CrossRefValue
             };
         }
     }

@@ -122,6 +122,29 @@ namespace AddressesAPI.Tests.V2.UseCase
         }
 
         [Test]
+        public void IfCrossReferenceCodeAndValueAreSupplied_GetsTheMatchingUprnsFromAddressGateway()
+        {
+            var code = _faker.Random.String2(6);
+            var value = _faker.Random.String2(12);
+            SetupValidatorToReturnValid();
+            var request = new SearchAddressRequest
+            {
+                CrossRefCode = code,
+                CrossRefValue = value
+            };
+            var uprns = _fixture.CreateMany<long>().ToList();
+            _addressGateway.Setup(s => s.GetMatchingCrossReferenceUprns(code, value))
+                .Returns(uprns).Verifiable();
+            _searchAddressGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(i =>
+                    i.CrossReferencedUprns.SequenceEqual(uprns))))
+                .Returns((null, 0)).Verifiable();
+            _classUnderTest.ExecuteAsync(request);
+
+            _addressGateway.Verify();
+            _searchAddressGateway.Verify();
+        }
+
+        [Test]
         public void GivenValidInput_WhenSearchGatewayRespondsWithNull_ThenResponseShouldBeNull()
         {
             SetupValidatorToReturnValid();

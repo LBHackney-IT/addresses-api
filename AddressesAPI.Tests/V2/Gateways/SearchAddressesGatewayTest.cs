@@ -389,49 +389,37 @@ namespace AddressesAPI.Tests.V2.Gateways
             addresses.Count.Should().Be(4);
         }
 
-        // [Test]
-        // public async Task WillSearchForAllAddressesUsingForACrossReference()
-        // {
-        //     await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
-        //
-        //     //--- Cross reference for address one
-        //     var uprnOne = _faker.Random.Long(10000000, 99999999);
-        //
-        //     var addressOne = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
-        //         addressConfig: new QueryableAddress { UPRN = uprnOne }
-        //     );
-        //
-        //     TestEfDataHelper.InsertCrossReference(ElasticsearchClient, uprnOne,
-        //         new CrossReference { Code = "TAXES", Value = "TestValue" }
-        //     );
-        //
-        //     //--- Cross reference for address two
-        //     var uprnTwo = _faker.Random.Long(10000000, 99999999);
-        //
-        //     var addressTwo = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
-        //         addressConfig: new QueryableAddress { UPRN = uprnTwo }
-        //     );
-        //
-        //     TestEfDataHelper.InsertCrossReference(ElasticsearchClient, uprnTwo,
-        //         new CrossReference { Code = "TAXES", Value = "TestValue" }
-        //     );
-        //
-        //     var request = new SearchParameters
-        //     {
-        //         Page = 1,
-        //         PageSize = 50,
-        //         Format = GlobalConstants.Format.Detailed,
-        //         Gazetteer = GlobalConstants.Gazetteer.Both,
-        //         CrossRefCode = "TAXES",
-        //         CrossRefValue = "TestValue"
-        //     };
-        //
-        //     var (addresses, _) = _classUnderTest.SearchAddresses(request);
-        //
-        //     addresses.Count.Should().Be(2);
-        //     addresses.Should().ContainEquivalentOf(addressOne.ToDomain());
-        //     addresses.Should().ContainEquivalentOf(addressTwo.ToDomain());
-        // }
+        [Test]
+        public async Task WillSearchForAllAddressesUsingCrossReferencedUprns()
+        {
+            //--- Cross reference for address one
+            var uprnOne = _faker.Random.Long(10000000, 99999999);
+
+            var addressOne = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
+                addressConfig: new QueryableAddress { UPRN = uprnOne }
+            ).ConfigureAwait(true);
+
+            //--- Cross reference for address two
+            var uprnTwo = _faker.Random.Long(10000000, 99999999);
+
+            var addressTwo = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
+                addressConfig: new QueryableAddress { UPRN = uprnTwo }
+            ).ConfigureAwait(true);
+
+            var request = new SearchParameters
+            {
+                Page = 1,
+                PageSize = 50,
+                Gazetteer = GlobalConstants.Gazetteer.Both,
+                CrossReferencedUprns = new List<long>{uprnOne, uprnTwo},
+            };
+
+            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+
+            addresses.Count.Should().Be(2);
+            addresses.Should().ContainEquivalentOf(addressOne.AddressKey);
+            addresses.Should().ContainEquivalentOf(addressTwo.AddressKey);
+        }
         #endregion
 
         #region parentShells
