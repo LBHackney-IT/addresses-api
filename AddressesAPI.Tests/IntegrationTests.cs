@@ -33,21 +33,22 @@ namespace AddressesAPI.Tests
         public void OneTimeSetUp()
         {
             _elasticserachTests = new ElasticsearchTests();
+            ElasticsearchClient = _elasticserachTests.SetupElasticsearchConnection();
             ConnectToPostgresDbUsingEf();
         }
 
         [SetUp]
-        public void BaseSetup()
+        public async Task BaseSetup()
         {
             Environment.SetEnvironmentVariable("CONNECTION_STRING", ConnectionString.TestDatabase());
             Environment.SetEnvironmentVariable("ELASTICSEARCH_DOMAIN_URL", _esDomainUri);
+            await _elasticserachTests.BeforeAnyElasticsearchTest(ElasticsearchClient).ConfigureAwait(true);
             _factory = new MockWebApplicationFactory<TStartup>(_connection);
             Client = _factory.CreateClient();
             DatabaseContext = new AddressesContext(_builder.Options);
             DatabaseContext.Database.Migrate();
             _transaction = DatabaseContext.Database.BeginTransaction();
-            ElasticsearchClient = _elasticserachTests.SetupElasticsearchConnection();
-            ElasticsearchTests.DeleteAddressesIndex(ElasticsearchClient);
+
         }
 
         [TearDown]

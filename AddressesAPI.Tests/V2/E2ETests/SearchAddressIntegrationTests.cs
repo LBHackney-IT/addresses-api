@@ -21,7 +21,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
         public async Task SearchAddressReturns200()
         {
             var addressKey = "eytshdnshsuahs";
-            TestEfDataHelper.InsertAddressInDb(DatabaseContext, addressKey);
+            await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, addressKey).ConfigureAwait(true);
 
             var queryString = "postcode=E8";
 
@@ -34,9 +34,9 @@ namespace AddressesAPI.Tests.V2.E2ETests
         {
             var addressKey = _faker.Random.String2(14);
             var postcode = "E4 2JH";
-            var record = TestEfDataHelper.InsertAddressInDb(DatabaseContext, addressKey,
-                new NationalAddress { Postcode = postcode });
-            AddSomeRandomAddressToTheDatabase();
+            var record = await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, addressKey,
+                new NationalAddress { Postcode = postcode }).ConfigureAwait(true);
+            await AddSomeRandomAddressToTheDatabase().ConfigureAwait(true);
 
             var queryString = $"postcode={postcode}&address_status={record.AddressStatus}&format=Detailed&address_scope=national";
 
@@ -55,8 +55,9 @@ namespace AddressesAPI.Tests.V2.E2ETests
             {
                 UPRN = _faker.Random.Int(),
             };
-            var record = TestEfDataHelper.InsertAddressInDb(DatabaseContext, addressKey, queryParameters);
-            AddSomeRandomAddressToTheDatabase();
+            var record = await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, addressKey, queryParameters)
+                .ConfigureAwait(true);
+            await AddSomeRandomAddressToTheDatabase().ConfigureAwait(true);
 
             var queryString = $"uprn={queryParameters.UPRN}&address_status={record.AddressStatus}&format=Detailed&address_scope=national";
 
@@ -77,8 +78,9 @@ namespace AddressesAPI.Tests.V2.E2ETests
                 USRN = _faker.Random.Int(),
                 AddressStatus = "Historical"
             };
-            TestEfDataHelper.InsertAddressInDb(DatabaseContext, addressKey, queryParameters);
-            AddSomeRandomAddressToTheDatabase();
+            await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, addressKey, queryParameters)
+                .ConfigureAwait(true);
+            await AddSomeRandomAddressToTheDatabase().ConfigureAwait(true);
 
             var queryString = $"USRN={queryParameters.USRN}&address_status=Historical&Format=Detailed&address_scope=national";
 
@@ -105,8 +107,9 @@ namespace AddressesAPI.Tests.V2.E2ETests
                 Postcode = "E41JJ",
                 AddressStatus = "Historical"
             };
-            TestEfDataHelper.InsertAddressInDb(DatabaseContext, addressKey, addressDetails);
-            AddSomeRandomAddressToTheDatabase();
+            await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, addressKey, addressDetails)
+                .ConfigureAwait(true);
+            await AddSomeRandomAddressToTheDatabase().ConfigureAwait(true);
             var queryString = $"uprn={addressDetails.UPRN}&address_status=Historical&format=Simple&address_scope=national";
 
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
@@ -132,10 +135,11 @@ namespace AddressesAPI.Tests.V2.E2ETests
                 UPRN = _faker.Random.Int(),
                 Gazetteer = "National"
             };
-            var record = TestEfDataHelper.InsertAddressInDb(DatabaseContext, addressKey, dbOptions);
+            var record = await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, addressKey, dbOptions)
+                .ConfigureAwait(true);
 
-            AddSomeRandomAddressToTheDatabase(count: 3);
-            AddSomeRandomAddressToTheDatabase(count: 3, gazetteer: "National");
+            await AddSomeRandomAddressToTheDatabase(count: 3).ConfigureAwait(true);
+            await AddSomeRandomAddressToTheDatabase(count: 3, gazetteer: "National").ConfigureAwait(true);
             var queryString = $"uprn={dbOptions.UPRN}&address_status={record.AddressStatus}&format=Detailed&address_scope=national";
 
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
@@ -151,14 +155,14 @@ namespace AddressesAPI.Tests.V2.E2ETests
         [TestCase("Hackney Borough")]
         public async Task SettingAddressScopeToHackneyBoroughWillOnlyReturnAddressesInHackney(string addressScope)
         {
-            var hackneyOutOfBorough = TestEfDataHelper.InsertAddressInDb(DatabaseContext,
-                request: new NationalAddress { Postcode = "N1 3JH", Gazetteer = "Hackney", NeverExport = true });
+            var hackneyOutOfBorough = await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient,
+                request: new NationalAddress { Postcode = "N1 3JH", Gazetteer = "Hackney", NeverExport = true }).ConfigureAwait(true);
 
-            var hackneyInBorough = TestEfDataHelper.InsertAddressInDb(DatabaseContext,
-                request: new NationalAddress { Postcode = "N1 7YH", Gazetteer = "Hackney", NeverExport = false });
+            var hackneyInBorough = await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient,
+                request: new NationalAddress { Postcode = "N1 7YH", Gazetteer = "Hackney", NeverExport = false }).ConfigureAwait(true);
 
-            var nationalAddress = TestEfDataHelper.InsertAddressInDb(DatabaseContext,
-                request: new NationalAddress { Postcode = "N1 7UK", Gazetteer = "National" });
+            var nationalAddress = await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient,
+                request: new NationalAddress { Postcode = "N1 7UK", Gazetteer = "National" }).ConfigureAwait(true);
 
             var queryString = $"postcode=N1&format=Detailed&address_scope={addressScope}";
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
@@ -176,16 +180,18 @@ namespace AddressesAPI.Tests.V2.E2ETests
             {
                 UPRN = _faker.Random.Int(1, 287987129),
             };
-            TestEfDataHelper.InsertAddressInDb(DatabaseContext, blockAddressKey, blockOfFlats);
+            await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, blockAddressKey, blockOfFlats)
+                .ConfigureAwait(true);
 
             var flatAddressKey = _faker.Random.String2(14);
             var flat = new NationalAddress
             {
                 ParentUPRN = blockOfFlats.UPRN,
             };
-            var flatRecord = TestEfDataHelper.InsertAddressInDb(DatabaseContext, flatAddressKey, flat);
+            var flatRecord = await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, flatAddressKey, flat)
+                .ConfigureAwait(true);
 
-            AddSomeRandomAddressToTheDatabase();
+            await AddSomeRandomAddressToTheDatabase().ConfigureAwait(true);
 
             var queryString = $"UPRN={flatRecord.UPRN}&Format=Detailed&include_parent_shells=true&address_scope=national";
 
@@ -237,15 +243,16 @@ namespace AddressesAPI.Tests.V2.E2ETests
             var hackneyBoroughOne = new NationalAddress { UPRN = uprnOne, Gazetteer = "Hackney", NeverExport = false };
             var hackneyBoroughTwo = new NationalAddress { UPRN = uprnTwo, Gazetteer = "Hackney", NeverExport = false };
 
-            var record = TestEfDataHelper.InsertAddressInDb(DatabaseContext,
-                request: hackneyBoroughOne);
+            var record = await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient,
+                request: hackneyBoroughOne).ConfigureAwait(true);
 
             TestEfDataHelper.InsertCrossReference(DatabaseContext, uprnOne, crossReferenceOne);
 
-            TestEfDataHelper.InsertAddressInDb(DatabaseContext, request: hackneyBoroughTwo);
+            await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, request: hackneyBoroughTwo).ConfigureAwait(true);
+
             TestEfDataHelper.InsertCrossReference(DatabaseContext, uprnTwo, crossReferenceTwo);
 
-            AddSomeRandomAddressToTheDatabase();
+            await AddSomeRandomAddressToTheDatabase().ConfigureAwait(true);
 
             var queryString = $"cross_ref_code={crossReferenceOne.Code}&cross_ref_value={crossReferenceOne.Value}&format=Detailed";
 
@@ -257,7 +264,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
             returnedAddress.Data.Addresses.First().AddressKey.Should().Be(record.AddressKey);
         }
 
-        private void AddSomeRandomAddressToTheDatabase(int? count = null, string gazetteer = "Local")
+        private async Task AddSomeRandomAddressToTheDatabase(int? count = null, string gazetteer = "Local")
         {
             var number = count ?? _faker.Random.Int(2, 7);
             for (var i = 0; i < number; i++)
@@ -267,7 +274,8 @@ namespace AddressesAPI.Tests.V2.E2ETests
                     .With(a => a.Gazetteer, gazetteer)
                     .Without(a => a.ParentUPRN)
                     .Create();
-                TestEfDataHelper.InsertAddressInDb(DatabaseContext, addressKey, randomAddress);
+                await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, addressKey, randomAddress)
+                    .ConfigureAwait(true);
             }
         }
 

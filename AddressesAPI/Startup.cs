@@ -131,9 +131,7 @@ namespace AddressesAPI
 
             var settings = new ConnectionSettings(new Uri(url))
                 .DefaultIndex(defaultIndex)
-                .DefaultMappingFor<QueryableAddress>(m => m
-                    .PropertyName(p => p.AddressKey, "AddressKey")
-                ).PrettyJson().ThrowExceptions();
+                .PrettyJson().ThrowExceptions().DisableDirectStreaming();
             var esClient = new ElasticClient(settings);
 
             services.AddSingleton<IElasticClient>(esClient);
@@ -157,6 +155,7 @@ namespace AddressesAPI
         {
             services.AddScoped<V2.Gateways.IAddressesGateway, V2.Gateways.AddressesGateway>();
             services.AddScoped<V2.Gateways.ICrossReferencesGateway, V2.Gateways.CrossReferencesGateway>();
+            services.AddScoped<V2.Gateways.ISearchAddressesGateway, V2.Gateways.ElasticGateway>();
         }
 
         private static void RegisterV1UseCases(IServiceCollection services)

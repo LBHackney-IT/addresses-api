@@ -15,12 +15,16 @@ namespace AddressesAPI.Tests
         private readonly string _esDomainUri = "http://localhost:9202";
         protected ElasticClient ElasticsearchClient { get; private set; }
 
+        [OneTimeSetUp]
+        public void BeforeAllElasticsearchTests()
+        {
+            ElasticsearchClient = SetupElasticsearchConnection();
+        }
+
         [SetUp]
         public async Task SetupElasticsearchClient()
         {
-            ElasticsearchClient = SetupElasticsearchConnection();
-            DeleteAddressesIndex(ElasticsearchClient);
-            await CreateAddressesIndex().ConfigureAwait(true);
+            await BeforeAnyElasticsearchTest(ElasticsearchClient).ConfigureAwait(true);
         }
 
         [TearDown]
@@ -29,6 +33,11 @@ namespace AddressesAPI.Tests
             DeleteAddressesIndex(ElasticsearchClient);
         }
 
+        public async Task BeforeAnyElasticsearchTest(ElasticClient client)
+        {
+            DeleteAddressesIndex(client);
+            await CreateAddressesIndex().ConfigureAwait(true);
+        }
         public ElasticClient SetupElasticsearchConnection()
         {
             var settings = new ConnectionSettings(new Uri(_esDomainUri))
