@@ -5,6 +5,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AddressesAPI", "AddressesAP
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AddressesAPI.Tests", "AddressesAPI.Tests\AddressesAPI.Tests.csproj", "{DE8E4E61-EB76-416B-8417-E8F2F6A0C0D3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reindex", "Reindex\Reindex.csproj", "{C09C3ADE-1A80-466A-95D7-D45F733EAD92}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReindexTests", "ReindexTests\ReindexTests.csproj", "{7E783D03-26A5-40CA-B13A-41F87D337116}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,5 +23,13 @@ Global
 		{DE8E4E61-EB76-416B-8417-E8F2F6A0C0D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE8E4E61-EB76-416B-8417-E8F2F6A0C0D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DE8E4E61-EB76-416B-8417-E8F2F6A0C0D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C09C3ADE-1A80-466A-95D7-D45F733EAD92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C09C3ADE-1A80-466A-95D7-D45F733EAD92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C09C3ADE-1A80-466A-95D7-D45F733EAD92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C09C3ADE-1A80-466A-95D7-D45F733EAD92}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E783D03-26A5-40CA-B13A-41F87D337116}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E783D03-26A5-40CA-B13A-41F87D337116}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E783D03-26A5-40CA-B13A-41F87D337116}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E783D03-26A5-40CA-B13A-41F87D337116}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
