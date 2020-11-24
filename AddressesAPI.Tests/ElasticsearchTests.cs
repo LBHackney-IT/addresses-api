@@ -40,15 +40,15 @@ namespace AddressesAPI.Tests
         {
             var esDomainUri = Environment.GetEnvironmentVariable("ELASTICSEARCH_DOMAIN_URL")
                               ?? "http://localhost:9202";
-            var settings = new ConnectionSettings(new Uri(esDomainUri))
-                    .DefaultIndex("hackney_addresses")
-                    .PrettyJson()
-                    .DisableDirectStreaming()
-                    .ThrowExceptions();
+            using var pool = new SingleNodeConnectionPool(new Uri(esDomainUri));
+            using var settings = new ConnectionSettings(pool).PrettyJson()
+                .DisableDirectStreaming()
+                .SniffOnStartup(false)
+                .ThrowExceptions();
             return new ElasticClient(settings);
         }
 
-        private static async Task CreateIndex(string name, ElasticClient client)
+        private static async Task CreateIndex(string name, IElasticClient client)
         {
             var settingsDoc = await File.ReadAllTextAsync("./../../../../data/elasticsearch/index.json")
                 .ConfigureAwait(true);

@@ -19,13 +19,15 @@ namespace AddressesAPI.Tests
         private NpgsqlConnection _connection;
         private IDbContextTransaction _transaction;
         private DbContextOptionsBuilder _builder;
-        private string _esDomainUri = "http://localhost:9202";
-        private ElasticsearchTests _elasticserachTests;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            _elasticserachTests = new ElasticsearchTests();
+            if (Environment.GetEnvironmentVariable("ELASTICSEARCH_DOMAIN_URL") == null)
+            {
+                Environment.SetEnvironmentVariable("ELASTICSEARCH_DOMAIN_URL", "http://localhost:9202");
+            }
+
             ElasticsearchClient = ElasticsearchTests.SetupElasticsearchConnection();
             ConnectToPostgresDbUsingEf();
         }
@@ -34,14 +36,12 @@ namespace AddressesAPI.Tests
         public async Task BaseSetup()
         {
             Environment.SetEnvironmentVariable("CONNECTION_STRING", ConnectionString.TestDatabase());
-            Environment.SetEnvironmentVariable("ELASTICSEARCH_DOMAIN_URL", _esDomainUri);
             await ElasticsearchTests.BeforeAnyElasticsearchTest(ElasticsearchClient).ConfigureAwait(true);
             _factory = new MockWebApplicationFactory<TStartup>(_connection);
             Client = _factory.CreateClient();
             DatabaseContext = new AddressesContext(_builder.Options);
             DatabaseContext.Database.Migrate();
             _transaction = DatabaseContext.Database.BeginTransaction();
-
         }
 
         [TearDown]

@@ -41,9 +41,8 @@ namespace ReindexTests
         {
             var esDomainUri = Environment.GetEnvironmentVariable("ELASTICSEARCH_DOMAIN_URL")
                               ?? "http://localhost:9202";
-            var pool = new SingleNodeConnectionPool(new Uri(esDomainUri));
-            var settings = new ConnectionSettings(pool)
-                .PrettyJson()
+            using var pool = new SingleNodeConnectionPool(new Uri(esDomainUri));
+            using var settings = new ConnectionSettings(pool).PrettyJson()
                 .DisableDirectStreaming()
                 .SniffOnStartup(false)
                 .ThrowExceptions();
