@@ -71,41 +71,5 @@ namespace AddressesAPI.V2.Controllers
                 return new BadRequestObjectResult(new ErrorResponse(e.ValidationResponse));
             }
         }
-
-        // [ProducesResponseType(typeof(APIResponse<SearchAddressResponse>), 200)]
-        // [ProducesResponseType(typeof(APIResponse<BadRequestException>), 400)]
-        // [HttpGet, MapToApiVersion("1")]
-        // [Route("elasticsearch")]
-        // public IActionResult GetAddressesWithEs([FromQuery] SearchAddressRequest request)
-        // {
-        //     var gateway = new ElasticGateway(_esClient);
-        //     var usecase = new SearchAddressUseCase(gateway, _searchAddressValidator);
-        //     if (!ModelState.IsValid)
-        //     {
-        //         var errors = new List<Error>();
-        //         foreach (var (key, value) in ModelState)
-        //         {
-        //             var err = new Error();
-        //             foreach (var error in value.Errors)
-        //             {
-        //                 err.FieldName = key;
-        //                 err.Message = error.ErrorMessage;
-        //                 errors.Add(err);
-        //             }
-        //         }
-        //
-        //         return new BadRequestObjectResult(new ErrorResponse(400, errors));
-        //     }
-        //
-        //     try
-        //     {
-        //         var response = usecase.ExecuteAsync(request);
-        //         return new OkObjectResult(new APIResponse<SearchAddressResponse>(response));
-        //     }
-        //     catch (BadRequestException e)
-        //     {
-        //         return new BadRequestObjectResult(new ErrorResponse(e.ValidationResponse));
-        //     }
-        // }
     }
 }

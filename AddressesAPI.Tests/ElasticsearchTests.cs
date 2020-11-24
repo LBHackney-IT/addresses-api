@@ -36,26 +36,27 @@ namespace AddressesAPI.Tests
         public async Task BeforeAnyElasticsearchTest(ElasticClient client)
         {
             DeleteAddressesIndex(client);
-            await CreateAddressesIndex().ConfigureAwait(true);
+            await CreateIndex("hackney_addresses").ConfigureAwait(true);
+            await CreateIndex("national_addresses").ConfigureAwait(true);
         }
         public ElasticClient SetupElasticsearchConnection()
         {
             var settings = new ConnectionSettings(new Uri(_esDomainUri))
-                .DefaultIndex("addresses")
+                .DefaultIndex("hackney_addresses")
                 .PrettyJson()
                 .DisableDirectStreaming()
                 .ThrowExceptions();
             return new ElasticClient(settings);
         }
 
-        private async Task CreateAddressesIndex()
+        private async Task CreateIndex(string name)
         {
             var settingsDoc = await File.ReadAllTextAsync("./../../../../data/elasticsearch/index.json")
                 .ConfigureAwait(true);
             var httpClient = new HttpClient();
             var content = new StringContent(settingsDoc);
             content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
-            await httpClient.PutAsync(new Uri(_esDomainUri + "/addresses"), content)
+            await httpClient.PutAsync(new Uri(_esDomainUri + "/" + name), content)
                 .ConfigureAwait(true);
             content.Dispose();
             httpClient.Dispose();
@@ -63,9 +64,14 @@ namespace AddressesAPI.Tests
 
         public static void DeleteAddressesIndex(ElasticClient client)
         {
-            if (client.Indices.Exists("addresses").Exists)
+            if (client.Indices.Exists("hackney_addresses").Exists)
             {
-                client.Indices.Delete("addresses");
+                client.Indices.Delete("hackney_addresses");
+            }
+
+            if (client.Indices.Exists("national_addresses").Exists)
+            {
+                client.Indices.Delete("national_addresses");
             }
         }
     }

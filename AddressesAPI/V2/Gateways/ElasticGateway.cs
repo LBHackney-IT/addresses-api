@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AddressesAPI.Infrastructure;
 using AddressesAPI.V2.Domain;
+using Amazon.Lambda.Core;
 using Nest;
 
 namespace AddressesAPI.V2.Gateways
@@ -9,10 +10,12 @@ namespace AddressesAPI.V2.Gateways
     public class ElasticGateway : ISearchAddressesGateway
     {
         private readonly IElasticClient _esClient;
+        private Indices.ManyIndices _indices;
 
         public ElasticGateway(IElasticClient esClient)
         {
             _esClient = esClient;
+            _indices = Indices.Index(new List<IndexName>{"hackney_addresses", "national_addresses"});
         }
 
         public (List<string>, long) SearchAddresses(SearchParameters request)
@@ -23,13 +26,15 @@ namespace AddressesAPI.V2.Gateways
                 ? QueryIncludingParentShells(request, q)
                 : BaseQuery(request, q);
 
-            var searchResponse = _esClient.Search<QueryableAddress>(s =>
-                s.Query(Query)
-                    .Sort(SortResults)
-                    .Size(request.PageSize)
-                    .Skip(pageOffset)
-                    .TrackTotalHits());
-
+            LambdaLogger.Log("Searching Elasticsearch");
+            var searchResponse = await _esClient.SearchAsync<QueryableAddress>(s => s.Index(_indices)
+                .Query(Query)
+                .Sort(SortResults)
+                .Size(request.PageSize)
+                .Skip(pageOffset)
+                .TrackTotalHits()).ConfigureAwait(true);
+            LambdaLogger.Log(searchResponse.ApiCall.DebugInformation);
+            LambdaLogger.Log($"Received {searchResponse.Documents.Count} documents");
             var addressKeys = searchResponse.Documents
                 .Select(a => a.AddressKey).ToList();
             var totalCount = searchResponse.HitsMetadata.Total.Value;
@@ -41,7 +46,7 @@ namespace AddressesAPI.V2.Gateways
         {
             var allAddressKeys = new List<string>();
             var children = _esClient.Search<QueryableAddress>(s =>
-                s.Query(q => BaseQuery(request, q))).Documents;
+                s.Index(_indices).Query(q => BaseQuery(request, q))).Documents;
 
             while (true)
             {
@@ -52,7 +57,8 @@ namespace AddressesAPI.V2.Gateways
                     .Distinct().ToList();
                 if (parentUprns.Count == 0) break;
                 children = _esClient.Search<QueryableAddress>(s =>
-                    s.Query(q => SearchForMultipleUprns(parentUprns, q))).Documents;
+                    s.Index(_indices).Query(q => SearchForMultipleUprns(parentUprns, q)))
+                    .Documents;
             }
 
             return q.Terms(t => t
