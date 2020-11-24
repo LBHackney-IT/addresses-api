@@ -3,6 +3,7 @@ using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Elasticsearch.Net;
 using Nest;
 using NUnit.Framework;
 
@@ -11,7 +12,6 @@ namespace ReindexTests
     [TestFixture]
     public class ElasticsearchTests
     {
-        private readonly string _esDomainUri = "http://localhost:9202";
         protected ElasticClient ElasticsearchClient { get; private set; }
 
         [OneTimeSetUp]
@@ -32,34 +32,25 @@ namespace ReindexTests
             await DeleteAllIndices(ElasticsearchClient);
         }
 
-        public async Task BeforeAnyElasticsearchTest(ElasticClient client)
+        private static async Task BeforeAnyElasticsearchTest(IElasticClient client)
         {
             await DeleteAllIndices(client);
-            // await CreateAddressesIndex().ConfigureAwait(true);
         }
-        public ElasticClient SetupElasticsearchConnection()
+
+        private static ElasticClient SetupElasticsearchConnection()
         {
-            var settings = new ConnectionSettings(new Uri(_esDomainUri))
+            var esDomainUri = Environment.GetEnvironmentVariable("ELASTICSEARCH_DOMAIN_URL")
+                              ?? "http://localhost:9202";
+            var pool = new SingleNodeConnectionPool(new Uri(esDomainUri));
+            var settings = new ConnectionSettings(pool)
                 .PrettyJson()
                 .DisableDirectStreaming()
+                .SniffOnStartup(false)
                 .ThrowExceptions();
             return new ElasticClient(settings);
         }
 
-        private async Task CreateAddressesIndex()
-        {
-            var settingsDoc = await File.ReadAllTextAsync("./../../../../data/elasticsearch/index.json")
-                .ConfigureAwait(true);
-            var httpClient = new HttpClient();
-            var content = new StringContent(settingsDoc);
-            content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
-            await httpClient.PutAsync(new Uri(_esDomainUri + "/addresses"), content)
-                .ConfigureAwait(true);
-            content.Dispose();
-            httpClient.Dispose();
-        }
-
-        private static async Task DeleteAllIndices(ElasticClient client)
+        private static async Task DeleteAllIndices(IElasticClient client)
         {
             var getAllIndices = await client.Indices.GetAsync(Indices.All);
             foreach (var (name, state) in getAllIndices.Indices)

@@ -134,9 +134,19 @@ namespace Reindex
 
         private async Task<SendMessageResponse> SendSqsMessageToQueue(string message)
         {
+            var delaySeconds = 600;
+            try
+            {
+                delaySeconds = Convert.ToInt32(Environment.GetEnvironmentVariable("SQS_MESSAGE_DELAY"));
+            }
+            catch (Exception)
+            {
+                LambdaLogger.Log("SQS_MESSAGE_DELAY either not found or not an integer, using default of 600s");
+            }
+
             var sqsRequest = new SendMessageRequest
             {
-                DelaySeconds = 600,
+                DelaySeconds = delaySeconds,
                 MessageBody = message,
                 QueueUrl = _sqsQueue,
             };

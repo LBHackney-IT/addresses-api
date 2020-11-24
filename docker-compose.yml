@@ -10,6 +10,7 @@ services:
       - 3000:3000
     environment:
       - CONNECTION_STRING=Host=dev-database;Port=5432;Database=devdb;Username=postgres;Password=mypassword
+      - ELASTICSEARCH_DOMAIN_URL=http://localhost:9200
     links:
       - dev-database
       - dev-elasticsearch
@@ -22,7 +23,7 @@ services:
     ports:
       - 9200:9200
     volumes:
-      - esdata:/usr/share/elasticsearch/data
+      - esdata-dev:/usr/share/elasticsearch/data
   dev-database:
     environment:
       - POSTGRES_USER=postgres
@@ -46,8 +47,13 @@ services:
       - DB_USERNAME=postgres
       - DB_PASSWORD=mypassword
       - DB_DATABASE=testdb
+      - ELASTICSEARCH_DOMAIN_URL= http://test-elasticsearch:9200
     links:
       - test-database
+      - test-elasticsearch
+    networks:
+      - elastic
+      - postgres
   test-database:
     image: postgres:12
     container_name: test-database
@@ -57,6 +63,32 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=mypassword
       - POSTGRES_DB=testdb
+    networks:
+      - postgres
+  test-elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.3
+    container_name: test-elasticsearch
+    environment:
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - 9202:9200
+    volumes:
+      - esdata-test:/usr/share/elasticsearch/data
+    networks:
+      elastic:
+        aliases:
+          - test-elasticsearch
+          - elastic
 volumes:
-  esdata:
+  esdata-test:
     driver: local
+  esdata-dev:
+    driver: local
+networks:
+  elastic:
+    driver: bridge
+  postgres:
+    driver: bridge

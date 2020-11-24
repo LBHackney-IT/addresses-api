@@ -142,12 +142,17 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
+#      - run:
+#          name: build elasticsearch
+#          command: docker-compose up test-elasticsearch
       - run:
           name: build
           command: docker-compose build addresses-api-test
       - run:
           name: Run tests
-          command: docker-compose run addresses-api-test
+          command: |
+            docker-compose up -d test-elasticsearch
+            docker-compose run addresses-api-test
   assume-role-development:
     executor: docker-python
     steps:
