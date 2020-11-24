@@ -30,7 +30,7 @@ namespace AddressesAPI.Tests.V2.Gateways
         public async Task ItWillGetAnAddressFromTheDatabase()
         {
             var addressKey = _faker.Random.String2(14);
-            await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient, addressKey).ConfigureAwait(true);
+            await TestDataHelper.InsertAddressInEs(ElasticsearchClient, addressKey).ConfigureAwait(true);
             var request = new SearchParameters
             {
                 Page = 1,
@@ -51,12 +51,12 @@ namespace AddressesAPI.Tests.V2.Gateways
         [TestCase("E7 4TT", "e7")]
         public async Task WillSearchPostcodeForAMatch(string savedPostcode, string postcodeSearch)
         {
-            var savedAddress = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
+            var savedAddress = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
                 addressConfig: new QueryableAddress { Postcode = savedPostcode }
                 ).ConfigureAwait(true);
 
             var randomPostcode = $"NW{_faker.Random.Int(1, 9)} {_faker.Random.Int(1, 9)}TY";
-            await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
+            await TestDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
             {
                 Postcode = randomPostcode
             }).ConfigureAwait(true);
@@ -79,14 +79,13 @@ namespace AddressesAPI.Tests.V2.Gateways
         [TestCase("E7 4TT", "e7 5tt")]
         public async Task PostcodeThatShouldNotMatch(string savedPostcode, string postcodeSearch)
         {
-            await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
+            await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
                 addressConfig: new QueryableAddress { Postcode = savedPostcode }
             ).ConfigureAwait(true);
             var request = new SearchParameters
             {
                 Page = 1,
                 PageSize = 50,
-                Format = GlobalConstants.Format.Detailed,
                 Gazetteer = GlobalConstants.Gazetteer.Both,
                 Postcode = postcodeSearch
             };
@@ -99,10 +98,10 @@ namespace AddressesAPI.Tests.V2.Gateways
         [TestCase("123383833", "383")]
         public async Task WillSearchBuildingsNumbersForAMatch(string savedBuildingNumber, string buildingNumberSearch)
         {
-            var savedAddress = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
+            var savedAddress = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
                 addressConfig: new QueryableAddress { BuildingNumber = savedBuildingNumber }
             ).ConfigureAwait(true);
-            await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
+            await TestDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
             var request = new SearchParameters
             {
                 Page = 1,
@@ -123,10 +122,10 @@ namespace AddressesAPI.Tests.V2.Gateways
         [TestCase("yellow street", "YELLOWstreet")]
         public async Task WillSearchStreetForAMatch(string savedStreet, string streetSearch)
         {
-            var savedAddress = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
+            var savedAddress = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
                 addressConfig: new QueryableAddress { Street = savedStreet }
             ).ConfigureAwait(true);
-            await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
+            await TestDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
             var request = new SearchParameters
             {
                 Page = 1,
@@ -152,11 +151,11 @@ namespace AddressesAPI.Tests.V2.Gateways
         [TestCase("Provisional", new[] { "Historical", "provisional" })]
         public async Task WillSearchForAddressesWithStatus(string savedStatus, IEnumerable<string> statusSearchTerm)
         {
-            var savedAddress = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
+            var savedAddress = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
                 addressConfig: new QueryableAddress { AddressStatus = savedStatus }
             ).ConfigureAwait(true);
 
-            await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
+            await TestDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
             {
                 AddressStatus = savedStatus == "Provisional" ? "Alternative" : "Provisional"
             }).ConfigureAwait(true);
@@ -176,9 +175,9 @@ namespace AddressesAPI.Tests.V2.Gateways
         [Test]
         public async Task IfNoAddressStatusSearchGivenDefaultsToApprovedPreferred()
         {
-            var savedAddress = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
+            var savedAddress = await TestDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
 
-            await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
+            await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
                 addressConfig: new QueryableAddress { AddressStatus = "Historical" }).ConfigureAwait(true);
             var request = new SearchParameters
             {
@@ -196,10 +195,10 @@ namespace AddressesAPI.Tests.V2.Gateways
         public async Task WillSearchUprnsForAMatch()
         {
             var uprn = _faker.Random.Number(10000000, 99999999);
-            var savedAddress = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
+            var savedAddress = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
                 addressConfig: new QueryableAddress { UPRN = uprn }
             ).ConfigureAwait(true);
-            await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
+            await TestDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
             var request = new SearchParameters
             {
                 Page = 1,
@@ -217,10 +216,10 @@ namespace AddressesAPI.Tests.V2.Gateways
         public async Task WillSearchUsrnsForAMatch()
         {
             var uprn = _faker.Random.Number(10000000, 99999999);
-            var savedAddress = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
+            var savedAddress = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
                 addressConfig: new QueryableAddress { USRN = uprn }
             ).ConfigureAwait(true);
-            await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
+            await TestDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
             var request = new SearchParameters
             {
                 Page = 1,
@@ -247,10 +246,10 @@ namespace AddressesAPI.Tests.V2.Gateways
         [TestCase("Military", "Military,Dual Use")]
         public async Task WillSearchForAnAddressesPrimaryUsage(string savedUsage, string usageSearchTerm)
         {
-            var savedAddress = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
+            var savedAddress = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
                 addressConfig: new QueryableAddress { UsagePrimary = savedUsage }
             ).ConfigureAwait(true);
-            await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
+            await TestDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
             {
                 UsagePrimary = savedUsage == "Commercial" ? "Military" : "Commercial"
             }).ConfigureAwait(true);
@@ -273,11 +272,11 @@ namespace AddressesAPI.Tests.V2.Gateways
         [TestCase("A2", "a2,C5")]
         public async Task WillSearchForAnAddressesUsageCodeFromAList(string savedUsage, string usageSearchTerm)
         {
-            var savedAddress = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
+            var savedAddress = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
                 addressConfig: new QueryableAddress { UsageCode = savedUsage }
             ).ConfigureAwait(true);
 
-            await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
+            await TestDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
             {
                 UsageCode = "B7"
             }).ConfigureAwait(true);
@@ -285,7 +284,6 @@ namespace AddressesAPI.Tests.V2.Gateways
             {
                 Page = 1,
                 PageSize = 50,
-                Format = GlobalConstants.Format.Detailed,
                 Gazetteer = GlobalConstants.Gazetteer.Both,
                 UsageCode = usageSearchTerm
             };
@@ -301,10 +299,10 @@ namespace AddressesAPI.Tests.V2.Gateways
         [TestCase("hackney")]
         public async Task CanSearchOnlyLocalHackneyAddressesCaseInsensitively(string gazetteer)
         {
-            var savedAddress = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
+            var savedAddress = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
                 addressConfig: new QueryableAddress { Gazetteer = gazetteer }
             ).ConfigureAwait(true);
-            await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
+            await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
                 addressConfig: new QueryableAddress { Gazetteer = "National" }
             ).ConfigureAwait(true);
             var request = new SearchParameters
@@ -322,10 +320,10 @@ namespace AddressesAPI.Tests.V2.Gateways
         [Test]
         public async Task WillFilterHackneyAddressByOutOfBoroughAddresses()
         {
-            var outOfBorough = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
+            var outOfBorough = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
                 addressConfig: new QueryableAddress { OutOfBoroughAddress = true, Gazetteer = "Hackney" }
             ).ConfigureAwait(true);
-            var hackneyAddress = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
+            var hackneyAddress = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
                 addressConfig: new QueryableAddress { OutOfBoroughAddress = false, Gazetteer = "Hackney" }
             ).ConfigureAwait(true);
             var request = new SearchParameters
@@ -344,10 +342,10 @@ namespace AddressesAPI.Tests.V2.Gateways
         [Test]
         public async Task WillFilterOutAllQueryableAddressesWhenQueryingForNoOutOfBoroughAddresses()
         {
-            var outOfBorough1 = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
+            var outOfBorough1 = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
                 addressConfig: new QueryableAddress { OutOfBoroughAddress = true, Gazetteer = "National" }
             ).ConfigureAwait(true);
-            var outOfBorough2 = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
+            var outOfBorough2 = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
                 addressConfig: new QueryableAddress { OutOfBoroughAddress = false, Gazetteer = "National" }
             ).ConfigureAwait(true);
             var request = new SearchParameters
@@ -365,16 +363,16 @@ namespace AddressesAPI.Tests.V2.Gateways
         [Test]
         public async Task IfOutOfBoroughFlagIsTrueReturnsAllAddresses()
         {
-            await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
+            await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
                 addressConfig: new QueryableAddress { OutOfBoroughAddress = true, Gazetteer = "Hackney" }
             ).ConfigureAwait(true);
-            await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
+            await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
                 addressConfig: new QueryableAddress { OutOfBoroughAddress = false, Gazetteer = "Hackney" }
             ).ConfigureAwait(true);
-            await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
+            await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
                 addressConfig: new QueryableAddress { OutOfBoroughAddress = false, Gazetteer = "National" }
             ).ConfigureAwait(true);
-            await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
+            await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
                 addressConfig: new QueryableAddress { OutOfBoroughAddress = true, Gazetteer = "National" }
             ).ConfigureAwait(true);
             var request = new SearchParameters
@@ -395,14 +393,14 @@ namespace AddressesAPI.Tests.V2.Gateways
             //--- Cross reference for address one
             var uprnOne = _faker.Random.Long(10000000, 99999999);
 
-            var addressOne = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
+            var addressOne = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
                 addressConfig: new QueryableAddress { UPRN = uprnOne }
             ).ConfigureAwait(true);
 
             //--- Cross reference for address two
             var uprnTwo = _faker.Random.Long(10000000, 99999999);
 
-            var addressTwo = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
+            var addressTwo = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
                 addressConfig: new QueryableAddress { UPRN = uprnTwo }
             ).ConfigureAwait(true);
 
@@ -427,11 +425,11 @@ namespace AddressesAPI.Tests.V2.Gateways
         [Test]
         public async Task IfSetToExcludeParentShellsWillOnlyReturnsResultsOfSearch()
         {
-            var parentShell = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
-            var addressToMatch = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
+            var parentShell = await TestDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
+            var addressToMatch = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
                 addressConfig: new QueryableAddress { ParentUPRN = parentShell.UPRN }
             ).ConfigureAwait(true);
-            await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
+            await TestDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
 
             var request = new SearchParameters
             {
@@ -450,17 +448,16 @@ namespace AddressesAPI.Tests.V2.Gateways
         [Test]
         public async Task IfSetToIncludeParentShellsIncludeImmediateParentShells()
         {
-            var parentShell = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
-            var addressToMatch = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
+            var parentShell = await TestDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
+            var addressToMatch = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
                 addressConfig: new QueryableAddress { ParentUPRN = parentShell.UPRN }
             ).ConfigureAwait(true);
-            await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
+            await TestDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
 
             var request = new SearchParameters
             {
                 Page = 1,
                 PageSize = 50,
-                Format = GlobalConstants.Format.Detailed,
                 Gazetteer = GlobalConstants.Gazetteer.Both,
                 Postcode = addressToMatch.Postcode,
                 IncludeParentShells = true
@@ -475,22 +472,21 @@ namespace AddressesAPI.Tests.V2.Gateways
         [Test]
         public async Task IfSetToIncludeParentShellsWillIncludeParentShellsInTotalCount()
         {
-            var parentShell = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
-            var addressOneToMatch = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
+            var parentShell = await TestDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
+            var addressOneToMatch = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
                 addressConfig: new QueryableAddress { ParentUPRN = parentShell.UPRN }
             ).ConfigureAwait(true);
-            var parentShellTwo = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
-            var addressTwoToMatch = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
+            var parentShellTwo = await TestDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
+            var addressTwoToMatch = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
                 addressConfig: new QueryableAddress { ParentUPRN = parentShellTwo.UPRN, Postcode = addressOneToMatch.Postcode }
             ).ConfigureAwait(true);
 
-            await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
+            await TestDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
 
             var request = new SearchParameters
             {
                 Page = 1,
                 PageSize = 2,
-                Format = GlobalConstants.Format.Detailed,
                 Gazetteer = GlobalConstants.Gazetteer.Both,
                 Postcode = addressOneToMatch.Postcode,
                 IncludeParentShells = true
@@ -504,13 +500,13 @@ namespace AddressesAPI.Tests.V2.Gateways
         [Test]
         public async Task IfSetToIncludeParentShellsIncludeParentShellsOfParentsShells()
         {
-            var grandParentShell = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
-            var parentShell = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
+            var grandParentShell = await TestDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
+            var parentShell = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
                 addressConfig: new QueryableAddress { ParentUPRN = grandParentShell.UPRN }).ConfigureAwait(true);
-            var addressToMatch = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
+            var addressToMatch = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
                 addressConfig: new QueryableAddress { ParentUPRN = parentShell.UPRN }
             ).ConfigureAwait(true);
-            await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
+            await TestDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
 
             var request = new SearchParameters
             {
@@ -532,10 +528,10 @@ namespace AddressesAPI.Tests.V2.Gateways
         [TestCase("N1 5TH")]
         public async Task IfSetToExcludeParentShellsWillNotReturnAnyParentShells(string postcode)
         {
-            var parentShell = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
+            var parentShell = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
                 addressConfig: new QueryableAddress { PropertyShell = true, Postcode = postcode }
             ).ConfigureAwait(true);
-            var notAParentShell = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient,
+            var notAParentShell = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
                 addressConfig: new QueryableAddress { PropertyShell = false, Postcode = postcode }
             ).ConfigureAwait(true);
 
@@ -543,7 +539,6 @@ namespace AddressesAPI.Tests.V2.Gateways
             {
                 Page = 1,
                 PageSize = 50,
-                Format = GlobalConstants.Format.Detailed,
                 Gazetteer = GlobalConstants.Gazetteer.Both,
                 Postcode = postcode,
                 IncludeParentShells = false
@@ -561,13 +556,13 @@ namespace AddressesAPI.Tests.V2.Gateways
         [Test]
         public async Task WillFirstlyOrderByTown()
         {
-            var addressOne = await TestEfDataHelper
+            var addressOne = await TestDataHelper
                 .InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress {Town = "town a"})
                 .ConfigureAwait(true);
-            var addressTwo = await TestEfDataHelper
+            var addressTwo = await TestDataHelper
                 .InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress {Town = "town b"})
                 .ConfigureAwait(true);
-            var addressThree = await TestEfDataHelper
+            var addressThree = await TestDataHelper
                 .InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress {Town = "hackney"})
                 .ConfigureAwait(true);
 
@@ -588,13 +583,13 @@ namespace AddressesAPI.Tests.V2.Gateways
         [Test]
         public async Task WillSecondlyOrderByPostcodePresence()
         {
-            var addressOne = await TestEfDataHelper
+            var addressOne = await TestDataHelper
                 .InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress { Town = "town a", Postcode = "" })
                 .ConfigureAwait(true);
-            var addressTwo = await TestEfDataHelper
+            var addressTwo = await TestDataHelper
                 .InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress { Town = "town a", Postcode = "E3 4TT" })
                 .ConfigureAwait(true);
-            var addressThree = await TestEfDataHelper
+            var addressThree = await TestDataHelper
                 .InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress { Town = "town b" })
                 .ConfigureAwait(true);
 
@@ -615,13 +610,13 @@ namespace AddressesAPI.Tests.V2.Gateways
         [Test]
         public async Task WillThirdlyOrderByStreet()
         {
-            var addressOne = await TestEfDataHelper
+            var addressOne = await TestDataHelper
                 .InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress { Town = "town b" })
                 .ConfigureAwait(true);
-            var addressTwo = await TestEfDataHelper
+            var addressTwo = await TestDataHelper
                 .InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress { Town = "town a", Postcode = "", Street = "B Street" })
                 .ConfigureAwait(true);
-            var addressThree = await TestEfDataHelper
+            var addressThree = await TestDataHelper
                 .InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress { Town = "town a", Postcode = "", Street = "A Street" })
                 .ConfigureAwait(true);
             var request = new SearchParameters
@@ -641,21 +636,21 @@ namespace AddressesAPI.Tests.V2.Gateways
         [Test]
         public async Task WillFourthlyOrderByPresenceAndOrderOfPaonStartNumber()
         {
-            var addressOne = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
+            var addressOne = await TestDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
             {
                 Town = "town a",
                 Postcode = "",
                 Street = "B Street",
                 PaonStartNumber = 3
             }).ConfigureAwait(true);
-            var addressTwo = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
+            var addressTwo = await TestDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
             {
                 Town = "town a",
                 Postcode = "",
                 Street = "B Street",
                 PaonStartNumber = 0
             }).ConfigureAwait(true);
-            var addressThree = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
+            var addressThree = await TestDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
             {
                 Town = "town a",
                 Postcode = "",
@@ -679,7 +674,7 @@ namespace AddressesAPI.Tests.V2.Gateways
         [Test]
         public async Task WillFifthlyOrderByPresenceAndOrderOfBuildingNumber()
         {
-            var addressOne = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
+            var addressOne = await TestDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
             {
                 Town = "town a",
                 Postcode = "",
@@ -687,7 +682,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 PaonStartNumber = 1,
                 BuildingNumber = ""
             }).ConfigureAwait(true);
-            var addressTwo = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
+            var addressTwo = await TestDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
             {
                 Town = "town a",
                 Postcode = "",
@@ -695,7 +690,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 PaonStartNumber = 1,
                 BuildingNumber = "78"
             }).ConfigureAwait(true);
-            var addressThree = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
+            var addressThree = await TestDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
             {
                 Town = "town a",
                 Postcode = "",
@@ -720,7 +715,7 @@ namespace AddressesAPI.Tests.V2.Gateways
         [Test]
         public async Task WillSixthOrderByPresenceAndOrderOfUnitNumber()
         {
-            var addressOne = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
+            var addressOne = await TestDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
             {
                 Town = "town a",
                 Postcode = "",
@@ -729,7 +724,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 BuildingNumber = "78",
                 UnitNumber = "43"
             }).ConfigureAwait(true);
-            var addressTwo = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
+            var addressTwo = await TestDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
             {
                 Town = "town a",
                 Postcode = "",
@@ -738,7 +733,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 BuildingNumber = "78",
                 UnitNumber = ""
             }).ConfigureAwait(true);
-            var addressThree = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
+            var addressThree = await TestDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
             {
                 Town = "town a",
                 Postcode = "",
@@ -764,7 +759,7 @@ namespace AddressesAPI.Tests.V2.Gateways
         [Test]
         public async Task WillInTheSeventhCaseOrderByPresenceAndOrderOfUnitName()
         {
-            var addressOne = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
+            var addressOne = await TestDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
             {
                 Town = "town a",
                 Postcode = "",
@@ -774,7 +769,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 UnitNumber = "43",
                 UnitName = "J name"
             }).ConfigureAwait(true);
-            var addressTwo = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
+            var addressTwo = await TestDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
             {
                 Town = "town a",
                 Postcode = "",
@@ -784,7 +779,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 UnitNumber = "43",
                 UnitName = "A name"
             }).ConfigureAwait(true);
-            var addressThree = await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
+            var addressThree = await TestDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
             {
                 Town = "town a",
                 Postcode = "",
@@ -901,7 +896,7 @@ namespace AddressesAPI.Tests.V2.Gateways
             var records = new List<QueryableAddress>();
             for (var i = 0; i < count; i++)
             {
-                records.Add(await TestEfDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
+                records.Add(await TestDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
                 {
                     Town = towns.ElementAt(i),
                     Postcode = postcodes.ElementAt(i),

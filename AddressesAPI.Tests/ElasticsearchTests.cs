@@ -1,9 +1,7 @@
 using System;
 using System.IO;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using AddressesAPI.Infrastructure;
+using Elasticsearch.Net;
 using Nest;
 using NUnit.Framework;
 
@@ -33,11 +31,11 @@ namespace AddressesAPI.Tests
             DeleteAddressesIndex(ElasticsearchClient);
         }
 
-        public async Task BeforeAnyElasticsearchTest(ElasticClient client)
+        public static async Task BeforeAnyElasticsearchTest(ElasticClient client)
         {
             DeleteAddressesIndex(client);
-            await CreateIndex("hackney_addresses").ConfigureAwait(true);
-            await CreateIndex("national_addresses").ConfigureAwait(true);
+            await CreateIndex("hackney_addresses", client).ConfigureAwait(true);
+            await CreateIndex("national_addresses", client).ConfigureAwait(true);
         }
         public ElasticClient SetupElasticsearchConnection()
         {
@@ -49,17 +47,13 @@ namespace AddressesAPI.Tests
             return new ElasticClient(settings);
         }
 
-        private async Task CreateIndex(string name)
+        private static async Task CreateIndex(string name, ElasticClient client)
         {
             var settingsDoc = await File.ReadAllTextAsync("./../../../../data/elasticsearch/index.json")
                 .ConfigureAwait(true);
-            var httpClient = new HttpClient();
-            var content = new StringContent(settingsDoc);
-            content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
-            await httpClient.PutAsync(new Uri(_esDomainUri + "/" + name), content)
+
+            await client.LowLevel.Indices.CreateAsync<BytesResponse>(name, settingsDoc)
                 .ConfigureAwait(true);
-            content.Dispose();
-            httpClient.Dispose();
         }
 
         public static void DeleteAddressesIndex(ElasticClient client)

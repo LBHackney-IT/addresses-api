@@ -7,8 +7,6 @@ namespace AddressesAPI.V2.Gateways
     {
         Address GetSingleAddress(string addressKey);
 
-        (List<Address>, int) SearchAddresses(SearchParameters request);
-
         List<Address> GetAddresses(List<string> addressKeys, GlobalConstants.Format format);
 
         List<long> GetMatchingCrossReferenceUprns(string code, string value);

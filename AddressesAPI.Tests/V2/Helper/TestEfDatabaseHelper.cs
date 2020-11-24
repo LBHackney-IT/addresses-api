@@ -6,7 +6,7 @@ using static Elasticsearch.Net.Refresh;
 
 namespace AddressesAPI.Tests.V2.Helper
 {
-    public static class TestEfDataHelper
+    public static class TestDataHelper
     {
         public static async Task<NationalAddress> InsertAddressInDbAndEs(AddressesContext context, ElasticClient elasticClient, string key = null,
             NationalAddress request = null)

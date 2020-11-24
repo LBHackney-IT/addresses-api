@@ -24,27 +24,6 @@ namespace AddressesAPI.V2.Gateways
             return addressRecord?.ToDomain();
         }
 
-        public (List<V2.Domain.Address>, int) SearchAddresses(SearchParameters request)
-        {
-            var baseQuery = CompileBaseSearchQuery(request);
-            var baseAddresses = baseQuery;
-
-            if (request.IncludeParentShells)
-            {
-                baseAddresses = GetParentShells(baseQuery, baseAddresses);
-            }
-
-            var totalCount = baseAddresses.Count();
-
-            var addresses = PageAddresses(OrderAddresses(baseAddresses), request.PageSize, request.Page)
-                .Select(
-                    a => request.Format == GlobalConstants.Format.Simple ? a.ToSimpleDomain() : a.ToDomain()
-                )
-                .ToList();
-
-            return (addresses, totalCount);
-        }
-
         public List<Domain.Address> GetAddresses(List<string> addressKeys, GlobalConstants.Format format)
         {
             var addresses = _addressesContext.Addresses

@@ -20,7 +20,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
         public async Task GetAddressReturns200WithValidAddressIdParameter()
         {
             var addressId = _faker.Random.String2(14);
-            TestEfDataHelper.InsertAddressInDb(DatabaseContext, addressId);
+            TestDataHelper.InsertAddressInDb(DatabaseContext, addressId);
 
             var url = new Uri($"api/v2/addresses/{addressId}", UriKind.Relative);
 
@@ -37,7 +37,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
                 .With(add => add.AddressKey, addressId)
                 .Create();
 
-            TestEfDataHelper.InsertAddressInDb(DatabaseContext, addressId, addressRecord);
+            TestDataHelper.InsertAddressInDb(DatabaseContext, addressId, addressRecord);
 
             var url = new Uri($"api/v2/addresses/{addressId}", UriKind.Relative);
 
@@ -65,7 +65,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
         {
 
             var addressId = _faker.Random.String2(14);
-            TestEfDataHelper.InsertAddressInDb(DatabaseContext, addressId);
+            TestDataHelper.InsertAddressInDb(DatabaseContext, addressId);
 
             var incorrectLength = addressId.Substring(0, 10);
 
@@ -85,7 +85,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
         {
 
             var addressId = _faker.Random.String2(14);
-            TestEfDataHelper.InsertAddressInDb(DatabaseContext, addressId);
+            TestDataHelper.InsertAddressInDb(DatabaseContext, addressId);
 
             var differentId = _faker.Random.String2(14);
 

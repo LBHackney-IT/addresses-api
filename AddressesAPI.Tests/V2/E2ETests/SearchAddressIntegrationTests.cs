@@ -21,7 +21,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
         public async Task SearchAddressReturns200()
         {
             var addressKey = "eytshdnshsuahs";
-            await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, addressKey).ConfigureAwait(true);
+            await TestDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, addressKey).ConfigureAwait(true);
 
             var queryString = "postcode=E8";
 
@@ -34,7 +34,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
         {
             var addressKey = _faker.Random.String2(14);
             var postcode = "E4 2JH";
-            var record = await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, addressKey,
+            var record = await TestDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, addressKey,
                 new NationalAddress { Postcode = postcode }).ConfigureAwait(true);
             await AddSomeRandomAddressToTheDatabase().ConfigureAwait(true);
 
@@ -55,7 +55,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
             {
                 UPRN = _faker.Random.Int(),
             };
-            var record = await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, addressKey, queryParameters)
+            var record = await TestDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, addressKey, queryParameters)
                 .ConfigureAwait(true);
             await AddSomeRandomAddressToTheDatabase().ConfigureAwait(true);
 
@@ -78,7 +78,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
                 USRN = _faker.Random.Int(),
                 AddressStatus = "Historical"
             };
-            await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, addressKey, queryParameters)
+            await TestDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, addressKey, queryParameters)
                 .ConfigureAwait(true);
             await AddSomeRandomAddressToTheDatabase().ConfigureAwait(true);
 
@@ -107,7 +107,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
                 Postcode = "E41JJ",
                 AddressStatus = "Historical"
             };
-            await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, addressKey, addressDetails)
+            await TestDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, addressKey, addressDetails)
                 .ConfigureAwait(true);
             await AddSomeRandomAddressToTheDatabase().ConfigureAwait(true);
             var queryString = $"uprn={addressDetails.UPRN}&address_status=Historical&format=Simple&address_scope=national";
@@ -135,7 +135,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
                 UPRN = _faker.Random.Int(),
                 Gazetteer = "National"
             };
-            var record = await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, addressKey, dbOptions)
+            var record = await TestDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, addressKey, dbOptions)
                 .ConfigureAwait(true);
 
             await AddSomeRandomAddressToTheDatabase(count: 3).ConfigureAwait(true);
@@ -155,13 +155,13 @@ namespace AddressesAPI.Tests.V2.E2ETests
         [TestCase("Hackney Borough")]
         public async Task SettingAddressScopeToHackneyBoroughWillOnlyReturnAddressesInHackney(string addressScope)
         {
-            var hackneyOutOfBorough = await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient,
+            var hackneyOutOfBorough = await TestDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient,
                 request: new NationalAddress { Postcode = "N1 3JH", Gazetteer = "Hackney", NeverExport = true }).ConfigureAwait(true);
 
-            var hackneyInBorough = await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient,
+            var hackneyInBorough = await TestDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient,
                 request: new NationalAddress { Postcode = "N1 7YH", Gazetteer = "Hackney", NeverExport = false }).ConfigureAwait(true);
 
-            var nationalAddress = await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient,
+            var nationalAddress = await TestDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient,
                 request: new NationalAddress { Postcode = "N1 7UK", Gazetteer = "National" }).ConfigureAwait(true);
 
             var queryString = $"postcode=N1&format=Detailed&address_scope={addressScope}";
@@ -180,7 +180,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
             {
                 UPRN = _faker.Random.Int(1, 287987129),
             };
-            await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, blockAddressKey, blockOfFlats)
+            await TestDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, blockAddressKey, blockOfFlats)
                 .ConfigureAwait(true);
 
             var flatAddressKey = _faker.Random.String2(14);
@@ -188,7 +188,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
             {
                 ParentUPRN = blockOfFlats.UPRN,
             };
-            var flatRecord = await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, flatAddressKey, flat)
+            var flatRecord = await TestDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, flatAddressKey, flat)
                 .ConfigureAwait(true);
 
             await AddSomeRandomAddressToTheDatabase().ConfigureAwait(true);
@@ -243,14 +243,14 @@ namespace AddressesAPI.Tests.V2.E2ETests
             var hackneyBoroughOne = new NationalAddress { UPRN = uprnOne, Gazetteer = "Hackney", NeverExport = false };
             var hackneyBoroughTwo = new NationalAddress { UPRN = uprnTwo, Gazetteer = "Hackney", NeverExport = false };
 
-            var record = await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient,
+            var record = await TestDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient,
                 request: hackneyBoroughOne).ConfigureAwait(true);
 
-            TestEfDataHelper.InsertCrossReference(DatabaseContext, uprnOne, crossReferenceOne);
+            TestDataHelper.InsertCrossReference(DatabaseContext, uprnOne, crossReferenceOne);
 
-            await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, request: hackneyBoroughTwo).ConfigureAwait(true);
+            await TestDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, request: hackneyBoroughTwo).ConfigureAwait(true);
 
-            TestEfDataHelper.InsertCrossReference(DatabaseContext, uprnTwo, crossReferenceTwo);
+            TestDataHelper.InsertCrossReference(DatabaseContext, uprnTwo, crossReferenceTwo);
 
             await AddSomeRandomAddressToTheDatabase().ConfigureAwait(true);
 
@@ -274,7 +274,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
                     .With(a => a.Gazetteer, gazetteer)
                     .Without(a => a.ParentUPRN)
                     .Create();
-                await TestEfDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, addressKey, randomAddress)
+                await TestDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, addressKey, randomAddress)
                     .ConfigureAwait(true);
             }
         }
