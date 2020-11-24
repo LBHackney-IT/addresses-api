@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using AddressesAPI.V2;
 using AddressesAPI.V2.Boundary.Requests;
 using AddressesAPI.V2.Boundary.Responses;
@@ -77,7 +78,7 @@ namespace AddressesAPI.Tests.V2.UseCase
                         && x.IncludeParentShells == request.IncludeParentShells
                         && x.CrossRefCode == request.CrossRefCode
                         && x.CrossRefValue == request.CrossRefValue)))
-                .Returns((new List<string>(), 1)).Verifiable();
+                .ReturnsAsync((new List<string>(), 1)).Verifiable();
 
             _classUnderTest.ExecuteAsync(request);
             _addressGateway.Verify();
@@ -99,7 +100,7 @@ namespace AddressesAPI.Tests.V2.UseCase
             };
             _searchAddressGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(i =>
                     i.Gazetteer.Equals(expectedGazetteer) && i.OutOfBoroughAddress.Equals(expectedOutOfBorough))))
-                .Returns((null, 0)).Verifiable();
+                .ReturnsAsync((null, 0)).Verifiable();
             _classUnderTest.ExecuteAsync(request);
             _addressGateway.Verify();
         }
@@ -116,7 +117,7 @@ namespace AddressesAPI.Tests.V2.UseCase
             };
             _searchAddressGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(i =>
                     i.AddressStatus.SequenceEqual(expectedList))))
-                .Returns((null, 0)).Verifiable();
+                .ReturnsAsync((null, 0)).Verifiable();
             _classUnderTest.ExecuteAsync(request);
             _addressGateway.Verify();
         }
@@ -137,7 +138,7 @@ namespace AddressesAPI.Tests.V2.UseCase
                 .Returns(uprns).Verifiable();
             _searchAddressGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(i =>
                     i.CrossReferencedUprns.SequenceEqual(uprns))))
-                .Returns((null, 0)).Verifiable();
+                .ReturnsAsync((null, 0)).Verifiable();
             _classUnderTest.ExecuteAsync(request);
 
             _addressGateway.Verify();
@@ -145,22 +146,22 @@ namespace AddressesAPI.Tests.V2.UseCase
         }
 
         [Test]
-        public void GivenValidInput_WhenSearchGatewayRespondsWithNull_ThenResponseShouldBeNull()
+        public async Task GivenValidInput_WhenSearchGatewayRespondsWithNull_ThenResponseShouldBeNull()
         {
             SetupValidatorToReturnValid();
             //arrange
             _searchAddressGateway.Setup(s => s.SearchAddresses(It.IsAny<SearchParameters>()))
-                .Returns((null, 0));
+                .ReturnsAsync((null, 0));
 
             //act
-            var response = _classUnderTest.ExecuteAsync(new SearchAddressRequest());
+            var response = await _classUnderTest.ExecuteAsync(new SearchAddressRequest()).ConfigureAwait(true);
             //assert
             response.Addresses.Should().BeNull();
         }
 
         [TestCase(GlobalConstants.Format.Simple)]
         [TestCase(GlobalConstants.Format.Detailed)]
-        public void GivenValidInput_Execute_ShouldRetrieveAddressDetailsFromTheGateway(GlobalConstants.Format format)
+        public async Task GivenValidInput_Execute_ShouldRetrieveAddressDetailsFromTheGateway(GlobalConstants.Format format)
         {
             SetupValidatorToReturnValid();
 
@@ -174,18 +175,18 @@ namespace AddressesAPI.Tests.V2.UseCase
             };
             _searchAddressGateway.Setup(s =>
                     s.SearchAddresses(It.Is<SearchParameters>(i => i.Postcode.Equals(postcode))))
-                .Returns((addressKeyList, 1));
+                .ReturnsAsync((addressKeyList, 1));
             _addressGateway.Setup(s => s.GetAddresses(addressKeyList, format))
                 .Returns(addresses);
 
-            var response = _classUnderTest.ExecuteAsync(request);
+            var response = await _classUnderTest.ExecuteAsync(request).ConfigureAwait(true);
 
             response.Should().NotBeNull();
             response.Addresses.Should().BeEquivalentTo(addresses.ToResponse());
         }
 
         [Test]
-        public void GivenValidInput_WhenExecute_ThenAddressesShouldBeReturnedWithCount()
+        public async Task GivenValidInput_WhenExecute_ThenAddressesShouldBeReturnedWithCount()
         {
             SetupValidatorToReturnValid();
 
@@ -196,18 +197,18 @@ namespace AddressesAPI.Tests.V2.UseCase
 
             _searchAddressGateway.Setup(s =>
                     s.SearchAddresses(It.IsAny<SearchParameters>()))
-                .Returns((addressKeyList, totalCount));
+                .ReturnsAsync((addressKeyList, totalCount));
             _addressGateway.Setup(s => s.GetAddresses(addressKeyList, GlobalConstants.Format.Simple))
                 .Returns(addresses);
 
-            var response = _classUnderTest.ExecuteAsync(new SearchAddressRequest());
+            var response = await _classUnderTest.ExecuteAsync(new SearchAddressRequest()).ConfigureAwait(false);
 
             response.Addresses.Count.Should().Be(numberOfAddressesInPage);
             response.TotalCount.Should().Be(totalCount);
         }
 
         [Test]
-        public void GivenPageZero_WhenExecute_ReturnsPageOne()
+        public async Task GivenPageZero_WhenExecute_ReturnsPageOneAsync()
         {
             SetupValidatorToReturnValid();
             //arrange
@@ -216,7 +217,7 @@ namespace AddressesAPI.Tests.V2.UseCase
                 Page = 0
             };
             //act
-            _classUnderTest.ExecuteAsync(request);
+            await _classUnderTest.ExecuteAsync(request).ConfigureAwait(true);
 
             //assert
             _searchAddressGateway.Verify(s => s.SearchAddresses(
@@ -227,7 +228,7 @@ namespace AddressesAPI.Tests.V2.UseCase
         public void GivenInvalidInput_WhenExecute_ThrowsValidationError()
         {
             SetupValidatorToReturnValid(false);
-            Func<SearchAddressResponse> testDelegate = () => _classUnderTest.ExecuteAsync(new SearchAddressRequest());
+            Func<Task<SearchAddressResponse>> testDelegate = async () => await _classUnderTest.ExecuteAsync(new SearchAddressRequest()).ConfigureAwait(true);
             testDelegate.Should().Throw<BadRequestException>();
         }
 

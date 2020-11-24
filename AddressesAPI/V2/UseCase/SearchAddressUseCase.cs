@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using AddressesAPI.V2.Boundary.Requests;
 using AddressesAPI.V2.Boundary.Responses;
 using AddressesAPI.V2.Boundary.Responses.Metadata;
@@ -24,7 +25,7 @@ namespace AddressesAPI.V2.UseCase
             _requestValidator = requestValidator;
         }
 
-        public SearchAddressResponse ExecuteAsync(SearchAddressRequest request)
+        public async Task<SearchAddressResponse> ExecuteAsync(SearchAddressRequest request)
         {
             var validation = _requestValidator.Validate(request);
             if (!validation.IsValid)
@@ -38,7 +39,7 @@ namespace AddressesAPI.V2.UseCase
                 searchParameters.CrossReferencedUprns =
                     _addressGateway.GetMatchingCrossReferenceUprns(request.CrossRefCode, request.CrossRefValue);
             }
-            var (addressKeys, totalCount) = _searchAddressesGateway.SearchAddresses(searchParameters);
+            var (addressKeys, totalCount) = await _searchAddressesGateway.SearchAddresses(searchParameters);
 
             var format = Enum.Parse<GlobalConstants.Format>(request.Format, true);
             var results = _addressGateway.GetAddresses(addressKeys, format);

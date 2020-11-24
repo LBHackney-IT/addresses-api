@@ -37,7 +37,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 PageSize = 50,
                 Gazetteer = GlobalConstants.Gazetteer.Both
             };
-            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(1);
             addresses.First().Should().Be(addressKey);
@@ -67,7 +67,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 Gazetteer = GlobalConstants.Gazetteer.Both,
                 Postcode = postcodeSearch
             };
-            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(1);
             addresses.First().Should().BeEquivalentTo(savedAddress.AddressKey);
@@ -90,7 +90,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 Gazetteer = GlobalConstants.Gazetteer.Both,
                 Postcode = postcodeSearch
             };
-            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(0);
         }
@@ -110,7 +110,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 Gazetteer = GlobalConstants.Gazetteer.Both,
                 BuildingNumber = buildingNumberSearch
             };
-            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(1);
             addresses.First().Should().BeEquivalentTo(savedAddress.AddressKey);
@@ -134,7 +134,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 Gazetteer = GlobalConstants.Gazetteer.Both,
                 Street = streetSearch
             };
-            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(1);
             addresses.First().Should().BeEquivalentTo(savedAddress.AddressKey);
@@ -167,7 +167,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 Gazetteer = GlobalConstants.Gazetteer.Both,
                 AddressStatus = statusSearchTerm
             };
-            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(1);
             addresses.First().Should().BeEquivalentTo(savedAddress.AddressKey);
@@ -186,7 +186,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 PageSize = 50,
                 Gazetteer = GlobalConstants.Gazetteer.Both,
             };
-            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(1);
             addresses.First().Should().BeEquivalentTo(savedAddress.AddressKey);
@@ -207,7 +207,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 Gazetteer = GlobalConstants.Gazetteer.Both,
                 Uprn = uprn
             };
-            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(1);
             addresses.First().Should().BeEquivalentTo(savedAddress.AddressKey);
@@ -228,7 +228,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 Gazetteer = GlobalConstants.Gazetteer.Both,
                 Usrn = uprn
             };
-            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(1);
             addresses.First().Should().BeEquivalentTo(savedAddress.AddressKey);
@@ -261,7 +261,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 Gazetteer = GlobalConstants.Gazetteer.Both,
                 UsagePrimary = usageSearchTerm
             };
-            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(1);
             addresses.First().Should().BeEquivalentTo(savedAddress.AddressKey);
@@ -289,7 +289,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 Gazetteer = GlobalConstants.Gazetteer.Both,
                 UsageCode = usageSearchTerm
             };
-            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(1);
             addresses.First().Should().BeEquivalentTo(savedAddress.AddressKey);
@@ -313,7 +313,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 PageSize = 50,
                 Gazetteer = GlobalConstants.Gazetteer.Hackney,
             };
-            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(1);
             addresses.First().Should().BeEquivalentTo(savedAddress.AddressKey);
@@ -335,7 +335,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 Gazetteer = GlobalConstants.Gazetteer.Both,
                 OutOfBoroughAddress = false,
             };
-            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(1);
             addresses.First().Should().BeEquivalentTo(hackneyAddress.AddressKey);
@@ -357,7 +357,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 Gazetteer = GlobalConstants.Gazetteer.Both,
                 OutOfBoroughAddress = false,
             };
-            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(0);
         }
@@ -384,7 +384,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 Gazetteer = GlobalConstants.Gazetteer.Both,
                 OutOfBoroughAddress = true,
             };
-            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(4);
         }
@@ -414,7 +414,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 CrossReferencedUprns = new List<long>{uprnOne, uprnTwo},
             };
 
-            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(2);
             addresses.Should().ContainEquivalentOf(addressOne.AddressKey);
@@ -441,7 +441,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 Postcode = addressToMatch.Postcode,
                 IncludeParentShells = false
             };
-            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(1);
             addresses.Should().ContainEquivalentOf(addressToMatch.AddressKey);
@@ -465,7 +465,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 Postcode = addressToMatch.Postcode,
                 IncludeParentShells = true
             };
-            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(2);
             addresses.Should().ContainEquivalentOf(addressToMatch.AddressKey);
@@ -495,7 +495,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 Postcode = addressOneToMatch.Postcode,
                 IncludeParentShells = true
             };
-            var (addresses, totalCount) = _classUnderTest.SearchAddresses(request);
+            var (addresses, totalCount) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(2);
             totalCount.Should().Be(4);
@@ -520,7 +520,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 Postcode = addressToMatch.Postcode,
                 IncludeParentShells = true
             };
-            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(3);
             addresses.Should().ContainEquivalentOf(addressToMatch.AddressKey);
@@ -548,7 +548,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 Postcode = postcode,
                 IncludeParentShells = false
             };
-            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(1);
             addresses.Should().ContainEquivalentOf(notAParentShell.AddressKey);
@@ -577,7 +577,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 PageSize = 50,
                 Gazetteer = GlobalConstants.Gazetteer.Both,
             };
-            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(3);
             addresses.ElementAt(0).Should().BeEquivalentTo(addressThree.AddressKey);
@@ -604,7 +604,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 PageSize = 50,
                 Gazetteer = GlobalConstants.Gazetteer.Both,
             };
-            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(3);
             addresses.ElementAt(0).Should().BeEquivalentTo(addressTwo.AddressKey);
@@ -630,7 +630,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 PageSize = 50,
                 Gazetteer = GlobalConstants.Gazetteer.Both,
             };
-            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(3);
             addresses.ElementAt(0).Should().BeEquivalentTo(addressThree.AddressKey);
@@ -668,7 +668,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 PageSize = 50,
                 Gazetteer = GlobalConstants.Gazetteer.Both,
             };
-            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(3);
             addresses.ElementAt(0).Should().BeEquivalentTo(addressOne.AddressKey);
@@ -709,7 +709,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 PageSize = 50,
                 Gazetteer = GlobalConstants.Gazetteer.Both,
             };
-            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(3);
             addresses.ElementAt(0).Should().BeEquivalentTo(addressTwo.AddressKey);
@@ -753,7 +753,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 PageSize = 50,
                 Gazetteer = GlobalConstants.Gazetteer.Both,
             };
-            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(3);
             addresses.ElementAt(0).Should().BeEquivalentTo(addressThree.AddressKey);
@@ -800,7 +800,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 PageSize = 50,
                 Gazetteer = GlobalConstants.Gazetteer.Both,
             };
-            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(3);
             addresses.ElementAt(0).Should().BeEquivalentTo(addressTwo.AddressKey);
@@ -823,7 +823,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 Gazetteer = GlobalConstants.Gazetteer.Both
             };
 
-            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(2);
         }
@@ -840,7 +840,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 Gazetteer = GlobalConstants.Gazetteer.Both
             };
 
-            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(3);
             addresses.Should().ContainEquivalentOf(records.ElementAt(3).AddressKey);
@@ -860,7 +860,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 Gazetteer = GlobalConstants.Gazetteer.Both
             };
 
-            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(4);
             addresses.Should().ContainEquivalentOf(records.ElementAt(8).AddressKey);
@@ -881,7 +881,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 Gazetteer = GlobalConstants.Gazetteer.Both
             };
 
-            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(4);
             addresses.Should().ContainEquivalentOf(records.ElementAt(0).AddressKey);
@@ -938,7 +938,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 PageSize = count + 1,
                 Gazetteer = GlobalConstants.Gazetteer.Both
             };
-            var (addresses, totalCount) = _classUnderTest.SearchAddresses(request);
+            var (addresses, totalCount) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(count);
             totalCount.Should().Be(count);
@@ -955,7 +955,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 PageSize = count - 5,
                 Gazetteer = GlobalConstants.Gazetteer.Both
             };
-            var (addresses, totalCount) = _classUnderTest.SearchAddresses(request);
+            var (addresses, totalCount) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(count - 5);
             totalCount.Should().Be(count);

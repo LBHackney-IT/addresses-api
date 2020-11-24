@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using AddressesAPI.Infrastructure;
 using AddressesAPI.V2.Domain;
 using Amazon.Lambda.Core;
@@ -18,7 +19,7 @@ namespace AddressesAPI.V2.Gateways
             _indices = Indices.Index(new List<IndexName>{"hackney_addresses", "national_addresses"});
         }
 
-        public (List<string>, long) SearchAddresses(SearchParameters request)
+        public async Task<(List<string>, long)> SearchAddresses(SearchParameters request)
         {
             var pageOffset = request.PageSize * (request.Page == 0 ? 0 : request.Page - 1);
 
