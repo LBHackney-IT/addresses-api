@@ -20,7 +20,6 @@ namespace AddressesAPI.Tests.V2.Helper
         public static async Task<QueryableAddress> InsertAddressInEs(ElasticClient elasticClient, string key = null, QueryableAddress addressConfig = null)
         {
             var randomQueryableAddress = CreateConfigurableQueryableAddressRecord(key, addressConfig);
-            randomQueryableAddress.id = randomQueryableAddress.AddressKey;
             var response = await elasticClient.IndexAsync(randomQueryableAddress, i => i.Refresh(WaitFor))
                 .ConfigureAwait(true);
             return randomQueryableAddress;
@@ -38,7 +37,6 @@ namespace AddressesAPI.Tests.V2.Helper
         {
             return new QueryableAddress
             {
-                id = address.AddressKey,
                 Gazetteer = address.Gazetteer,
                 Line1 = address.Line1,
                 Line2 = address.Line2,
