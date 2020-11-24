@@ -8,6 +8,7 @@ using AddressesAPI.V1.Gateways;
 using AddressesAPI.V1.UseCase;
 using AddressesAPI.V1.UseCase.Interfaces;
 using AddressesAPI.Versioning;
+using Elasticsearch.Net;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -19,6 +20,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Nest;
+using Nest.JsonNetSerializer;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -58,7 +60,6 @@ namespace AddressesAPI
             });
 
             services.AddSingleton<IApiVersionDescriptionProvider, DefaultApiVersionDescriptionProvider>();
-
             services.AddSwaggerGen(c =>
             {
                 c.AddSecurityDefinition("Token",
@@ -127,12 +128,11 @@ namespace AddressesAPI
         private static void ConfigureElasticsearch(IServiceCollection services)
         {
             var url = Environment.GetEnvironmentVariable("ELASTICSEARCH_DOMAIN_URL") ?? "http://localhost:9202";
-            var defaultIndex = "addresses";
-
-            var settings = new ConnectionSettings(new Uri(url))
-                .DefaultIndex(defaultIndex)
-                .PrettyJson().ThrowExceptions().DisableDirectStreaming();
-            var esClient = new ElasticClient(settings);
+            var pool = new SingleNodeConnectionPool(new Uri(url));
+            var connectionSettings =
+                new ConnectionSettings(pool, JsonNetSerializer.Default)
+                    .PrettyJson().ThrowExceptions().DisableDirectStreaming();
+            var esClient = new ElasticClient(connectionSettings);
 
             services.AddSingleton<IElasticClient>(esClient);
         }
