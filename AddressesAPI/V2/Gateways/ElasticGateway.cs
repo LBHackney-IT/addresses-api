@@ -16,7 +16,7 @@ namespace AddressesAPI.V2.Gateways
         public ElasticGateway(IElasticClient esClient)
         {
             _esClient = esClient;
-            _indices = Indices.Index(new List<IndexName>{"hackney_addresses", "national_addresses"});
+            _indices = Indices.Index(new List<IndexName> { "hackney_addresses", "national_addresses" });
         }
 
         public async Task<(List<string>, long)> SearchAddresses(SearchParameters request)

@@ -63,7 +63,7 @@ namespace AddressesAPI.Tests.V2.Gateways
             var addressKey = _faker.Random.String2(14);
             var savedAddress = TestDataHelper.InsertAddressInDb(DatabaseContext, addressKey);
 
-            var addresses = _classUnderTest.GetAddresses(new List<string>{addressKey}, GlobalConstants.Format.Detailed);
+            var addresses = _classUnderTest.GetAddresses(new List<string> { addressKey }, GlobalConstants.Format.Detailed);
 
             addresses.Count.Should().Be(1);
             addresses.First().AddressKey.Should().Be(addressKey);
@@ -77,7 +77,7 @@ namespace AddressesAPI.Tests.V2.Gateways
             var savedAddress = TestDataHelper.InsertAddressInDb(DatabaseContext, addressKey);
             TestDataHelper.InsertAddressInDb(DatabaseContext);
 
-            var addresses = _classUnderTest.GetAddresses(new List<string>{addressKey}, GlobalConstants.Format.Detailed);
+            var addresses = _classUnderTest.GetAddresses(new List<string> { addressKey }, GlobalConstants.Format.Detailed);
 
             addresses.Count.Should().Be(1);
             addresses.First().AddressKey.Should().Be(addressKey);
@@ -109,7 +109,7 @@ namespace AddressesAPI.Tests.V2.Gateways
             var addressKey = _faker.Random.String2(14);
             var savedAddress = TestDataHelper.InsertAddressInDb(DatabaseContext, addressKey);
 
-            var addresses = _classUnderTest.GetAddresses(new List<string>{addressKey}, GlobalConstants.Format.Detailed);
+            var addresses = _classUnderTest.GetAddresses(new List<string> { addressKey }, GlobalConstants.Format.Detailed);
 
             addresses.Count.Should().Be(1);
             addresses.First().AddressKey.Should().Be(addressKey);
@@ -122,7 +122,7 @@ namespace AddressesAPI.Tests.V2.Gateways
             var addressKey = _faker.Random.String2(14);
             var savedAddress = TestDataHelper.InsertAddressInDb(DatabaseContext, addressKey);
 
-            var addresses = _classUnderTest.GetAddresses(new List<string>{addressKey}, GlobalConstants.Format.Simple);
+            var addresses = _classUnderTest.GetAddresses(new List<string> { addressKey }, GlobalConstants.Format.Simple);
 
             var expectedAddress = new Address
             {

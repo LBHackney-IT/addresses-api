@@ -26,7 +26,7 @@ namespace AddressesAPI.Tests
         public void OneTimeSetUp()
         {
             _elasticserachTests = new ElasticsearchTests();
-            ElasticsearchClient = _elasticserachTests.SetupElasticsearchConnection();
+            ElasticsearchClient = ElasticsearchTests.SetupElasticsearchConnection();
             ConnectToPostgresDbUsingEf();
         }
 

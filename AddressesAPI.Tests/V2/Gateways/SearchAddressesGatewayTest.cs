@@ -409,7 +409,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 Page = 1,
                 PageSize = 50,
                 Gazetteer = GlobalConstants.Gazetteer.Both,
-                CrossReferencedUprns = new List<long>{uprnOne, uprnTwo},
+                CrossReferencedUprns = new List<long> { uprnOne, uprnTwo },
             };
 
             var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
@@ -557,13 +557,13 @@ namespace AddressesAPI.Tests.V2.Gateways
         public async Task WillFirstlyOrderByTown()
         {
             var addressOne = await TestDataHelper
-                .InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress {Town = "town a"})
+                .InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress { Town = "town a" })
                 .ConfigureAwait(true);
             var addressTwo = await TestDataHelper
-                .InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress {Town = "town b"})
+                .InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress { Town = "town b" })
                 .ConfigureAwait(true);
             var addressThree = await TestDataHelper
-                .InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress {Town = "hackney"})
+                .InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress { Town = "hackney" })
                 .ConfigureAwait(true);
 
             var request = new SearchParameters

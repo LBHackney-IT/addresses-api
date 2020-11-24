@@ -10,7 +10,6 @@ namespace AddressesAPI.Tests
     [TestFixture]
     public class ElasticsearchTests
     {
-        private readonly string _esDomainUri = "http://localhost:9202";
         protected ElasticClient ElasticsearchClient { get; private set; }
 
         [OneTimeSetUp]
@@ -37,13 +36,15 @@ namespace AddressesAPI.Tests
             await CreateIndex("hackney_addresses", client).ConfigureAwait(true);
             await CreateIndex("national_addresses", client).ConfigureAwait(true);
         }
-        public ElasticClient SetupElasticsearchConnection()
+        public static ElasticClient SetupElasticsearchConnection()
         {
-            var settings = new ConnectionSettings(new Uri(_esDomainUri))
-                .DefaultIndex("hackney_addresses")
-                .PrettyJson()
-                .DisableDirectStreaming()
-                .ThrowExceptions();
+            var esDomainUri = Environment.GetEnvironmentVariable("ELASTICSEARCH_DOMAIN_URL")
+                              ?? "http://localhost:9202";
+            var settings = new ConnectionSettings(new Uri(esDomainUri))
+                    .DefaultIndex("hackney_addresses")
+                    .PrettyJson()
+                    .DisableDirectStreaming()
+                    .ThrowExceptions();
             return new ElasticClient(settings);
         }
 
