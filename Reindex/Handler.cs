@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,7 +13,7 @@ using Nest.JsonNetSerializer;
 using Newtonsoft.Json;
 using JsonConverter = System.Text.Json.Serialization.JsonConverter;
 
-[assembly:LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
+[assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 namespace Reindex
 {
     public class Handler
@@ -77,7 +77,9 @@ namespace Reindex
 
             var sqsMessage = new SqsMessage
             {
-                alias = alias, newIndex = newIndexName, taskId = response.Task.FullyQualifiedId
+                alias = alias,
+                newIndex = newIndexName,
+                taskId = response.Task.FullyQualifiedId
             };
 
             var sqsResponse = await SendSqsMessageToQueue(JsonConvert.SerializeObject(sqsMessage));

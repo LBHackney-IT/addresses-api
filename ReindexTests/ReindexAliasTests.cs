@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -40,7 +40,7 @@ namespace ReindexTests
             var settings = @"{""settings"": {}, ""mappings"": {} }";
 
             var expectedIndexName = alias + "_" + DateTime.Now.ToString("yyyyMMddhhmm");
-            await _classUnderTest.ReindexAlias(new ReindexRequest{alias = alias, config = settings}, null);
+            await _classUnderTest.ReindexAlias(new ReindexRequest { alias = alias, config = settings }, null);
 
             var indexExists = (await ElasticsearchClient.Indices.ExistsAsync(Indices.Index(expectedIndexName))).Exists;
             indexExists.Should().BeTrue();
@@ -56,7 +56,7 @@ namespace ReindexTests
             var settings = @"{""settings"": {""analysis"": {""analyzer"": {""my-custom-analyzer"": {""tokenizer"": ""keyword""}}}},""mappings"": {} }";
 
             var expectedIndexName = alias + "_" + DateTime.Now.ToString("yyyyMMddhhmm");
-            await _classUnderTest.ReindexAlias(new ReindexRequest{alias = alias, config = settings}, null);
+            await _classUnderTest.ReindexAlias(new ReindexRequest { alias = alias, config = settings }, null);
 
             var indexState = (await ElasticsearchClient.Indices.GetAsync(Indices.Index(expectedIndexName)))
                 .Indices[expectedIndexName];
@@ -72,7 +72,7 @@ namespace ReindexTests
             await AssignToAlias(alias, "initialindex");
 
             var expectedIndexName = alias + "_" + DateTime.Now.ToString("yyyyMMddhhmm");
-            await _classUnderTest.ReindexAlias(new ReindexRequest{alias = alias}, null);
+            await _classUnderTest.ReindexAlias(new ReindexRequest { alias = alias }, null);
 
             var indexState = (await ElasticsearchClient.Indices.GetAsync(Indices.Index(expectedIndexName)))
                 .Indices[expectedIndexName];
@@ -91,12 +91,12 @@ namespace ReindexTests
             await IndexDocuments(alias, documents);
 
             var expectedIndexName = alias + "_" + DateTime.Now.ToString("yyyyMMddhhMM");
-            await _classUnderTest.ReindexAlias(new ReindexRequest{alias = alias}, null);
+            await _classUnderTest.ReindexAlias(new ReindexRequest { alias = alias }, null);
 
             _sqsClientMock.Setup(a => a.SendMessageAsync(It.Is<SendMessageRequest>(
                     r => CheckSqsMessage(r, alias, expectedIndexName)),
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new SendMessageResponse {MessageId = "ID"});
+                .ReturnsAsync(new SendMessageResponse { MessageId = "ID" });
             _sqsClientMock.Verify();
         }
 

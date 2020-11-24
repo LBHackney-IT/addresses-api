@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Amazon.Lambda.SQSEvents;
@@ -40,7 +40,7 @@ namespace ReindexTests
                     s => StoreMessage(s, out sqsMessage)), default))
                 .ReturnsAsync(new SendMessageResponse());
 
-            await _classUnderTest.ReindexAlias(new ReindexRequest {alias = alias}, null);
+            await _classUnderTest.ReindexAlias(new ReindexRequest { alias = alias }, null);
 
             sqsMessage.alias.Should().Be(alias);
 
@@ -64,7 +64,7 @@ namespace ReindexTests
                     s => StoreMessage(s, out sqsMessage)), default))
                 .ReturnsAsync(new SendMessageResponse());
 
-            await _classUnderTest.ReindexAlias(new ReindexRequest {alias = alias}, null);
+            await _classUnderTest.ReindexAlias(new ReindexRequest { alias = alias }, null);
             System.Threading.Thread.Sleep(1000);
             await _classUnderTest.SwitchAlias(SqsEvent(sqsMessage), null);
 
