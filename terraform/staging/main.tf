@@ -143,7 +143,7 @@ module "address-es-dms" {
   source                       = "github.com/LBHackney-IT/aws-dms-terraform.git//dms_replication_task"
   environment_name             = "staging"
   project_name                 = "addresses-api"
-  migration_type               = "full-load"
+  migration_type               = "full-load-and-cdc"
   replication_instance_arn     = "arn:aws:dms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rep:DNTOW6TGQEGCAOWQMZYHQRTWAA"
   replication_task_indentifier = "addresses-api-es-dms-task"
   task_settings                = file("${path.module}/task_settings.json")
