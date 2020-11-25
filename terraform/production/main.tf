@@ -53,6 +53,10 @@ data "aws_ssm_parameter" "addresses_postgres_username" {
   name = "/addresses-api/production/postgres-username"
 }
 
+data "aws_ssm_parameter" "addresses_postgres_hostname" {
+    name = "/addresses-api/production/postgres-hostname"
+}
+
 module "postgres_db_production" {
   source               = "github.com/LBHackney-IT/aws-hackney-common-terraform.git//modules/database/postgres"
   environment_name     = "production"
@@ -91,4 +95,56 @@ module "elasticsearch_db_staging" {
     ebs_volume_size= "10"
     region= data.aws_region.current.name
     account_id= data.aws_caller_identity.current.account_id
+}
+
+data "aws_ssm_parameter" "addresses_elasticsearch_domain" {
+    name = "/addresses-api/production/elasticsearch-domain"
+}
+
+/*    DMS SETUP    */
+resource "aws_dms_endpoint" "address_elasticsearch" {
+    endpoint_id   = "target-addresses-es"
+    endpoint_type = "target"
+    engine_name   = "elasticsearch"
+    port          = 443
+    ssl_mode      = "none"
+
+    elasticsearch_settings {
+        endpoint_uri            = data.aws_ssm_parameter.addresses_elasticsearch_domain.value
+        service_access_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/DMS_Elasticsearch_Addresses"
+    }
+
+    tags = {
+        Name         = "target-addresses-es",
+        Environment  = "production",
+        project_name = "addresses-api"
+    }
+}
+
+module "source_db_endpoint" {
+    source                  = "github.com/LBHackney-IT/aws-dms-terraform.git//dms_endpoint"
+    database_name           = "addresses_api"
+    dms_endpoint_identifier = "source-addresses-postgres"
+    endpoint_type           = "source"
+    engine_name             = "postgres"
+    database_port           = 5500
+    db_server               = data.aws_ssm_parameter.addresses_postgres_hostname.value
+    ssl_mode                = "none"
+    environment_name        = "production"
+    project_name            = "addresses-api"
+    db_username             = data.aws_ssm_parameter.addresses_postgres_username.value
+    db_password             = data.aws_ssm_parameter.addresses_postgres_db_password.value
+}
+
+module "address-es-dms" {
+    source                       = "github.com/LBHackney-IT/aws-dms-terraform.git//dms_replication_task"
+    environment_name             = "production"
+    project_name                 = "addresses-api"
+    migration_type               = "full-load-and-cdc"
+    replication_instance_arn     = "arn:aws:dms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rep:65CJ5HE2DMCUW5X6EPKTKUDVWA"
+    replication_task_indentifier = "addresses-api-es-dms-task"
+    task_settings                = file("${path.module}/task_settings.json")
+    source_endpoint_arn          = module.source_db_endpoint.dms_endpoint_arn
+    target_endpoint_arn          = aws_dms_endpoint.address_elasticsearch.endpoint_arn
+    task_table_mappings          = file("${path.module}/selection_rules.json")
 }
