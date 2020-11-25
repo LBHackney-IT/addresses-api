@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using AddressesAPI.Infrastructure;
 using AddressesAPI.V2.Boundary.Requests;
 using AddressesAPI.V2.Boundary.Responses;
 using AddressesAPI.V2.Boundary.Responses.Metadata;
@@ -8,7 +7,6 @@ using AddressesAPI.V2.Gateways;
 using AddressesAPI.V2.UseCase;
 using AddressesAPI.V2.UseCase.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Nest;
 
 namespace AddressesAPI.V2.Controllers
 {
@@ -18,18 +16,11 @@ namespace AddressesAPI.V2.Controllers
     public class SearchAddressController : V1.Controllers.BaseController
     {
         private readonly ISearchAddressUseCase _searchAddressUseCase;
-        private IElasticClient _esClient;
-        private ISearchAddressValidator _searchAddressValidator;
-        private AddressesContext _addressContext;
 
 
-        public SearchAddressController(ISearchAddressUseCase searchAddressUseCase, IElasticClient esClient,
-            ISearchAddressValidator searchAddressValidator, AddressesContext addressesContext)
+        public SearchAddressController(ISearchAddressUseCase searchAddressUseCase)
         {
             _searchAddressUseCase = searchAddressUseCase;
-            _esClient = esClient;
-            _searchAddressValidator = searchAddressValidator;
-            _addressContext = addressesContext;
         }
 
         /// <summary>
