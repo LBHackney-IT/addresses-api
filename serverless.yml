@@ -32,6 +32,9 @@ functions:
           method: ANY
           private: true
           cors: true
+          authorizer:
+            arn: ${ssm:/platform-apis-lambda-authorizer-arn}
+            type: request
   reindexElasticsearchAlias:
     name: ${self:service}-reindex-es-alias-${self:provider.stage}
     handler: Reindex::Reindex.Handler::ReindexAlias
