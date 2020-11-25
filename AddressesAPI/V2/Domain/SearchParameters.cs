@@ -20,5 +20,6 @@ namespace AddressesAPI.V2.Domain
         public string CrossRefValue { get; set; }
         public int Page { get; set; }
         public int PageSize { get; set; }
+        public string AddressQuery { get; set; }
     }
 }

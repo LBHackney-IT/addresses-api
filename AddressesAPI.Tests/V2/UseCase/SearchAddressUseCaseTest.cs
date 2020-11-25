@@ -46,6 +46,7 @@ namespace AddressesAPI.Tests.V2.UseCase
 
             var request = new SearchAddressRequest
             {
+                Query = _faker.Address.FullAddress(),
                 Postcode = "RM3 0FS",
                 AddressScope = "HackneyGazetteer",
                 Page = _faker.Random.Int(),
@@ -77,7 +78,8 @@ namespace AddressesAPI.Tests.V2.UseCase
                         && x.UsagePrimary == request.UsagePrimary
                         && x.IncludeParentShells == request.IncludeParentShells
                         && x.CrossRefCode == request.CrossRefCode
-                        && x.CrossRefValue == request.CrossRefValue)))
+                        && x.CrossRefValue == request.CrossRefValue
+                        && x.AddressQuery == request.Query)))
                 .ReturnsAsync((new List<string>(), 1)).Verifiable();
 
             _classUnderTest.ExecuteAsync(request);

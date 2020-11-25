@@ -14,6 +14,11 @@ namespace AddressesAPI.V2.Boundary.Requests
             AddressStatus = "approved";
         }
 
+        ///<summary>
+        /// Query the address text across all address lines. The query will return partial matches and accept some misspelling errors
+        /// </summary>
+        public string Query { get; set; }
+
         /// <summary>
         /// Postcode partial match i.e. "E8 4" will return addresses that have a postcode starting with E84**
         /// (Whitespace is removed automatically)

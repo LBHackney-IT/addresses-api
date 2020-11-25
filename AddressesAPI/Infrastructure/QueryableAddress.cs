@@ -72,6 +72,10 @@ namespace AddressesAPI.Infrastructure
         [MaxLength(100)]
         public string Line4 { get; set; }
 
+        [MaxLength(700)]
+        [Text(Name = "full_address")]
+        public string FullAddress { get; set; }
+
         [Text(Name = "paon_start_num")]
         public short? PaonStartNumber { get; set; }
         [Text(Name = "unit_number")]

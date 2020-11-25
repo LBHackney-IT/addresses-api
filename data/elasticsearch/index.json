@@ -10,6 +10,19 @@
           "char_filter": [
             "remove_whitespace"
           ]
+        },
+        "address_text": {
+          "type": "custom",
+          "tokenizer": "classic",
+          "ignore_case": true,
+          "char_filter": [
+            "remove_apostrophes"
+          ],
+          "filter": [
+            "lowercase",
+            "common_street_terms_synonyms",
+            "ignore_unmeaningful_building_words"
+          ]
         }
       },
       "char_filter": {
@@ -17,6 +30,26 @@
           "type": "pattern_replace",
           "pattern": " ",
           "replacement": ""
+        },
+        "remove_apostrophes": {
+          "type": "pattern_replace",
+          "pattern": "'",
+          "replacement": ""
+        }
+      },
+      "filter": {
+        "common_street_terms_synonyms": {
+          "type": "synonym",
+          "ignore_case": true,
+          "lenient": false,
+          "synonyms": [ "road, lane, street, avenue, rd, str, avn, ave, close => road" ]
+        },
+        "ignore_unmeaningful_building_words": {
+          "type": "stop",
+          "ignore_case": true,
+          "stopwords": [
+            "flat"
+          ]
         }
       }
     }
@@ -52,39 +85,27 @@
       },
       "line1" : {
         "type" : "text",
-        "fields" : {
-          "keyword" : {
-            "type" : "keyword",
-            "ignore_above" : 256
-          }
-        }
+        "analyzer": "address_text",
+        "copy_to": "full_address"
       },
       "line2" : {
         "type" : "text",
-        "fields" : {
-          "keyword" : {
-            "type" : "keyword",
-            "ignore_above" : 256
-          }
-        }
+        "analyzer": "address_text",
+        "copy_to": "full_address"
       },
       "line3" : {
         "type" : "text",
-        "fields" : {
-          "keyword" : {
-            "type" : "keyword",
-            "ignore_above" : 256
-          }
-        }
+        "analyzer": "address_text",
+        "copy_to": "full_address"
       },
       "line4" : {
         "type" : "text",
-        "fields" : {
-          "keyword" : {
-            "type" : "keyword",
-            "ignore_above" : 256
-          }
-        }
+        "analyzer": "address_text",
+        "copy_to": "full_address"
+      },
+      "full_address" : {
+        "type" : "text",
+        "analyzer": "address_text"
       },
       "neverexport" : {
         "type" : "boolean"

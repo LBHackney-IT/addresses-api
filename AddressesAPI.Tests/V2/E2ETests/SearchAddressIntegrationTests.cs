@@ -92,6 +92,39 @@ namespace AddressesAPI.Tests.V2.E2ETests
             returnedAddress.Data.Addresses.First().AddressKey.Should().Be(addressKey);
         }
 
+        [TestCase("green street")]
+        [TestCase("green str")]
+        [TestCase("green road")]
+        [TestCase("green")]
+        [TestCase("290 green street")]
+        [TestCase("290C green street")]
+        public async Task CanQueryTheAddressText(string query)
+        {
+            var addressKey = _faker.Random.String2(14);
+            var addressLines = new[] { "Flat C", "290 Green Street", "Hackney", "London" };
+
+            var queryParameters = new NationalAddress
+            {
+                Line1 = addressLines.ElementAt(0),
+                Line2 = addressLines.ElementAt(1),
+                Line3 = addressLines.ElementAt(2),
+                Line4 = addressLines.ElementAt(3),
+                Gazetteer = "hackney"
+            };
+            await TestDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, addressKey, queryParameters)
+                .ConfigureAwait(true);
+            await AddSomeRandomAddressToTheDatabase().ConfigureAwait(true);
+
+            var queryString = $"query={query}&format=detailed";
+
+            var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
+            response.StatusCode.Should().Be(200);
+
+            var returnedAddress = await response.ConvertToSearchAddressResponseObject().ConfigureAwait(true);
+            returnedAddress.Data.Addresses.Count.Should().Be(1);
+            returnedAddress.Data.Addresses.First().AddressKey.Should().Be(addressKey);
+        }
+
         [Test]
         public async Task UsingTheSimpleFlagOnlyReturnsBasicAddressInformation()
         {
@@ -218,8 +251,8 @@ namespace AddressesAPI.Tests.V2.E2ETests
 
         [TestCase("page_size=100", "PageSize", "PageSize cannot exceed 50")]
         [TestCase("postcode=12376", "Postcode", "Must provide at least the first part of the postcode.")]
-        [TestCase("address_scope=national&street=hackneyroad", "", "You must provide at least one of (uprn, usrn, postcode), when address_scope is 'national'.")]
-        [TestCase("address_scope=hackneygazetteer", "", "You must provide at least one of (uprn, usrn, postcode, street, usagePrimary, usageCode), when address_scope is 'hackney borough' or 'hackney gazetteer'.")]
+        [TestCase("address_scope=national&street=hackneyroad", "", "You must provide at least one of (query, uprn, usrn, postcode), when address_scope is 'national'.")]
+        [TestCase("address_scope=hackneygazetteer", "", "You must provide at least one of (query, uprn, usrn, postcode, street, usagePrimary, usageCode), when address_scope is 'hackney borough' or 'hackney gazetteer'.")]
         public async Task ValidationErrors(string queryString, string fieldName, string message)
         {
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);

@@ -77,6 +77,7 @@ namespace AddressesAPI.V2.UseCase
                 UsagePrimary = request.UsagePrimary,
                 OutOfBoroughAddress = addressScope != GlobalConstants.AddressScope.HackneyBorough,
                 IncludeParentShells = request.IncludeParentShells,
+                AddressQuery = request.Query
             };
         }
     }
