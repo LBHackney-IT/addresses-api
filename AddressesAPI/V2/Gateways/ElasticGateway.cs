@@ -33,7 +33,8 @@ namespace AddressesAPI.V2.Gateways
                 .Sort(SortResults)
                 .Size(request.PageSize)
                 .Skip(pageOffset)
-                .TrackTotalHits()).ConfigureAwait(true);
+                .TrackTotalHits() // This instructs elasticsearch to return the total number of documents that matched before paging was applied.
+            ).ConfigureAwait(true);
             LambdaLogger.Log(searchResponse.ApiCall.DebugInformation);
             LambdaLogger.Log($"Received {searchResponse.Documents.Count} documents");
             var addressKeys = searchResponse.Documents
@@ -43,6 +44,14 @@ namespace AddressesAPI.V2.Gateways
             return (addressKeys, totalCount);
         }
 
+        /// <summary>
+        /// If the parent_shell query is set to true then we you can use this query to compile a list of all addresses which
+        /// match the base query plus their parent shells, and their parent shells in turn. It will then create a query
+        /// that can be used to retrieve all of these addresses using their address keys.
+        /// </summary>
+        /// <param name="request">parameters to use for searching</param>
+        /// <param name="q">The lambda function, used by NEST, to build the query on</param>
+        /// <returns></returns>
         private QueryContainer QueryIncludingParentShells(SearchParameters request, QueryContainerDescriptor<QueryableAddress> q)
         {
             var allAddressKeys = new List<string>();
@@ -67,8 +76,19 @@ namespace AddressesAPI.V2.Gateways
                 .Terms(allAddressKeys));
         }
 
+        /// <summary>
+        /// This method will compile a query that can be executed against Elastcisearch using all the search parameters
+        /// provided, but not including any sorting or paging.
+        /// </summary>
+        /// <param name="request">parameters to use for searching</param>
+        /// <param name="q">The lambda function, used by NEST, to build the query on</param>
+        /// <returns></returns>
         private static QueryContainer BaseQuery(SearchParameters request, QueryContainerDescriptor<QueryableAddress> q)
         {
+            //These method all return a QueryContainer, which is a type that stores all querying methods/types that can then
+            //be used to search in Elasctisearch.
+            //For more information about the querying methods used in these methods, please check out elasticsearch's docs
+            //https://www.elastic.co/guide/en/elasticsearch/client/net-api/current/query-dsl.html
             return SearchPostcodes(request, q)
                    && SearchBuildingNumbers(request, q)
                    && SearchAddressStatuses(q, request)
