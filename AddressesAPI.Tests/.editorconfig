@@ -2,4 +2,5 @@
 #Naming
 # Allow only identifiers in tests to contain the underscore (_) character.
 dotnet_diagnostic.CA1707.severity = none
+# Don't have to call dispose on objects before they are out of scope
 dotnet_diagnostic.CA2000.severity = none
