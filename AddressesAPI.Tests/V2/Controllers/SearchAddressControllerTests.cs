@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using AddressesAPI.V2;
 using AddressesAPI.V2.Boundary.Requests;
 using AddressesAPI.V2.Boundary.Responses;
@@ -36,11 +37,11 @@ namespace AddressesAPI.Tests.V2.Controllers
 
         [TestCase("RM3 0FS", GlobalConstants.AddressScope.HackneyBorough)]
         [TestCase("IG11 7QD", GlobalConstants.AddressScope.National)]
-        public void GivenValidSearchAddressRequest_WhenCallingGet_ThenShouldReturnAPIResponseListOfAddresses(string postcode, GlobalConstants.AddressScope addressScope)
+        public async Task GivenValidSearchAddressRequest_WhenCallingGet_ThenShouldReturnAPIResponseListOfAddresses(string postcode, GlobalConstants.AddressScope addressScope)
         {
             //arrange
             _mock.Setup(s => s.ExecuteAsync(It.IsAny<SearchAddressRequest>()))
-                .Returns(new SearchAddressResponse
+                .ReturnsAsync(new SearchAddressResponse
                 {
                     Addresses = new List<AddressResponse>()
                 });
@@ -51,7 +52,7 @@ namespace AddressesAPI.Tests.V2.Controllers
                 AddressScope = addressScope.ToString()
             };
             //act
-            var response = _classUnderTest.GetAddresses(request);
+            var response = await _classUnderTest.GetAddresses(request).ConfigureAwait(true);
             //assert
             response.Should().NotBeNull();
             response.Should().BeOfType<OkObjectResult>();

@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using AddressesAPI.V2.Boundary.Requests;
 using AddressesAPI.V2.Boundary.Responses;
 using AddressesAPI.V2.Boundary.Responses.Metadata;
@@ -14,14 +15,17 @@ namespace AddressesAPI.V2.UseCase
     {
         private readonly IAddressesGateway _addressGateway;
         private readonly ISearchAddressValidator _requestValidator;
+        private readonly ISearchAddressesGateway _searchAddressesGateway;
 
-        public SearchAddressUseCase(IAddressesGateway addressesGateway, ISearchAddressValidator requestValidator)
+        public SearchAddressUseCase(IAddressesGateway addressesGateway, ISearchAddressValidator requestValidator,
+            ISearchAddressesGateway searchAddressesGateway)
         {
             _addressGateway = addressesGateway;
+            _searchAddressesGateway = searchAddressesGateway;
             _requestValidator = requestValidator;
         }
 
-        public SearchAddressResponse ExecuteAsync(SearchAddressRequest request)
+        public async Task<SearchAddressResponse> ExecuteAsync(SearchAddressRequest request)
         {
             var validation = _requestValidator.Validate(request);
             if (!validation.IsValid)
@@ -29,7 +33,16 @@ namespace AddressesAPI.V2.UseCase
                 throw new BadRequestException(validation);
             }
             var searchParameters = MapRequestToSearchParameters(request);
-            var (results, totalCount) = _addressGateway.SearchAddresses(searchParameters);
+
+            if (request.CrossRefCode != null && request.CrossRefValue != null)
+            {
+                searchParameters.CrossReferencedUprns =
+                    _addressGateway.GetMatchingCrossReferenceUprns(request.CrossRefCode, request.CrossRefValue);
+            }
+            var (addressKeys, totalCount) = await _searchAddressesGateway.SearchAddresses(searchParameters);
+
+            var format = Enum.Parse<GlobalConstants.Format>(request.Format, true);
+            var results = _addressGateway.GetAddresses(addressKeys, format);
 
             if (results == null)
                 return new SearchAddressResponse();
@@ -49,7 +62,6 @@ namespace AddressesAPI.V2.UseCase
 
             return new SearchParameters
             {
-                Format = Enum.Parse<GlobalConstants.Format>(request.Format, true),
                 Gazetteer = addressScope != GlobalConstants.AddressScope.National
                     ? GlobalConstants.Gazetteer.Hackney
                     : GlobalConstants.Gazetteer.Both,
@@ -65,8 +77,6 @@ namespace AddressesAPI.V2.UseCase
                 UsagePrimary = request.UsagePrimary,
                 OutOfBoroughAddress = addressScope != GlobalConstants.AddressScope.HackneyBorough,
                 IncludeParentShells = request.IncludeParentShells,
-                CrossRefCode = request.CrossRefCode,
-                CrossRefValue = request.CrossRefValue
             };
         }
     }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using AddressesAPI.V2;
 using AddressesAPI.V2.Boundary.Requests;
 using AddressesAPI.V2.Boundary.Responses;
@@ -22,21 +23,24 @@ namespace AddressesAPI.Tests.V2.UseCase
     public class SearchAddressUseCaseTest
     {
         private ISearchAddressUseCase _classUnderTest;
-        private Mock<IAddressesGateway> _fakeGateway;
+        private Mock<IAddressesGateway> _addressGateway;
         private Mock<ISearchAddressValidator> _fakeValidator;
         private Faker _faker = new Faker();
         private Fixture _fixture = new Fixture();
+        private Mock<ISearchAddressesGateway> _searchAddressGateway;
 
         [SetUp]
         public void SetUp()
         {
-            _fakeGateway = new Mock<IAddressesGateway>();
+            _addressGateway = new Mock<IAddressesGateway>();
+            _searchAddressGateway = new Mock<ISearchAddressesGateway>();
             _fakeValidator = new Mock<ISearchAddressValidator>();
-            _classUnderTest = new SearchAddressUseCase(_fakeGateway.Object, _fakeValidator.Object);
+            _classUnderTest = new SearchAddressUseCase(
+                _addressGateway.Object, _fakeValidator.Object, _searchAddressGateway.Object);
         }
 
         [Test]
-        public void GivenValidInput_WhenExecute_WillPassAllSearchParametersToTheGateway()
+        public void GivenValidInput_WhenExecute_WillPassAllSearchParametersToTheSearchGateway()
         {
             SetupValidatorToReturnValid();
 
@@ -44,7 +48,6 @@ namespace AddressesAPI.Tests.V2.UseCase
             {
                 Postcode = "RM3 0FS",
                 AddressScope = "HackneyGazetteer",
-                Format = "Detailed",
                 Page = _faker.Random.Int(),
                 Street = _faker.Address.StreetAddress(),
                 UsageCode = _faker.Random.String2(4),
@@ -58,27 +61,27 @@ namespace AddressesAPI.Tests.V2.UseCase
                 CrossRefCode = "123DEF",
                 CrossRefValue = "20000"
             };
-            _fakeGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(
-                    x => x.Format == GlobalConstants.Format.Detailed
-                         && x.Gazetteer == GlobalConstants.Gazetteer.Hackney
-                         && x.OutOfBoroughAddress
-                         && x.Page == request.Page
-                         && x.Postcode == request.Postcode
-                         && x.Street == request.Street
-                         && x.Uprn == request.UPRN
-                         && x.Usrn == request.USRN
-                         && x.AddressStatus.SequenceEqual(new[] { "approved" })
-                         && x.BuildingNumber == request.BuildingNumber
-                         && x.PageSize == request.PageSize
-                         && x.UsageCode == request.UsageCode
-                         && x.UsagePrimary == request.UsagePrimary
-                         && x.IncludeParentShells == request.IncludeParentShells
-                         && x.CrossRefCode == request.CrossRefCode
-                         && x.CrossRefValue == request.CrossRefValue)))
-                .Returns((new List<Address>(), 1)).Verifiable();
+            _searchAddressGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(
+                    x =>
+                        x.Gazetteer == GlobalConstants.Gazetteer.Hackney
+                        && x.OutOfBoroughAddress
+                        && x.Page == request.Page
+                        && x.Postcode == request.Postcode
+                        && x.Street == request.Street
+                        && x.Uprn == request.UPRN
+                        && x.Usrn == request.USRN
+                        && x.AddressStatus.SequenceEqual(new[] { "approved" })
+                        && x.BuildingNumber == request.BuildingNumber
+                        && x.PageSize == request.PageSize
+                        && x.UsageCode == request.UsageCode
+                        && x.UsagePrimary == request.UsagePrimary
+                        && x.IncludeParentShells == request.IncludeParentShells
+                        && x.CrossRefCode == request.CrossRefCode
+                        && x.CrossRefValue == request.CrossRefValue)))
+                .ReturnsAsync((new List<string>(), 1)).Verifiable();
 
             _classUnderTest.ExecuteAsync(request);
-            _fakeGateway.Verify();
+            _addressGateway.Verify();
         }
 
         [TestCase("HackneyBorough", GlobalConstants.Gazetteer.Hackney, false)]
@@ -95,11 +98,11 @@ namespace AddressesAPI.Tests.V2.UseCase
                 Postcode = "E8",
                 AddressScope = addressScope
             };
-            _fakeGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(i =>
+            _searchAddressGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(i =>
                     i.Gazetteer.Equals(expectedGazetteer) && i.OutOfBoroughAddress.Equals(expectedOutOfBorough))))
-                .Returns((null, 0)).Verifiable();
+                .ReturnsAsync((null, 0)).Verifiable();
             _classUnderTest.ExecuteAsync(request);
-            _fakeGateway.Verify();
+            _addressGateway.Verify();
         }
 
         [TestCase("approved,historical", new[] { "approved", "historical" })]
@@ -112,70 +115,100 @@ namespace AddressesAPI.Tests.V2.UseCase
                 Postcode = "E8",
                 AddressStatus = addressQuery
             };
-            _fakeGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(i =>
+            _searchAddressGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(i =>
                     i.AddressStatus.SequenceEqual(expectedList))))
-                .Returns((null, 0)).Verifiable();
+                .ReturnsAsync((null, 0)).Verifiable();
             _classUnderTest.ExecuteAsync(request);
-            _fakeGateway.Verify();
+            _addressGateway.Verify();
         }
 
         [Test]
-        public void GivenValidInput_WhenGatewayRespondsWithNull_ThenResponseShouldBeNull()
+        public void IfCrossReferenceCodeAndValueAreSupplied_GetsTheMatchingUprnsFromAddressGateway()
+        {
+            var code = _faker.Random.String2(6);
+            var value = _faker.Random.String2(12);
+            SetupValidatorToReturnValid();
+            var request = new SearchAddressRequest
+            {
+                CrossRefCode = code,
+                CrossRefValue = value
+            };
+            var uprns = _fixture.CreateMany<long>().ToList();
+            _addressGateway.Setup(s => s.GetMatchingCrossReferenceUprns(code, value))
+                .Returns(uprns).Verifiable();
+            _searchAddressGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(i =>
+                    i.CrossReferencedUprns.SequenceEqual(uprns))))
+                .ReturnsAsync((null, 0)).Verifiable();
+            _classUnderTest.ExecuteAsync(request);
+
+            _addressGateway.Verify();
+            _searchAddressGateway.Verify();
+        }
+
+        [Test]
+        public async Task GivenValidInput_WhenSearchGatewayRespondsWithNull_ThenResponseShouldBeNull()
         {
             SetupValidatorToReturnValid();
             //arrange
-            _fakeGateway.Setup(s => s.SearchAddresses(It.IsAny<SearchParameters>()))
-                .Returns((null, 0));
+            _searchAddressGateway.Setup(s => s.SearchAddresses(It.IsAny<SearchParameters>()))
+                .ReturnsAsync((null, 0));
 
             //act
-            var response = _classUnderTest.ExecuteAsync(new SearchAddressRequest());
+            var response = await _classUnderTest.ExecuteAsync(new SearchAddressRequest()).ConfigureAwait(true);
             //assert
             response.Addresses.Should().BeNull();
         }
 
-        [Test]
-        public void GivenValidInput_WhenExecute_ThenAddressDetailsShouldBeReturned()
+        [TestCase(GlobalConstants.Format.Simple)]
+        [TestCase(GlobalConstants.Format.Detailed)]
+        public async Task GivenValidInput_Execute_ShouldRetrieveAddressDetailsFromTheGateway(GlobalConstants.Format format)
         {
             SetupValidatorToReturnValid();
 
             var addresses = _fixture.CreateMany<Address>().ToList();
-
+            var addressKeyList = _fixture.CreateMany<string>().ToList();
             var postcode = "RM3 0FS";
             var request = new SearchAddressRequest
             {
-                Postcode = postcode
+                Postcode = postcode,
+                Format = format.ToString()
             };
-            _fakeGateway.Setup(s =>
+            _searchAddressGateway.Setup(s =>
                     s.SearchAddresses(It.Is<SearchParameters>(i => i.Postcode.Equals(postcode))))
-                .Returns((addresses, 1));
+                .ReturnsAsync((addressKeyList, 1));
+            _addressGateway.Setup(s => s.GetAddresses(addressKeyList, format))
+                .Returns(addresses);
 
-            var response = _classUnderTest.ExecuteAsync(request);
+            var response = await _classUnderTest.ExecuteAsync(request).ConfigureAwait(true);
 
             response.Should().NotBeNull();
             response.Addresses.Should().BeEquivalentTo(addresses.ToResponse());
         }
 
         [Test]
-        public void GivenValidInput_WhenExecute_ThenAddressesShouldBeReturnedWithCount()
+        public async Task GivenValidInput_WhenExecute_ThenAddressesShouldBeReturnedWithCount()
         {
             SetupValidatorToReturnValid();
 
             var totalCount = _faker.Random.Int(30, 200);
             var numberOfAddressesInPage = _faker.Random.Int(3, 30);
             var addresses = _fixture.CreateMany<Address>(numberOfAddressesInPage).ToList();
+            var addressKeyList = _fixture.CreateMany<string>().ToList();
 
-            _fakeGateway.Setup(s =>
+            _searchAddressGateway.Setup(s =>
                     s.SearchAddresses(It.IsAny<SearchParameters>()))
-                .Returns((addresses, totalCount));
+                .ReturnsAsync((addressKeyList, totalCount));
+            _addressGateway.Setup(s => s.GetAddresses(addressKeyList, GlobalConstants.Format.Simple))
+                .Returns(addresses);
 
-            var response = _classUnderTest.ExecuteAsync(new SearchAddressRequest());
+            var response = await _classUnderTest.ExecuteAsync(new SearchAddressRequest()).ConfigureAwait(false);
 
             response.Addresses.Count.Should().Be(numberOfAddressesInPage);
             response.TotalCount.Should().Be(totalCount);
         }
 
         [Test]
-        public void GivenPageZero_WhenExecute_ReturnsPageOne()
+        public async Task GivenPageZero_WhenExecute_ReturnsPageOneAsync()
         {
             SetupValidatorToReturnValid();
             //arrange
@@ -184,10 +217,10 @@ namespace AddressesAPI.Tests.V2.UseCase
                 Page = 0
             };
             //act
-            _classUnderTest.ExecuteAsync(request);
+            await _classUnderTest.ExecuteAsync(request).ConfigureAwait(true);
 
             //assert
-            _fakeGateway.Verify(s => s.SearchAddresses(
+            _searchAddressGateway.Verify(s => s.SearchAddresses(
                 It.Is<SearchParameters>(i => i.Page.Equals(1))));
         }
 
@@ -195,7 +228,7 @@ namespace AddressesAPI.Tests.V2.UseCase
         public void GivenInvalidInput_WhenExecute_ThrowsValidationError()
         {
             SetupValidatorToReturnValid(false);
-            Func<SearchAddressResponse> testDelegate = () => _classUnderTest.ExecuteAsync(new SearchAddressRequest());
+            Func<Task<SearchAddressResponse>> testDelegate = async () => await _classUnderTest.ExecuteAsync(new SearchAddressRequest()).ConfigureAwait(true);
             testDelegate.Should().Throw<BadRequestException>();
         }
 

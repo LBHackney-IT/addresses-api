@@ -77,13 +77,11 @@ commands:
       - run:
           name: Build lambda
           command: |
-            cd ./AddressesAPI/
             chmod +x ./build.sh
             ./build.sh
       - run:
           name: Deploy lambda
           command: |
-            cd ./AddressesAPI/
             sls deploy --stage <<parameters.stage>> --conceal
   migrate-database:
     description: "Migrate database"
@@ -142,9 +140,6 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-#      - run:
-#          name: build elasticsearch
-#          command: docker-compose up test-elasticsearch
       - run:
           name: build
           command: docker-compose build addresses-api-test

@@ -24,25 +24,16 @@ namespace AddressesAPI.V2.Gateways
             return addressRecord?.ToDomain();
         }
 
-        public (List<V2.Domain.Address>, int) SearchAddresses(SearchParameters request)
+        public List<Domain.Address> GetAddresses(List<string> addressKeys, GlobalConstants.Format format)
         {
-            var baseQuery = CompileBaseSearchQuery(request);
-            var baseAddresses = baseQuery;
+            var addresses = _addressesContext.Addresses
+                .Where(a => addressKeys.Contains(a.AddressKey));
 
-            if (request.IncludeParentShells)
-            {
-                baseAddresses = GetParentShells(baseQuery, baseAddresses);
-            }
-
-            var totalCount = baseAddresses.Count();
-
-            var addresses = PageAddresses(OrderAddresses(baseAddresses), request.PageSize, request.Page)
-                .Select(
-                    a => request.Format == GlobalConstants.Format.Simple ? a.ToSimpleDomain() : a.ToDomain()
-                )
+            return addressKeys
+                .Select(a => addresses.FirstOrDefault(ad => ad.AddressKey == a))
+                .Where(a => a != null)
+                .Select(a => format == GlobalConstants.Format.Simple ? a.ToSimpleDomain() : a.ToDomain())
                 .ToList();
-
-            return (addresses, totalCount);
         }
 
         private IQueryable<Address> GetParentShells(IQueryable<Address> baseQuery, IQueryable<Address> baseAddresses)
@@ -99,7 +90,7 @@ namespace AddressesAPI.V2.Gateways
                 .ThenBy(a => a.UnitName);
         }
 
-        private List<long> GetMatchingCrossReferenceUprns(string code, string value)
+        public List<long> GetMatchingCrossReferenceUprns(string code, string value)
         {
             return _addressesContext.AddressCrossReferences
                 .Where(cr => cr.Code == code)

@@ -22,7 +22,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
         public async Task GetCrossReferenceAddressReturns200()
         {
             var uprn = _faker.Random.Int();
-            TestEfDataHelper.InsertCrossReference(DatabaseContext, uprn);
+            TestDataHelper.InsertCrossReference(DatabaseContext, uprn);
 
             var url = new Uri($"api/v2/properties/{uprn}/crossreferences", UriKind.Relative);
             var response = await Client.GetAsync(url).ConfigureAwait(true);
@@ -40,7 +40,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
             var record = _fixture.Build<CrossReference>()
                                                .With(add => add.UPRN, uprn)
                                                .Create();
-            TestEfDataHelper.InsertCrossReference(DatabaseContext, uprn, record);
+            TestDataHelper.InsertCrossReference(DatabaseContext, uprn, record);
 
             var url = new Uri($"api/v2/properties/{uprn}/crossreferences", UriKind.Relative);
             var response = await Client.GetAsync(url).ConfigureAwait(true);
@@ -58,7 +58,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
         public async Task Get404WhenUPRNIsNotProvided()
         {
             var uprn = _faker.Random.Int();
-            TestEfDataHelper.InsertCrossReference(DatabaseContext, uprn);
+            TestDataHelper.InsertCrossReference(DatabaseContext, uprn);
 
             var url = new Uri($"api/v2/properties/crossreferences", UriKind.Relative);
             var response = await Client.GetAsync(url).ConfigureAwait(true);
@@ -69,7 +69,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
         public async Task Get400WhenUPRNIsNotNumeric()
         {
             var uprn = _faker.Random.Int();
-            TestEfDataHelper.InsertCrossReference(DatabaseContext, uprn);
+            TestDataHelper.InsertCrossReference(DatabaseContext, uprn);
 
             var url = new Uri("api/v2/properties/1937dhhu/crossreferences", UriKind.Relative);
             var response = await Client.GetAsync(url).ConfigureAwait(true);

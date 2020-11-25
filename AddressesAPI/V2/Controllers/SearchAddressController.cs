@@ -1,7 +1,10 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using AddressesAPI.V2.Boundary.Requests;
 using AddressesAPI.V2.Boundary.Responses;
 using AddressesAPI.V2.Boundary.Responses.Metadata;
+using AddressesAPI.V2.Gateways;
+using AddressesAPI.V2.UseCase;
 using AddressesAPI.V2.UseCase.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -31,7 +34,7 @@ namespace AddressesAPI.V2.Controllers
         [ProducesResponseType(typeof(APIResponse<SearchAddressResponse>), 200)]
         [ProducesResponseType(typeof(APIResponse<BadRequestException>), 400)]
         [HttpGet, MapToApiVersion("1")]
-        public IActionResult GetAddresses([FromQuery] SearchAddressRequest request)
+        public async Task<IActionResult> GetAddresses([FromQuery] SearchAddressRequest request)
         {
             if (!ModelState.IsValid)
             {
@@ -52,7 +55,7 @@ namespace AddressesAPI.V2.Controllers
 
             try
             {
-                var response = _searchAddressUseCase.ExecuteAsync(request);
+                var response = await _searchAddressUseCase.ExecuteAsync(request);
                 return new OkObjectResult(new APIResponse<SearchAddressResponse>(response));
             }
             catch (BadRequestException e)
