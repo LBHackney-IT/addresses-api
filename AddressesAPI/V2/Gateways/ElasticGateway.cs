@@ -23,13 +23,9 @@ namespace AddressesAPI.V2.Gateways
         {
             var pageOffset = request.PageSize * (request.Page == 0 ? 0 : request.Page - 1);
 
-            QueryContainer Query(QueryContainerDescriptor<QueryableAddress> q) => request.IncludeParentShells
-                ? QueryIncludingParentShells(request, q)
-                : BaseQuery(request, q);
-
             LambdaLogger.Log("Searching Elasticsearch");
             var searchResponse = await _esClient.SearchAsync<QueryableAddress>(s => s.Index(_indices)
-                .Query(Query)
+                .Query(q => BaseQuery(request, q) || ParentShellsOfQuery(request, q))
                 .Sort(SortResults)
                 .Size(request.PageSize)
                 .Skip(pageOffset)
@@ -45,35 +41,50 @@ namespace AddressesAPI.V2.Gateways
         }
 
         /// <summary>
-        /// If the parent_shell query is set to true then we you can use this query to compile a list of all addresses which
-        /// match the base query plus their parent shells, and their parent shells in turn. It will then create a query
-        /// that can be used to retrieve all of these addresses using their address keys.
+        /// If the parent_shell query is set to true then we you can use this query to compile a list of UPRN's for all addresses
+        /// that are parent shells of addresses in the base query, and their parent shells in turn. It will return a query
+        /// that can be used to retrieve these addresses.
         /// </summary>
         /// <param name="request">parameters to use for searching</param>
         /// <param name="q">The lambda function, used by NEST, to build the query on</param>
         /// <returns></returns>
-        private QueryContainer QueryIncludingParentShells(SearchParameters request, QueryContainerDescriptor<QueryableAddress> q)
+        private QueryContainer ParentShellsOfQuery(SearchParameters request, QueryContainerDescriptor<QueryableAddress> q)
         {
-            var allAddressKeys = new List<string>();
-            var children = _esClient.Search<QueryableAddress>(s =>
-                s.Index(_indices).Query(q => BaseQuery(request, q))).Documents;
+            if (!request.IncludeParentShells) return null;
 
-            while (true)
+            var children = _esClient.Search<QueryableAddress>(s =>
+                    s.Index(_indices)
+                        .Query(q1 => BaseQuery(request, q1) && HasAParentShell(q1))
+                        .Size(10000)
+                        .Source(sf => sf.Includes(fd =>
+                            fd.Fields(f => f.ParentUPRN))))
+                .Documents;
+            var parentUprns = new List<long>();
+
+            LambdaLogger.Log($"Base query found {children.Count} children with parent shells");
+
+            while (children.Count > 0)
             {
-                allAddressKeys.AddRange(children.Select(c => c.AddressKey));
-                var parentUprns = children
-                    .Where(d => d.ParentUPRN != null)
+                var uprns = children
                     .Select(d => (long) d.ParentUPRN)
                     .Distinct().ToList();
-                if (parentUprns.Count == 0) break;
+                parentUprns.AddRange(uprns);
+                LambdaLogger.Log($"Found {parentUprns.Count} distinct parents");
+
                 children = _esClient.Search<QueryableAddress>(s =>
-                    s.Index(_indices).Query(q => SearchForMultipleUprns(parentUprns, q)))
-                    .Documents;
+                    s.Index(_indices)
+                     .Query(q => SearchForMultipleUprns(uprns, q) && HasAParentShell(q))
+                     .Size(10000)
+                     .Source(sf => sf.Includes(fd =>
+                         fd.Fields(f => f.ParentUPRN))))
+                        .Documents;
             }
 
+            LambdaLogger.Log($"Total {parentUprns.Count} parents");
+
             return q.Terms(t => t
-                .Field(f => f.AddressKey)
-                .Terms(allAddressKeys));
+                .Field(f => f.UPRN)
+                .Terms(parentUprns));
         }
 
         /// <summary>
@@ -125,6 +136,12 @@ namespace AddressesAPI.V2.Gateways
             }
 
             return null;
+        }
+
+        private static QueryContainer HasAParentShell(QueryContainerDescriptor<QueryableAddress> q)
+        {
+            return q.Exists(f => f.Field(fld => fld.ParentUPRN))
+                   && !q.Term(m => m.Field(f => f.ParentUPRN).Value(0));
         }
 
         private static QueryContainer FilterOutOfBoroughAddresses(SearchParameters request,

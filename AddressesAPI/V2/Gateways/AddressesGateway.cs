@@ -27,7 +27,7 @@ namespace AddressesAPI.V2.Gateways
         public List<Domain.Address> GetAddresses(List<string> addressKeys, GlobalConstants.Format format)
         {
             var addresses = _addressesContext.Addresses
-                .Where(a => addressKeys.Contains(a.AddressKey));
+                .Where(a => addressKeys.Contains(a.AddressKey)).ToList();
 
             return addressKeys
                 .Select(a => addresses.FirstOrDefault(ad => ad.AddressKey == a))
