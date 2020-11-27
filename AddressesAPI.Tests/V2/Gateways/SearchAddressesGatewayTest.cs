@@ -9,6 +9,7 @@ using AddressesAPI.V2.Domain;
 using AddressesAPI.V2.Gateways;
 using Bogus;
 using FluentAssertions;
+using Nest;
 using NUnit.Framework;
 
 namespace AddressesAPI.Tests.V2.Gateways
@@ -137,6 +138,71 @@ namespace AddressesAPI.Tests.V2.Gateways
 
             addresses.Count.Should().Be(1);
             addresses.First().Should().BeEquivalentTo(savedAddress.AddressKey);
+        }
+
+        [TestCase("340", "green road", "hackney", "london", "green road")]
+        [TestCase("340", "green road", "hackney", "london", "hackney")]
+        [TestCase("340", "green road", "hackney", "london", "london")]
+        [TestCase("340 green road", null, "hackney", "london", "green road")]
+        [TestCase("340", "green road", "hackney", "london", "green road hackney")]
+        [TestCase("340", "green road", "hackney", "london", "green street")]
+        [TestCase("340", "green road", "hackney", "london", "grean road")]
+        [TestCase("Flat A", "100 Mare Street", "Islington", "LDN", "100A Mare Street")]
+        [TestCase("6", "St James's road", "Islington", "LDN", "6 St Jamess road")]
+        [TestCase("6", "St James's road", "Islington", "LDN", "6 St James road")]
+        [TestCase("GROUND FLOOR FLAT", "210 Mare Street", "Hackney", "London", "210 Mare Street")]
+        public async Task WillMatchPartialAndFuzzySearches(string line1, string line2, string line3, string line4, string searchTerm)
+        {
+            var savedAddress = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
+                addressConfig: new QueryableAddress
+                {
+                    Line1 = line1,
+                    Line2 = line2,
+                    Line3 = line3,
+                    Line4 = line4,
+                }
+            ).ConfigureAwait(true);
+            await TestDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
+            var request = new SearchParameters
+            {
+                Page = 1,
+                PageSize = 50,
+                Gazetteer = GlobalConstants.Gazetteer.Both,
+                AddressQuery = searchTerm
+            };
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
+
+            addresses.Count.Should().Be(1);
+            addresses.First().Should().BeEquivalentTo(savedAddress.AddressKey);
+        }
+
+
+        [TestCase("340", "yellow road", "hackney", "london", "green road")]
+        [TestCase("340", "yellow road", "hackney", "london", "engre road")]
+        [TestCase("Flat A", "100 Mare Street", "Islington", "LDN", "8 Mare Street")]
+        [TestCase("Flat A", "10 DISPENSARY LANE", "Mare Street", "Hackney", "210 Mare Street")]
+        public async Task WillNotMatchDifferentSearches(string line1, string line2, string line3, string line4, string searchTerm)
+        {
+            var savedAddress = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
+                addressConfig: new QueryableAddress
+                {
+                    Line1 = line1,
+                    Line2 = line2,
+                    Line3 = line3,
+                    Line4 = line4,
+                }
+            ).ConfigureAwait(true);
+            await TestDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
+            var request = new SearchParameters
+            {
+                Page = 1,
+                PageSize = 50,
+                Gazetteer = GlobalConstants.Gazetteer.Both,
+                AddressQuery = searchTerm
+            };
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
+
+            addresses.Count.Should().Be(0);
         }
 
         [TestCase("Alternative", new[] { "Alternative" })]
@@ -802,6 +868,7 @@ namespace AddressesAPI.Tests.V2.Gateways
             addresses.ElementAt(1).Should().BeEquivalentTo(addressOne.AddressKey);
             addresses.ElementAt(2).Should().BeEquivalentTo(addressThree.AddressKey);
         }
+
         #endregion
 
         #region pagination

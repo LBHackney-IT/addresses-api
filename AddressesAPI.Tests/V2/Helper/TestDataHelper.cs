@@ -83,6 +83,7 @@ namespace AddressesAPI.Tests.V2.Helper
             var fixture = new Fixture();
             var randomAddressRecord = fixture.Build<QueryableAddress>()
                 .With(a => a.AddressStatus, request?.AddressStatus ?? "Approved")
+                .Without(a => a.FullAddress)
                 .Create();
             if (key != null) randomAddressRecord.AddressKey = key;
             if (request?.Postcode != null) randomAddressRecord.Postcode = ReplaceEmptyStringWithNull(request.Postcode);

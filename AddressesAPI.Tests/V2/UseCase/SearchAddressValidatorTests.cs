@@ -305,6 +305,20 @@ namespace AddressesAPI.Tests.V2.UseCase
             _classUnderTest.TestValidate(request).ShouldNotHaveError();
         }
 
+        [TestCase("hackney road")]
+        public void GivenARequestWithOnlyAnAddressQuery_IfAddressScopeIsHackneyGazetteer_WhenCallingValidation_ItReturnsNoError(string query)
+        {
+            var request = new SearchAddressRequest() { Query = query, AddressScope = _localGazetteer };
+            _classUnderTest.TestValidate(request).ShouldNotHaveError();
+        }
+
+        [TestCase("liverpool road")]
+        public void GivenARequestWithOnlyAnAddressQuery_IfAddressScopeIsNational_WhenCallingValidation_ItReturnsNoError(string query)
+        {
+            var request = new SearchAddressRequest() { Query = query, AddressScope = _nationalGazetteer };
+            _classUnderTest.TestValidate(request).ShouldNotHaveError();
+        }
+
         [TestCase("Sesame street")]
         public void GivenARequestWithOnlyAStreet_IfAddressScopeIsHackneyGazetteer_WhenCallingValidation_ItReturnsNoError(string street)
         {
@@ -317,7 +331,7 @@ namespace AddressesAPI.Tests.V2.UseCase
         {
             var request = new SearchAddressRequest() { Street = street, AddressScope = _nationalGazetteer };
             _classUnderTest.TestValidate(request).ShouldHaveError().WithErrorMessage(
-                "You must provide at least one of (uprn, usrn, postcode), when address_scope is 'national'.");
+                "You must provide at least one of (query, uprn, usrn, postcode), when address_scope is 'national'.");
         }
 
         [TestCase("someValue")]
@@ -332,7 +346,7 @@ namespace AddressesAPI.Tests.V2.UseCase
         {
             var request = new SearchAddressRequest() { UsagePrimary = usagePrimary, AddressScope = _nationalGazetteer };
             _classUnderTest.TestValidate(request).ShouldHaveError().WithErrorMessage(
-                "You must provide at least one of (uprn, usrn, postcode), when address_scope is 'national'.");
+                "You must provide at least one of (query, uprn, usrn, postcode), when address_scope is 'national'.");
         }
 
         [TestCase("otherValue")]
@@ -347,7 +361,7 @@ namespace AddressesAPI.Tests.V2.UseCase
         {
             var request = new SearchAddressRequest() { UsageCode = usageCode, AddressScope = _nationalGazetteer };
             _classUnderTest.TestValidate(request).ShouldHaveError().WithErrorMessage(
-                "You must provide at least one of (uprn, usrn, postcode), when address_scope is 'national'.");
+                "You must provide at least one of (query, uprn, usrn, postcode), when address_scope is 'national'.");
         }
 
         [TestCase("12345")]
@@ -355,7 +369,7 @@ namespace AddressesAPI.Tests.V2.UseCase
         {
             var request = new SearchAddressRequest() { BuildingNumber = buildingNumber, AddressScope = _localGazetteer };
             _classUnderTest.TestValidate(request).ShouldHaveError().WithErrorMessage(
-                "You must provide at least one of (uprn, usrn, postcode, street, usagePrimary, usageCode), when address_scope is 'hackney borough' or 'hackney gazetteer'.");
+                "You must provide at least one of (query, uprn, usrn, postcode, street, usagePrimary, usageCode), when address_scope is 'hackney borough' or 'hackney gazetteer'.");
         }
 
         [TestCase("12345")]
@@ -363,7 +377,7 @@ namespace AddressesAPI.Tests.V2.UseCase
         {
             var request = new SearchAddressRequest() { BuildingNumber = buildingNumber, AddressScope = _nationalGazetteer };
             _classUnderTest.TestValidate(request).ShouldHaveError().WithErrorMessage(
-                "You must provide at least one of (uprn, usrn, postcode), when address_scope is 'national'.");
+                "You must provide at least one of (query, uprn, usrn, postcode), when address_scope is 'national'.");
         }
 
         [Test]

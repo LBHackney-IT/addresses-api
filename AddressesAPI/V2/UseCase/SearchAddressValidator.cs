@@ -35,11 +35,11 @@ namespace AddressesAPI.V2.UseCase
 
             RuleFor(r => r)
                 .Must(CheckForAtLeastOneMandatoryFilterPropertyWithHackneyGazetteer)
-                .WithMessage("You must provide at least one of (uprn, usrn, postcode, street, usagePrimary, usageCode), when address_scope is 'hackney borough' or 'hackney gazetteer'.");
+                .WithMessage("You must provide at least one of (query, uprn, usrn, postcode, street, usagePrimary, usageCode), when address_scope is 'hackney borough' or 'hackney gazetteer'.");
 
             RuleFor(r => r)
                 .Must(CheckForAtLeastOneMandatoryFilterPropertyWithNationalGazetteer)
-                .WithMessage("You must provide at least one of (uprn, usrn, postcode), when address_scope is 'national'.");
+                .WithMessage("You must provide at least one of (query, uprn, usrn, postcode), when address_scope is 'national'.");
 
             RuleFor(r => r)
                 .Must(CheckCrossReferenceCodeWhenGivenHasAValue)
@@ -76,12 +76,13 @@ namespace AddressesAPI.V2.UseCase
             }
 
             return request.AddressScope.Equals(GlobalConstants.AddressScope.National.ToString(), StringComparison.InvariantCultureIgnoreCase)
-                                              || request.UPRN != null
-                                              || request.USRN != null
-                                              || request.Postcode != null
-                                              || request.Street != null
-                                              || request.UsagePrimary != null
-                                              || request.UsageCode != null;
+                  || request.UPRN != null
+                  || request.USRN != null
+                  || request.Postcode != null
+                  || request.Street != null
+                  || request.UsagePrimary != null
+                  || request.UsageCode != null
+                  || !string.IsNullOrWhiteSpace(request.Query);
         }
 
         private static bool CheckForAtLeastOneMandatoryFilterPropertyWithNationalGazetteer(SearchAddressRequest request)
@@ -89,7 +90,8 @@ namespace AddressesAPI.V2.UseCase
             return !request.AddressScope.Equals(GlobalConstants.AddressScope.National.ToString(), StringComparison.InvariantCultureIgnoreCase)
                    || request.UPRN != null
                    || request.USRN != null
-                   || request.Postcode != null;
+                   || request.Postcode != null
+                   || !string.IsNullOrWhiteSpace(request.Query);
         }
 
         private static bool CheckCrossReferenceCodeWhenGivenHasAValue(SearchAddressRequest request)

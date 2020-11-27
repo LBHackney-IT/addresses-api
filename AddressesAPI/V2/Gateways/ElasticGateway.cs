@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -30,6 +31,7 @@ namespace AddressesAPI.V2.Gateways
                 .Size(request.PageSize)
                 .Skip(pageOffset)
                 .TrackTotalHits() // This instructs elasticsearch to return the total number of documents that matched before paging was applied.
+                .Explain()
             ).ConfigureAwait(true);
             LambdaLogger.Log(searchResponse.ApiCall.DebugInformation);
             LambdaLogger.Log($"Received {searchResponse.Documents.Count} documents");
@@ -88,7 +90,7 @@ namespace AddressesAPI.V2.Gateways
         }
 
         /// <summary>
-        /// This method will compile a query that can be executed against Elastcisearch using all the search parameters
+        /// This method will compile a query that can be executed against Elasticsearch using all the search parameters
         /// provided, but not including any sorting or paging.
         /// </summary>
         /// <param name="request">parameters to use for searching</param>
@@ -111,7 +113,22 @@ namespace AddressesAPI.V2.Gateways
                    && FilterOutOfBoroughAddresses(request, q)
                    && SearchStreet(request, q)
                    && SearchCrossReferencedUprns(request, q)
-                   && FilterParentShells(request, q);
+                   && FilterParentShells(request, q)
+                   && SearchAddressFullText(request, q);
+        }
+
+        private static QueryContainer SearchAddressFullText(SearchParameters request, QueryContainerDescriptor<QueryableAddress> q)
+        {
+            if (request.AddressQuery == null) return null;
+
+            return q.Match(c => c
+                .Field(f => f.FullAddress)
+                .Query(request.AddressQuery)
+                .Analyzer("address_text")
+                .Fuzziness(Fuzziness.Auto)
+                .PrefixLength(3)
+                .Operator(Operator.And)
+            );
         }
 
         private static SortDescriptor<QueryableAddress> SortResults(SortDescriptor<QueryableAddress> srt)
