@@ -102,6 +102,53 @@ data "aws_ssm_parameter" "addresses_elasticsearch_domain" {
 }
 
 /*    DMS SETUP    */
+data "aws_iam_policy_document" "dms-assume-role-policy" {
+    statement {
+        actions = ["sts:AssumeRole"]
+
+        principals {
+            type        = "Service"
+            identifiers = ["dms.amazonaws.com"]
+        }
+    }
+}
+
+resource "aws_iam_role" "dms_service_role" {
+    name               = "dms_service_role"
+    path               = "/system/"
+    assume_role_policy = data.aws_iam_policy_document.dms-assume-role-policy.json
+}
+
+resource "aws_iam_policy" "es_policy" {
+    name        = "DMS_Elasticsearch_Addresses"
+    description = "A policy allowing you CRUD operations on addresses API elasticsearch cluster"
+
+    policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                       "es:ESHttpDelete",
+                       "es:ESHttpGet",
+                       "es:ESHttpHead",
+                       "es:ESHttpPost",
+                       "es:ESHttpPut"
+                     ],
+            "Resource": "${module.elasticsearch_db_staging.es_arn}"
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "attach_policy" {
+    role       = aws_iam_role.dms_service_role.name
+    policy_arn = aws_iam_policy.es_policy.arn
+}
+
+
 resource "aws_dms_endpoint" "address_elasticsearch" {
     endpoint_id   = "target-addresses-es"
     endpoint_type = "target"
@@ -111,7 +158,7 @@ resource "aws_dms_endpoint" "address_elasticsearch" {
 
     elasticsearch_settings {
         endpoint_uri            = data.aws_ssm_parameter.addresses_elasticsearch_domain.value
-        service_access_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/DMS_Elasticsearch_Addresses"
+        service_access_role_arn = aws_iam_role.dms_service_role.arn
     }
 
     tags = {
