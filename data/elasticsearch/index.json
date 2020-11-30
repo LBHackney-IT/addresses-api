@@ -45,7 +45,6 @@
       "filter": {
         "common_street_terms_synonyms": {
           "type": "synonym",
-          "ignore_case": true,
           "lenient": false,
           "synonyms": [ "road, raod, lane, lanes, street, streat, avenue, rd, str, avn, ave, close => road" ]
         },
@@ -90,7 +89,15 @@
         }
       },
       "building_number" : {
-        "type" : "keyword"
+        "type" : "keyword",
+        "fields": {
+          "sort": {
+            "type": "icu_collation_keyword",
+            "index": false,
+            "numeric": true,
+            "case_level": false
+          }
+        }
       },
       "gazetteer" : {
         "type" : "text",
@@ -124,10 +131,17 @@
       "full_address" : {
         "type" : "text",
         "analyzer": "address_text",
+        "similarity": "boolean",
         "fields": {
           "extracted_numbers": {
             "type": "text",
-            "analyzer": "extract_number_analyzer"
+            "analyzer": "extract_number_analyzer",
+            "similarity": "boolean"
+          },
+          "exact_text": {
+            "type" : "text",
+            "analyzer": "standard",
+            "similarity": "boolean"
           }
         }
       },
@@ -135,7 +149,15 @@
         "type" : "boolean"
       },
       "paon_start_num" : {
-        "type" : "keyword"
+        "type" : "keyword",
+        "fields": {
+          "sort": {
+            "type": "icu_collation_keyword",
+            "index": false,
+            "numeric": true,
+            "case_level": false
+          }
+        }
       },
       "parent_uprn" : {
         "type" : "long"
@@ -166,7 +188,15 @@
         "type" : "keyword"
       },
       "unit_number" : {
-        "type" : "keyword"
+        "type" : "keyword",
+        "fields": {
+          "sort": {
+            "type": "icu_collation_keyword",
+            "index": false,
+            "numeric": true,
+            "case_level": false
+          }
+        }
       },
       "blpu_class" : {
         "type" : "text",

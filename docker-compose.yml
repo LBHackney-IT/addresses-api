@@ -66,8 +66,11 @@ services:
     networks:
       - postgres
   test-elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.3
+    image: test-elasticsearch
     container_name: test-elasticsearch
+    build:
+      context: .
+      dockerfile: data/elasticsearch/Dockerfile
     environment:
       - xpack.security.enabled=false
       - discovery.type=single-node

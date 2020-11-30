@@ -621,6 +621,134 @@ namespace AddressesAPI.Tests.V2.Gateways
         #region ordering
 
         [Test]
+        public async Task WillOrderCorrectStreetNamesOverCommonSynonyms()
+        {
+            var savedAddresses = new List<QueryableAddress>
+            {
+                new QueryableAddress
+                {
+                    Street = "Elton Road", Line1 = "107 Elton Road", Line2 = "hackney", Line3 = null, Line4 = null, Town = "hackney", Postcode = "E3 4TT"
+                },
+                new QueryableAddress
+                {
+                    Street = "Elton Close", Line1 = "12 Elton Close", Line2 = "hackney", Line3 = null, Line4 = null, Town = "hackney", Postcode = "E3 4TT"
+                },
+            };
+            savedAddresses = await IndexAddresses(savedAddresses).ConfigureAwait(true);
+
+            var request = new SearchParameters
+            {
+                Page = 1,
+                PageSize = 50,
+                Gazetteer = GlobalConstants.Gazetteer.Both,
+                AddressQuery = "Elton Road"
+            };
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
+
+            addresses.Count.Should().Be(2);
+            addresses.ElementAt(0).Should().BeEquivalentTo(savedAddresses.ElementAt(0).AddressKey);
+            addresses.ElementAt(1).Should().BeEquivalentTo(savedAddresses.ElementAt(1).AddressKey);
+        }
+
+        [Test]
+        public async Task ItWillOrderCorrectMatchesOverFuzzyMatches()
+        {
+            var savedAddresses = new List<QueryableAddress>
+            {
+                new QueryableAddress
+                {
+                    Street = "GUNNERSBURY AVENUE",
+                    Line1 = "EALING RIDING SCHOOL",
+                    Line2 = " 17-19 GUNNERSBURY AVENUE",
+                    Line3 = "EALING",
+                    Line4 = "LONDON",
+                    PaonStartNumber = 17,
+                    UnitNumber = null,
+                    UnitName = "EALING RIDING SCHOOL",
+                    BuildingNumber = "17 -19",
+                    Town = "EALING",
+                    Postcode = "W5 3XD"
+                },
+                new QueryableAddress
+                {
+                    Street = "READING LANE",
+                    Line1 = "FLAT D",
+                    Line2 = "7 READING LANE",
+                    PaonStartNumber = 7,
+                    UnitNumber = null,
+                    UnitName = "D",
+                    BuildingNumber = "7",
+                    Line3 = "HACKNEY",
+                    Line4 = "LONDON",
+                    Town = "LONDON",
+                    Postcode = "E8 1DS"
+                },
+            };
+            savedAddresses = await IndexAddresses(savedAddresses).ConfigureAwait(true);
+
+            var request = new SearchParameters
+            {
+                Page = 1,
+                PageSize = 50,
+                Gazetteer = GlobalConstants.Gazetteer.Both,
+                AddressQuery = "reading lane, london"
+            };
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
+
+            addresses.Count.Should().Be(2);
+            addresses.ElementAt(0).Should().BeEquivalentTo(savedAddresses.ElementAt(1).AddressKey);
+            addresses.ElementAt(1).Should().BeEquivalentTo(savedAddresses.ElementAt(0).AddressKey);
+        }
+
+        [Test]
+        public async Task WillNotBoostResultsWithMultipleSearchTermsReferenced()
+        {
+            var savedAddresses = new List<QueryableAddress>
+            {
+                new QueryableAddress
+                {
+                    Street = "Greenwood Drive",
+                    Line1 = "Flat 10",
+                    Line2 = "10 Greenwood Drive",
+                    Line3 = null,
+                    Line4 = null,
+                    PaonStartNumber = 10,
+                    UnitNumber = "10",
+                    BuildingNumber = "10",
+                    Town = "hackney",
+                    Postcode = "E3 4TT"
+                },
+                new QueryableAddress
+                {
+                    Street = "Greenwood Drive",
+                    Line1 = "Flat 2",
+                    Line2 = "10 Greenwood Drive",
+                    PaonStartNumber = 10,
+                    UnitNumber = "2",
+                    BuildingNumber = "10",
+                    Line3 = null,
+                    Line4 = null,
+                    Town = "hackney",
+                    Postcode = "E3 4TT"
+                },
+            };
+            savedAddresses = await IndexAddresses(savedAddresses).ConfigureAwait(true);
+
+            var request = new SearchParameters
+            {
+                Page = 1,
+                PageSize = 50,
+                Gazetteer = GlobalConstants.Gazetteer.Both,
+                AddressQuery = "10 Greenwood Drive"
+            };
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
+
+            addresses.Count.Should().Be(2);
+            addresses.ElementAt(0).Should().BeEquivalentTo(savedAddresses.ElementAt(1).AddressKey);
+            addresses.ElementAt(1).Should().BeEquivalentTo(savedAddresses.ElementAt(0).AddressKey);
+        }
+
+        [Test]
         public async Task WillFirstlyOrderByTown()
         {
             var savedAddresses = new List<QueryableAddress>
@@ -701,8 +829,8 @@ namespace AddressesAPI.Tests.V2.Gateways
             var savedAddresses = new List<QueryableAddress>
             {
                 new QueryableAddress { Town = "town a", Postcode = "", Street = "B Street", PaonStartNumber = 3 },
-                new QueryableAddress {Town = "town a", Postcode = "", Street = "B Street", PaonStartNumber = 0},
-                new QueryableAddress { Town = "town a", Postcode = "", Street = "B Street", PaonStartNumber = 0 }
+                new QueryableAddress { Town = "town a", Postcode = "", Street = "B Street", PaonStartNumber = 0 },
+                new QueryableAddress { Town = "town a", Postcode = "", Street = "B Street", PaonStartNumber = 5 }
             };
             savedAddresses = await IndexAddresses(savedAddresses).ConfigureAwait(true);
 
@@ -726,8 +854,8 @@ namespace AddressesAPI.Tests.V2.Gateways
             var savedAddresses = new List<QueryableAddress>
             {
                 new QueryableAddress { Town = "town a", Postcode = "", Street = "B Street", PaonStartNumber = 1, BuildingNumber = "" },
-                new QueryableAddress { Town = "town a", Postcode = "", Street = "B Street", PaonStartNumber = 1, BuildingNumber = "78" },
-                new QueryableAddress { Town = "town a", Postcode = "", Street = "B Street", PaonStartNumber = 1, BuildingNumber = "99" }
+                new QueryableAddress { Town = "town a", Postcode = "", Street = "B Street", PaonStartNumber = 1, BuildingNumber = "9" },
+                new QueryableAddress { Town = "town a", Postcode = "", Street = "B Street", PaonStartNumber = 1, BuildingNumber = "79" }
             };
             savedAddresses = await IndexAddresses(savedAddresses).ConfigureAwait(true);
 

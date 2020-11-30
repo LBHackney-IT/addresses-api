@@ -135,18 +135,25 @@ namespace AddressesAPI.V2.Gateways
                 .Query(request.AddressQuery)
             );
 
-            return fuzzyMatchText && exactlyMatchNumbers;
+            var exactMatch = q.Match(m => m
+                .Field("full_address.exact_text")
+                .Analyzer("standard")
+                .Query(request.AddressQuery)
+                .Operator(Operator.And));
+
+            return (fuzzyMatchText && exactlyMatchNumbers) || (exactMatch);
         }
 
         private static SortDescriptor<QueryableAddress> SortResults(SortDescriptor<QueryableAddress> srt)
         {
             return srt
+                .Descending(SortSpecialField.Score)
                 .Ascending(f => f.Town)
                 .Field(f => f.Field(n => n.Postcode).Missing("_last"))
                 .Ascending(f => f.Street)
-                .Field(f => f.Field(n => n.PaonStartNumber).Ascending().Missing("_last"))
-                .Field(f => f.Field(n => n.BuildingNumber).Ascending().Missing("_last"))
-                .Field(f => f.Field(n => n.UnitNumber).Ascending().Missing("_last"))
+                .Field(f => f.Field("paon_start_num.sort").Ascending().Missing("_last"))
+                .Field(f => f.Field("building_number.sort").Ascending().Missing("_last"))
+                .Field(f => f.Field("unit_number.sort").Ascending().Missing("_last"))
                 .Field(f => f.Field(n => n.UnitName).Ascending().Missing("_last"));
         }
 
