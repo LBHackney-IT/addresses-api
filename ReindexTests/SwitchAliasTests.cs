@@ -72,6 +72,27 @@ namespace ReindexTests
             task.ApiCall.HttpStatusCode.Should().Be(404);
         }
 
+        [Test]
+        public async Task IfSpecifiedDeleteIndexAfterReindexing()
+        {
+            CreateIndexWithConfig("initialindex", "{}");
+            var alias = _fixture.Create<string>();
+            await AssignToAlias(alias, "initialindex");
+
+            var sqsMessage = new SqsMessage();
+            _sqsClientMock.Setup(s => s.SendMessageAsync(It.Is<SendMessageRequest>(
+                    s => StoreMessage(s, out sqsMessage)), default))
+                .ReturnsAsync(new SendMessageResponse());
+
+            await _classUnderTest.ReindexAlias(new ReindexRequest { alias = alias }, null);
+            System.Threading.Thread.Sleep(1000);
+            sqsMessage.deleteAfterReindex = true;
+            await _classUnderTest.SwitchAlias(SqsEvent(sqsMessage), null);
+
+            var index = await ElasticsearchClient.Indices.GetAsync(Indices.Index("initialindex"));
+            index.Indices.Count.Should().Be(0);
+        }
+
         private static SQSEvent SqsEvent(SqsMessage sqsMessage)
         {
             var sqsEvent = new SQSEvent

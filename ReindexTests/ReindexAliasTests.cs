@@ -90,13 +90,16 @@ namespace ReindexTests
             await AssignToAlias(alias, "initialindex");
             await IndexDocuments(alias, documents);
 
-            var expectedIndexName = alias + "_" + DateTime.Now.ToString("yyyyMMddhhMM");
-            await _classUnderTest.ReindexAlias(new ReindexRequest { alias = alias }, null);
+            var expectedIndexName = alias + "_" + DateTime.Now.ToString("yyyyMMddhhmm");
+            var deleteAfterReindex = true;
 
             _sqsClientMock.Setup(a => a.SendMessageAsync(It.Is<SendMessageRequest>(
-                    r => CheckSqsMessage(r, alias, expectedIndexName)),
+                    r => CheckSqsMessage(r, alias, expectedIndexName, deleteAfterReindex)),
                     It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new SendMessageResponse { MessageId = "ID" });
+                .ReturnsAsync(new SendMessageResponse { MessageId = "ID" }).Verifiable();
+
+            await _classUnderTest.ReindexAlias(new ReindexRequest { alias = alias, deleteAfterReindex = deleteAfterReindex }, null);
+
             _sqsClientMock.Verify();
         }
 
@@ -119,10 +122,11 @@ namespace ReindexTests
             }
         }
 
-        private static bool CheckSqsMessage(SendMessageRequest request, string alias, string indexName)
+        private static bool CheckSqsMessage(SendMessageRequest request, string alias, string indexName, bool deleteAfterReindex)
         {
             var data = JsonConvert.DeserializeObject<SqsMessage>(request.MessageBody);
-            return data.alias.Equals(alias) && data.newIndex.Equals(indexName) && data.taskId != null;
+            return data.alias.Equals(alias) && data.newIndex.Equals(indexName) && data.taskId != null
+                && data.deleteAfterReindex == deleteAfterReindex;
         }
     }
 }

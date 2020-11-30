@@ -79,7 +79,8 @@ namespace Reindex
             {
                 alias = alias,
                 newIndex = newIndexName,
-                taskId = response.Task.FullyQualifiedId
+                taskId = response.Task.FullyQualifiedId,
+                deleteAfterReindex = request.deleteAfterReindex
             };
 
             var sqsResponse = await SendSqsMessageToQueue(JsonConvert.SerializeObject(sqsMessage));
@@ -111,7 +112,7 @@ namespace Reindex
                 }
             }
 
-            await RemoveAllReferencesToAlias(data.alias);
+            var indices = await RemoveAllReferencesToAlias(data.alias);
 
             await _elasticSearchClient.Indices.PutAliasAsync(Indices.Index(data.newIndex), data.alias);
             LambdaLogger.Log($"Address alias {data.alias} to index {data.newIndex}");
@@ -119,10 +120,21 @@ namespace Reindex
             await _elasticSearchClient.DeleteAsync<TaskId>(data.taskId, d => d.Index(".tasks"));
             LambdaLogger.Log($"Deleted Task document with ID {data.taskId}");
 
-            //Delete old index?
+            if (data.deleteAfterReindex)
+            {
+                await RemoveAllIndicesForAlias(indices);
+            }
         }
 
-        private async Task RemoveAllReferencesToAlias(string alias)
+        private async Task RemoveAllIndicesForAlias(IEnumerable<string> indices)
+        {
+            foreach (var index in indices)
+            {
+                await _elasticSearchClient.Indices.DeleteAsync(Indices.Index(index));
+            }
+        }
+
+        private async Task<IReadOnlyCollection<string>> RemoveAllReferencesToAlias(string alias)
         {
             var indicesForAlias = await _elasticSearchClient.GetIndicesPointingToAliasAsync(alias);
             foreach (var index in indicesForAlias)
@@ -130,6 +142,8 @@ namespace Reindex
                 await _elasticSearchClient.Indices.DeleteAliasAsync(Indices.Index(index), alias);
                 LambdaLogger.Log($"Removed alias {alias} from index {index}");
             }
+
+            return indicesForAlias;
         }
 
         private async Task<SendMessageResponse> SendSqsMessageToQueue(string message)
