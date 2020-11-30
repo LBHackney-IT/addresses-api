@@ -80,7 +80,7 @@ module "postgres_db_production" {
 
 /*    ELASTICSEARCH SETUP    */
 
-module "elasticsearch_db_staging" {
+module "elasticsearch_db_production" {
     source = "github.com/LBHackney-IT/aws-hackney-common-terraform.git//modules/database/elasticsearch"
     vpc_id= data.aws_vpc.production_vpc.id
     environment_name= "production"
@@ -136,7 +136,7 @@ resource "aws_iam_policy" "es_policy" {
                        "es:ESHttpPost",
                        "es:ESHttpPut"
                      ],
-            "Resource": "${module.elasticsearch_db_staging.es_arn}"
+            "Resource": "${module.elasticsearch_db_production.es_arn}"
         }
     ]
 }
