@@ -121,14 +121,21 @@ namespace AddressesAPI.V2.Gateways
         {
             if (request.AddressQuery == null) return null;
 
-            return q.Match(c => c
+            var fuzzyMatchText = q.Match(c => c
                 .Field(f => f.FullAddress)
                 .Query(request.AddressQuery)
                 .Analyzer("address_text")
                 .Fuzziness(Fuzziness.Auto)
-                .PrefixLength(3)
                 .Operator(Operator.And)
             );
+            var exactlyMatchNumbers = q.Match(m => m
+                .Field("full_address.extracted_numbers")
+                .ZeroTermsQuery(ZeroTermsQuery.All)
+                .Analyzer("extract_number_analyzer")
+                .Query(request.AddressQuery)
+            );
+
+            return fuzzyMatchText && exactlyMatchNumbers;
         }
 
         private static SortDescriptor<QueryableAddress> SortResults(SortDescriptor<QueryableAddress> srt)

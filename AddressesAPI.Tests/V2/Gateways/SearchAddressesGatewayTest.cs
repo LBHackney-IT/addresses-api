@@ -151,6 +151,8 @@ namespace AddressesAPI.Tests.V2.Gateways
         [TestCase("6", "St James's road", "Islington", "LDN", "6 St Jamess road")]
         [TestCase("6", "St James's road", "Islington", "LDN", "6 St James road")]
         [TestCase("GROUND FLOOR FLAT", "210 Mare Street", "Hackney", "London", "210 Mare Street")]
+        [TestCase("Flat 7", "Allerton House", "Hackney", "London", "flat 7 alerton house")]
+        [TestCase("Flat 1", "29 Oxford Road", "MOSELEY AND KINGS HEATH", "BIRMINGHAM", "1 29 oxord road")]
         public async Task WillMatchPartialAndFuzzySearches(string line1, string line2, string line3, string line4, string searchTerm)
         {
             var savedAddress = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
@@ -175,7 +177,6 @@ namespace AddressesAPI.Tests.V2.Gateways
             addresses.Count.Should().Be(1);
             addresses.First().Should().BeEquivalentTo(savedAddress.AddressKey);
         }
-
 
         [TestCase("340", "yellow road", "hackney", "london", "green road")]
         [TestCase("340", "yellow road", "hackney", "london", "engre road")]

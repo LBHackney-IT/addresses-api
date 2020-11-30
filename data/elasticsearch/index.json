@@ -21,8 +21,13 @@
           "filter": [
             "lowercase",
             "common_street_terms_synonyms",
-            "ignore_unmeaningful_building_words"
+            "ignore_unmeaningful_building_words",
+            "remove_numbers"
           ]
+        },
+        "extract_number_analyzer" : {
+          "tokenizer" : "standard",
+          "filter" : ["extract_numbers", "decimal_digit"]
         }
       },
       "char_filter": {
@@ -42,14 +47,27 @@
           "type": "synonym",
           "ignore_case": true,
           "lenient": false,
-          "synonyms": [ "road, lane, street, avenue, rd, str, avn, ave, close => road" ]
+          "synonyms": [ "road, raod, lane, lanes, street, streat, avenue, rd, str, avn, ave, close => road" ]
         },
         "ignore_unmeaningful_building_words": {
           "type": "stop",
           "ignore_case": true,
           "stopwords": [
-            "flat"
+            "flat",
+            "flt",
+            "apt",
+            "apartment",
+            "fat"
           ]
+        },
+        "extract_numbers" : {
+          "type" : "keep_types",
+          "types" : [ "<NUM>" ]
+        },
+        "remove_numbers" : {
+          "type" : "keep_types",
+          "types" : [ "<NUM>" ],
+          "mode": "exclude"
         }
       }
     }
@@ -105,7 +123,13 @@
       },
       "full_address" : {
         "type" : "text",
-        "analyzer": "address_text"
+        "analyzer": "address_text",
+        "fields": {
+          "extracted_numbers": {
+            "type": "text",
+            "analyzer": "extract_number_analyzer"
+          }
+        }
       },
       "neverexport" : {
         "type" : "boolean"
