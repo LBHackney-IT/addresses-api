@@ -623,15 +623,13 @@ namespace AddressesAPI.Tests.V2.Gateways
         [Test]
         public async Task WillFirstlyOrderByTown()
         {
-            var addressOne = await TestDataHelper
-                .InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress { Town = "town a" })
-                .ConfigureAwait(true);
-            var addressTwo = await TestDataHelper
-                .InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress { Town = "town b" })
-                .ConfigureAwait(true);
-            var addressThree = await TestDataHelper
-                .InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress { Town = "hackney" })
-                .ConfigureAwait(true);
+            var savedAddresses = new List<QueryableAddress>
+            {
+                new QueryableAddress { Town = "town a" },
+                new QueryableAddress { Town = "town b" },
+                new QueryableAddress { Town = "hackney" }
+            };
+            savedAddresses = await IndexAddresses(savedAddresses).ConfigureAwait(true);
 
             var request = new SearchParameters
             {
@@ -642,23 +640,21 @@ namespace AddressesAPI.Tests.V2.Gateways
             var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(3);
-            addresses.ElementAt(0).Should().BeEquivalentTo(addressThree.AddressKey);
-            addresses.ElementAt(1).Should().BeEquivalentTo(addressOne.AddressKey);
-            addresses.ElementAt(2).Should().BeEquivalentTo(addressTwo.AddressKey);
+            addresses.ElementAt(0).Should().BeEquivalentTo(savedAddresses.ElementAt(2).AddressKey);
+            addresses.ElementAt(1).Should().BeEquivalentTo(savedAddresses.ElementAt(0).AddressKey);
+            addresses.ElementAt(2).Should().BeEquivalentTo(savedAddresses.ElementAt(1).AddressKey);
         }
 
         [Test]
         public async Task WillSecondlyOrderByPostcodePresence()
         {
-            var addressOne = await TestDataHelper
-                .InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress { Town = "town a", Postcode = "" })
-                .ConfigureAwait(true);
-            var addressTwo = await TestDataHelper
-                .InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress { Town = "town a", Postcode = "E3 4TT" })
-                .ConfigureAwait(true);
-            var addressThree = await TestDataHelper
-                .InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress { Town = "town b" })
-                .ConfigureAwait(true);
+            var savedAddresses = new List<QueryableAddress>
+            {
+                new QueryableAddress { Town = "town a", Postcode = "" },
+                new QueryableAddress { Town = "town a", Postcode = "E3 4TT" },
+                new QueryableAddress { Town = "town b" }
+            };
+            savedAddresses = await IndexAddresses(savedAddresses).ConfigureAwait(true);
 
             var request = new SearchParameters
             {
@@ -669,23 +665,22 @@ namespace AddressesAPI.Tests.V2.Gateways
             var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(3);
-            addresses.ElementAt(0).Should().BeEquivalentTo(addressTwo.AddressKey);
-            addresses.ElementAt(1).Should().BeEquivalentTo(addressOne.AddressKey);
-            addresses.ElementAt(2).Should().BeEquivalentTo(addressThree.AddressKey);
+            addresses.ElementAt(0).Should().BeEquivalentTo(savedAddresses.ElementAt(1).AddressKey);
+            addresses.ElementAt(1).Should().BeEquivalentTo(savedAddresses.ElementAt(0).AddressKey);
+            addresses.ElementAt(2).Should().BeEquivalentTo(savedAddresses.ElementAt(2).AddressKey);
         }
 
         [Test]
         public async Task WillThirdlyOrderByStreet()
         {
-            var addressOne = await TestDataHelper
-                .InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress { Town = "town b" })
-                .ConfigureAwait(true);
-            var addressTwo = await TestDataHelper
-                .InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress { Town = "town a", Postcode = "", Street = "B Street" })
-                .ConfigureAwait(true);
-            var addressThree = await TestDataHelper
-                .InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress { Town = "town a", Postcode = "", Street = "A Street" })
-                .ConfigureAwait(true);
+            var savedAddresses = new List<QueryableAddress>
+            {
+                new QueryableAddress { Town = "town b" },
+                new QueryableAddress { Town = "town a", Postcode = "", Street = "B Street" },
+                new QueryableAddress { Town = "town a", Postcode = "", Street = "A Street" }
+            };
+            savedAddresses = await IndexAddresses(savedAddresses).ConfigureAwait(true);
+
             var request = new SearchParameters
             {
                 Page = 1,
@@ -695,35 +690,22 @@ namespace AddressesAPI.Tests.V2.Gateways
             var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(3);
-            addresses.ElementAt(0).Should().BeEquivalentTo(addressThree.AddressKey);
-            addresses.ElementAt(1).Should().BeEquivalentTo(addressTwo.AddressKey);
-            addresses.ElementAt(2).Should().BeEquivalentTo(addressOne.AddressKey);
+            addresses.ElementAt(0).Should().BeEquivalentTo(savedAddresses.ElementAt(2).AddressKey);
+            addresses.ElementAt(1).Should().BeEquivalentTo(savedAddresses.ElementAt(1).AddressKey);
+            addresses.ElementAt(2).Should().BeEquivalentTo(savedAddresses.ElementAt(0).AddressKey);
         }
 
         [Test]
         public async Task WillFourthlyOrderByPresenceAndOrderOfPaonStartNumber()
         {
-            var addressOne = await TestDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
+            var savedAddresses = new List<QueryableAddress>
             {
-                Town = "town a",
-                Postcode = "",
-                Street = "B Street",
-                PaonStartNumber = 3
-            }).ConfigureAwait(true);
-            var addressTwo = await TestDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
-            {
-                Town = "town a",
-                Postcode = "",
-                Street = "B Street",
-                PaonStartNumber = 0
-            }).ConfigureAwait(true);
-            var addressThree = await TestDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
-            {
-                Town = "town a",
-                Postcode = "",
-                Street = "B Street",
-                PaonStartNumber = 5
-            }).ConfigureAwait(true);
+                new QueryableAddress { Town = "town a", Postcode = "", Street = "B Street", PaonStartNumber = 3 },
+                new QueryableAddress {Town = "town a", Postcode = "", Street = "B Street", PaonStartNumber = 0},
+                new QueryableAddress { Town = "town a", Postcode = "", Street = "B Street", PaonStartNumber = 0 }
+            };
+            savedAddresses = await IndexAddresses(savedAddresses).ConfigureAwait(true);
+
             var request = new SearchParameters
             {
                 Page = 1,
@@ -733,38 +715,22 @@ namespace AddressesAPI.Tests.V2.Gateways
             var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(3);
-            addresses.ElementAt(0).Should().BeEquivalentTo(addressOne.AddressKey);
-            addresses.ElementAt(1).Should().BeEquivalentTo(addressThree.AddressKey);
-            addresses.ElementAt(2).Should().BeEquivalentTo(addressTwo.AddressKey);
+            addresses.ElementAt(0).Should().BeEquivalentTo(savedAddresses.ElementAt(0).AddressKey);
+            addresses.ElementAt(1).Should().BeEquivalentTo(savedAddresses.ElementAt(2).AddressKey);
+            addresses.ElementAt(2).Should().BeEquivalentTo(savedAddresses.ElementAt(1).AddressKey);
         }
 
         [Test]
         public async Task WillFifthlyOrderByPresenceAndOrderOfBuildingNumber()
         {
-            var addressOne = await TestDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
+            var savedAddresses = new List<QueryableAddress>
             {
-                Town = "town a",
-                Postcode = "",
-                Street = "B Street",
-                PaonStartNumber = 1,
-                BuildingNumber = ""
-            }).ConfigureAwait(true);
-            var addressTwo = await TestDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
-            {
-                Town = "town a",
-                Postcode = "",
-                Street = "B Street",
-                PaonStartNumber = 1,
-                BuildingNumber = "78"
-            }).ConfigureAwait(true);
-            var addressThree = await TestDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
-            {
-                Town = "town a",
-                Postcode = "",
-                Street = "B Street",
-                PaonStartNumber = 1,
-                BuildingNumber = "99"
-            }).ConfigureAwait(true);
+                new QueryableAddress { Town = "town a", Postcode = "", Street = "B Street", PaonStartNumber = 1, BuildingNumber = "" },
+                new QueryableAddress { Town = "town a", Postcode = "", Street = "B Street", PaonStartNumber = 1, BuildingNumber = "78" },
+                new QueryableAddress { Town = "town a", Postcode = "", Street = "B Street", PaonStartNumber = 1, BuildingNumber = "99" }
+            };
+            savedAddresses = await IndexAddresses(savedAddresses).ConfigureAwait(true);
+
             var request = new SearchParameters
             {
                 Page = 1,
@@ -774,41 +740,43 @@ namespace AddressesAPI.Tests.V2.Gateways
             var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(3);
-            addresses.ElementAt(0).Should().BeEquivalentTo(addressTwo.AddressKey);
-            addresses.ElementAt(1).Should().BeEquivalentTo(addressThree.AddressKey);
-            addresses.ElementAt(2).Should().BeEquivalentTo(addressOne.AddressKey);
+            addresses.ElementAt(0).Should().BeEquivalentTo(savedAddresses.ElementAt(1).AddressKey);
+            addresses.ElementAt(1).Should().BeEquivalentTo(savedAddresses.ElementAt(2).AddressKey);
+            addresses.ElementAt(2).Should().BeEquivalentTo(savedAddresses.ElementAt(0).AddressKey);
         }
 
         [Test]
         public async Task WillSixthOrderByPresenceAndOrderOfUnitNumber()
         {
-            var addressOne = await TestDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
+            var savedAddresses = new List<QueryableAddress>
             {
-                Town = "town a",
-                Postcode = "",
-                Street = "B Street",
-                PaonStartNumber = 1,
-                BuildingNumber = "78",
-                UnitNumber = "43"
-            }).ConfigureAwait(true);
-            var addressTwo = await TestDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
-            {
-                Town = "town a",
-                Postcode = "",
-                Street = "B Street",
-                PaonStartNumber = 1,
-                BuildingNumber = "78",
-                UnitNumber = ""
-            }).ConfigureAwait(true);
-            var addressThree = await TestDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
-            {
-                Town = "town a",
-                Postcode = "",
-                Street = "B Street",
-                PaonStartNumber = 1,
-                BuildingNumber = "78",
-                UnitNumber = "23"
-            }).ConfigureAwait(true);
+                new QueryableAddress {
+                    Town = "town a",
+                    Postcode = "",
+                    Street = "B Street",
+                    PaonStartNumber = 1,
+                    BuildingNumber = "78",
+                    UnitNumber = "43"
+                },
+                new QueryableAddress {
+                    Town = "town a",
+                    Postcode = "",
+                    Street = "B Street",
+                    PaonStartNumber = 1,
+                    BuildingNumber = "78",
+                    UnitNumber = ""
+                },
+                new QueryableAddress {
+                    Town = "town a",
+                    Postcode = "",
+                    Street = "B Street",
+                    PaonStartNumber = 1,
+                    BuildingNumber = "78",
+                    UnitNumber = "23"
+                }
+            };
+            savedAddresses = await IndexAddresses(savedAddresses).ConfigureAwait(true);
+
             var request = new SearchParameters
             {
                 Page = 1,
@@ -818,44 +786,46 @@ namespace AddressesAPI.Tests.V2.Gateways
             var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(3);
-            addresses.ElementAt(0).Should().BeEquivalentTo(addressThree.AddressKey);
-            addresses.ElementAt(1).Should().BeEquivalentTo(addressOne.AddressKey);
-            addresses.ElementAt(2).Should().BeEquivalentTo(addressTwo.AddressKey);
+            addresses.ElementAt(0).Should().BeEquivalentTo(savedAddresses.ElementAt(2).AddressKey);
+            addresses.ElementAt(1).Should().BeEquivalentTo(savedAddresses.ElementAt(0).AddressKey);
+            addresses.ElementAt(2).Should().BeEquivalentTo(savedAddresses.ElementAt(1).AddressKey);
         }
 
         [Test]
         public async Task WillInTheSeventhCaseOrderByPresenceAndOrderOfUnitName()
         {
-            var addressOne = await TestDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
+            var savedAddresses = new List<QueryableAddress>
             {
-                Town = "town a",
-                Postcode = "",
-                Street = "B Street",
-                PaonStartNumber = 1,
-                BuildingNumber = "78",
-                UnitNumber = "43",
-                UnitName = "J name"
-            }).ConfigureAwait(true);
-            var addressTwo = await TestDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
-            {
-                Town = "town a",
-                Postcode = "",
-                Street = "B Street",
-                PaonStartNumber = 1,
-                BuildingNumber = "78",
-                UnitNumber = "43",
-                UnitName = "A name"
-            }).ConfigureAwait(true);
-            var addressThree = await TestDataHelper.InsertAddressInEs(ElasticsearchClient, addressConfig: new QueryableAddress
-            {
-                Town = "town a",
-                Postcode = "",
-                Street = "B Street",
-                PaonStartNumber = 1,
-                BuildingNumber = "78",
-                UnitNumber = "43",
-                UnitName = ""
-            }).ConfigureAwait(true);
+                new QueryableAddress {
+                    Town = "town a",
+                    Postcode = "",
+                    Street = "B Street",
+                    PaonStartNumber = 1,
+                    BuildingNumber = "78",
+                    UnitNumber = "43",
+                    UnitName = "J name"
+                },
+                new QueryableAddress {
+                    Town = "town a",
+                    Postcode = "",
+                    Street = "B Street",
+                    PaonStartNumber = 1,
+                    BuildingNumber = "78",
+                    UnitNumber = "43",
+                    UnitName = "A name"
+                },
+                new QueryableAddress {
+                    Town = "town a",
+                    Postcode = "",
+                    Street = "B Street",
+                    PaonStartNumber = 1,
+                    BuildingNumber = "78",
+                    UnitNumber = "43",
+                    UnitName = ""
+                }
+            };
+            savedAddresses = await IndexAddresses(savedAddresses).ConfigureAwait(true);
+
             var request = new SearchParameters
             {
                 Page = 1,
@@ -865,11 +835,23 @@ namespace AddressesAPI.Tests.V2.Gateways
             var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(3);
-            addresses.ElementAt(0).Should().BeEquivalentTo(addressTwo.AddressKey);
-            addresses.ElementAt(1).Should().BeEquivalentTo(addressOne.AddressKey);
-            addresses.ElementAt(2).Should().BeEquivalentTo(addressThree.AddressKey);
+            addresses.ElementAt(0).Should().BeEquivalentTo(savedAddresses.ElementAt(1).AddressKey);
+            addresses.ElementAt(1).Should().BeEquivalentTo(savedAddresses.ElementAt(0).AddressKey);
+            addresses.ElementAt(2).Should().BeEquivalentTo(savedAddresses.ElementAt(2).AddressKey);
         }
 
+        private async Task<List<QueryableAddress>> IndexAddresses(IEnumerable<QueryableAddress> addresses)
+        {
+            var newAddresses = new List<QueryableAddress>();
+            foreach (var queryableAddress in addresses)
+            {
+                newAddresses.Add(await TestDataHelper
+                    .InsertAddressInEs(ElasticsearchClient, addressConfig: queryableAddress)
+                    .ConfigureAwait(true));
+            }
+
+            return newAddresses;
+        }
         #endregion
 
         #region pagination
