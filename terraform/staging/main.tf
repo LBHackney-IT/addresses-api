@@ -80,6 +80,45 @@ module "postgres_db_staging" {
   project_name         = "platform apis"
 }
 
+/*    CLOUDWATCH ALARM SET UP    */
+
+data "aws_sns_topic" "platform_apis" {
+  name = "Platform-APIs-Alerts"
+}
+
+resource "aws_cloudwatch_metric_alarm" "database-transactions-log-disk-usage" {
+  alarm_name          = "database-transactions-log-disk-usage"
+  alarm_description   = "This metric monitors transactions log disk usage goes above a threshold"
+  alarm_actions       = ["${data.aws_sns_topic.platform_apis.arn}"]
+  comparison_operator = "GreaterThanThreshold"
+  threshold           = "3000"
+  evaluation_periods  = "1"
+  metric_name         = "TransactionLogsDiskUsage"
+  namespace           = "RDS"
+  period              = "300"
+  statistic           = "Average"
+
+  dimensions = {
+    DBInstanceIdentifier = "${module.postgres_db_staging.instance_id}"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "free_storage_space_too_low" {
+  alarm_name          = "free-storage-space-too-low"
+  alarm_description   = "Average database free storage space too low within the last 5 minutes"
+  alarm_actions       = ["${data.aws_sns_topic.platform_apis.arn}"]
+  comparison_operator = "LessThanThreshold"
+  threshold           = "40000"
+  evaluation_periods  = "1"
+  metric_name         = "FreeStorageSpace"
+  namespace           = "RDS"
+  period              = "300"
+  statistic           = "Average"
+
+  dimensions = {
+    DBInstanceIdentifier = "${module.postgres_db_staging.instance_id}"
+  }
+}
 
 /*    ELASTICSEARCH SETUP    */
 
@@ -106,27 +145,27 @@ data "aws_ssm_parameter" "addresses_elasticsearch_domain" {
 
 /*    DMS SETUP    */
 data "aws_iam_policy_document" "dms-assume-role-policy" {
-    statement {
-        actions = ["sts:AssumeRole"]
+  statement {
+    actions = ["sts:AssumeRole"]
 
-        principals {
-            type        = "Service"
-            identifiers = ["dms.amazonaws.com"]
-        }
+    principals {
+      type        = "Service"
+      identifiers = ["dms.amazonaws.com"]
     }
+  }
 }
 
 resource "aws_iam_role" "dms_service_role" {
-    name               = "dms_service_role"
-    path               = "/system/"
-    assume_role_policy = data.aws_iam_policy_document.dms-assume-role-policy.json
+  name               = "dms_service_role"
+  path               = "/system/"
+  assume_role_policy = data.aws_iam_policy_document.dms-assume-role-policy.json
 }
 
 resource "aws_iam_policy" "es_policy" {
-    name        = "DMS_Elasticsearch_Addresses_API"
-    description = "A policy allowing you CRUD operations on addresses API elasticsearch cluster"
+  name        = "DMS_Elasticsearch_Addresses_API"
+  description = "A policy allowing you CRUD operations on addresses API elasticsearch cluster"
 
-    policy = <<EOF
+  policy = <<EOF
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -147,8 +186,8 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "attach_policy" {
-    role       = aws_iam_role.dms_service_role.name
-    policy_arn = aws_iam_policy.es_policy.arn
+  role       = aws_iam_role.dms_service_role.name
+  policy_arn = aws_iam_policy.es_policy.arn
 }
 
 resource "aws_dms_endpoint" "address_elasticsearch" {
