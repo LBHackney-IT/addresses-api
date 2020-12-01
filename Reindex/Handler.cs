@@ -94,10 +94,12 @@ namespace Reindex
             var data = JsonConvert.DeserializeObject<SqsMessage>(message);
             LambdaLogger.Log($"Received SQS message {message}");
             var task = await _elasticSearchClient.Tasks.GetTaskAsync(new TaskId(data.taskId));
+            LambdaLogger.Log(JsonConvert.SerializeObject(task));
 
+            if (task.ApiCall.HttpStatusCode == 404) return;
             if (!task.Completed)
             {
-                LambdaLogger.Log("Task has not completed: re-adding message to queue with 10 minute delay");
+                LambdaLogger.Log("Task has not completed: re-adding message to queue");
                 var sqsResponse = await SendSqsMessageToQueue(message);
                 LambdaLogger.Log($"Re-sent task ID to sqs queue messageId: {sqsResponse.MessageId}");
                 return;
