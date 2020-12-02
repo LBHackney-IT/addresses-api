@@ -58,7 +58,7 @@ namespace AddressesAPI.V1.Gateways
                 .ThenBy(a => a.PaonStartNumber)
                 .ThenBy(a => a.BuildingNumber == null)
                 .ThenBy(a => a.BuildingNumber)
-                .ThenBy(a => a.UnitNumber == null)
+                .ThenBy(a => a.UnitNumber == 0)
                 .ThenBy(a => a.UnitNumber)
                 .ThenBy(a => a.UnitName == null)
                 .ThenBy(a => a.UnitName);
