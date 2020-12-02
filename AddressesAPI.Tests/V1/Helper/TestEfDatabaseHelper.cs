@@ -29,7 +29,7 @@ namespace AddressesAPI.Tests.V1.Helper
             if (request?.Street != null) randomAddressRecord.Street = request.Street;
             if (request?.PaonStartNumber != null) randomAddressRecord.PaonStartNumber = request.PaonStartNumber;
             if (request?.BuildingNumber != null) randomAddressRecord.BuildingNumber = ReplaceEmptyStringWithNull(request.BuildingNumber);
-            if (request?.UnitNumber != null) randomAddressRecord.UnitNumber = ReplaceEmptyStringWithNull(request.UnitNumber);
+            if (request?.UnitNumber != null) randomAddressRecord.UnitNumber = request.UnitNumber;
             if (request?.UnitName != null) randomAddressRecord.UnitName = ReplaceEmptyStringWithNull(request.UnitName);
             if (request?.Line1 != null) randomAddressRecord.Line1 = request.Line1;
             if (request?.Line2 != null) randomAddressRecord.Line2 = request.Line2;

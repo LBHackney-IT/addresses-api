@@ -558,7 +558,7 @@ namespace AddressesAPI.Tests.V1.Gateways
                 Street = "B Street",
                 PaonStartNumber = 1,
                 BuildingNumber = "78",
-                UnitNumber = "43"
+                UnitNumber = 43
             });
             var addressTwo = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress
             {
@@ -567,7 +567,7 @@ namespace AddressesAPI.Tests.V1.Gateways
                 Street = "B Street",
                 PaonStartNumber = 1,
                 BuildingNumber = "78",
-                UnitNumber = ""
+                UnitNumber = 0
             });
             var addressThree = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress
             {
@@ -576,7 +576,7 @@ namespace AddressesAPI.Tests.V1.Gateways
                 Street = "B Street",
                 PaonStartNumber = 1,
                 BuildingNumber = "78",
-                UnitNumber = "23"
+                UnitNumber = 23
             });
             var request = new SearchParameters
             {
@@ -603,7 +603,7 @@ namespace AddressesAPI.Tests.V1.Gateways
                 Street = "B Street",
                 PaonStartNumber = 1,
                 BuildingNumber = "78",
-                UnitNumber = "43",
+                UnitNumber = 43,
                 UnitName = "J name"
             });
             var addressTwo = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress
@@ -613,7 +613,7 @@ namespace AddressesAPI.Tests.V1.Gateways
                 Street = "B Street",
                 PaonStartNumber = 1,
                 BuildingNumber = "78",
-                UnitNumber = "43",
+                UnitNumber = 43,
                 UnitName = "A name"
             });
             var addressThree = TestEfDataHelper.InsertAddress(DatabaseContext, request: new NationalAddress
@@ -623,7 +623,7 @@ namespace AddressesAPI.Tests.V1.Gateways
                 Street = "B Street",
                 PaonStartNumber = 1,
                 BuildingNumber = "78",
-                UnitNumber = "43",
+                UnitNumber = 43,
                 UnitName = ""
             });
             var request = new SearchParameters
@@ -744,7 +744,7 @@ namespace AddressesAPI.Tests.V1.Gateways
                     Postcode = postcodes.ElementAt(i),
                     Street = streets.ElementAt(i),
                     BuildingNumber = buildingNumbers.ElementAt(i),
-                    UnitNumber = unitNumbers.ElementAt(i),
+                    UnitNumber = Convert.ToInt16($"{i}{_faker.Random.Int(10, 99)}"),
                     UnitName = unitNames.ElementAt(i),
                     PaonStartNumber = Convert.ToInt16($"{i}{_faker.Random.Int(10, 99)}")
                 }));

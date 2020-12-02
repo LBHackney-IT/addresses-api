@@ -106,7 +106,7 @@ To make changes to the database structure e.g add columns, etc. Follow these ste
 
 1. If you haven't done so previously, you need to install the [dotnet ef cli tool](https://docs.microsoft.com/en-us/ef/core/miscellaneous/cli/dotnet) by running `dotnet tool install --global dotnet-ef` in your terminal.
 2. Make the changes you want to the database model in the code, namely in `AddressesContext` or any of the DbSet's listed within the file.
-3. In your terminal, navigate to the project root folder and run `dotnet ef migrations add -o ./V1/Infrastructure/Migrations -p AddressesAPI NameOfThisMigration` to create the migration files. `NameOfThisMigration` should be replaced with your migration name e.g. `AddColumnNameToCrossReferencesTable`.
+3. In your terminal, navigate to the project root folder and run `dotnet ef migrations add -o ./Infrastructure/Migrations -p AddressesAPI NameOfThisMigration` to create the migration files. `NameOfThisMigration` should be replaced with your migration name e.g. `AddColumnNameToCrossReferencesTable`.
 4. Go to the folder `/AddressesAPI/V1/Infrastructure/Migrations` and you should see two new files for the migration. In the one which doesn't end in `.Designer` you can check through the migration script to make sure everything is being created as you expect.
 5. If the migration file looks wrong or you have missed something, you can either:
 

@@ -66,8 +66,7 @@ namespace AddressesAPI.Infrastructure
         public double Northing { get; set; }
 
         [Column("unit_number")]
-        [MaxLength(17)]
-        public string UnitNumber { get; set; }
+        public int? UnitNumber { get; set; }
 
         [Column("sao_text")]
         [MaxLength(90)]
