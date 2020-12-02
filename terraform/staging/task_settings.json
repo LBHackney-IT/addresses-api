@@ -30,7 +30,23 @@
       "EnableLogging": true,
       "LogComponents": [
           {
+              "Id": "TRANSFORMATION",
+              "Severity": "LOGGER_SEVERITY_DEFAULT"
+          },
+          {
               "Id": "SOURCE_UNLOAD",
+              "Severity": "LOGGER_SEVERITY_DEFAULT"
+          },
+          {
+              "Id": "IO",
+              "Severity": "LOGGER_SEVERITY_DEFAULT"
+          },
+          {
+              "Id": "TARGET_LOAD",
+              "Severity": "LOGGER_SEVERITY_DEFAULT"
+          },
+          {
+              "Id": "PERFORMANCE",
               "Severity": "LOGGER_SEVERITY_DEFAULT"
           },
           {
@@ -38,7 +54,15 @@
               "Severity": "LOGGER_SEVERITY_DEFAULT"
           },
           {
-              "Id": "TARGET_LOAD",
+              "Id": "SORTER",
+              "Severity": "LOGGER_SEVERITY_DEFAULT"
+          },
+          {
+              "Id": "REST_SERVER",
+              "Severity": "LOGGER_SEVERITY_DEFAULT"
+          },
+          {
+              "Id": "VALIDATOR_EXT",
               "Severity": "LOGGER_SEVERITY_DEFAULT"
           },
           {
@@ -48,10 +72,42 @@
           {
               "Id": "TASK_MANAGER",
               "Severity": "LOGGER_SEVERITY_DEFAULT"
+          },
+          {
+              "Id": "TABLES_MANAGER",
+              "Severity": "LOGGER_SEVERITY_DEFAULT"
+          },
+          {
+              "Id": "METADATA_MANAGER",
+              "Severity": "LOGGER_SEVERITY_DEFAULT"
+          },
+          {
+              "Id": "FILE_FACTORY",
+              "Severity": "LOGGER_SEVERITY_DEFAULT"
+          },
+          {
+              "Id": "COMMON",
+              "Severity": "LOGGER_SEVERITY_DEFAULT"
+          },
+          {
+              "Id": "ADDONS",
+              "Severity": "LOGGER_SEVERITY_DEFAULT"
+          },
+          {
+              "Id": "DATA_STRUCTURE",
+              "Severity": "LOGGER_SEVERITY_DEFAULT"
+          },
+          {
+              "Id": "COMMUNICATION",
+              "Severity": "LOGGER_SEVERITY_DEFAULT"
+          },
+          {
+              "Id": "FILE_TRANSFER",
+              "Severity": "LOGGER_SEVERITY_DEFAULT"
           }
       ],
-      "CloudWatchLogGroup": null,
-      "CloudWatchLogStream": null
+      "CloudWatchLogGroup": "dms-tasks-staging-dms-instance",
+      "CloudWatchLogStream": "dms-task-2374SA74Z4BGD3UW4DZNUD5H2C43W4CXXQC56ZI"
   },
   "ControlTablesSettings": {
       "historyTimeslotInMinutes": 5,
