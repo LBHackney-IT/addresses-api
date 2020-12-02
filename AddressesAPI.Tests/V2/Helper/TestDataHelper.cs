@@ -50,6 +50,7 @@ namespace AddressesAPI.Tests.V2.Helper
                 AddressStatus = address.AddressStatus,
                 BuildingNumber = address.BuildingNumber,
                 PropertyShell = address.PropertyShell,
+                PropertyChangeDate = address.PropertyChangeDate,
                 UsageCode = address.UsageCode,
                 UsagePrimary = address.UsagePrimary,
                 AddressChangeDate = address.AddressChangeDate,
@@ -99,6 +100,8 @@ namespace AddressesAPI.Tests.V2.Helper
             if (request?.Street != null) randomAddressRecord.Street = request.Street;
             if (request?.PaonStartNumber != null) randomAddressRecord.PaonStartNumber = request.PaonStartNumber;
             if (request?.PaonStartNumber == 0) randomAddressRecord.PaonStartNumber = null;
+            if (request?.PropertyChangeDate != null) randomAddressRecord.PropertyChangeDate = request.PropertyChangeDate;
+            if (request?.PropertyChangeDate == 0) randomAddressRecord.PropertyChangeDate = null;
             if (request?.BuildingNumber != null)
                 randomAddressRecord.BuildingNumber = ReplaceEmptyStringWithNull(request.BuildingNumber);
             if (request?.UnitNumber != null) randomAddressRecord.UnitNumber = ReplaceEmptyStringWithNull(request.UnitNumber);
@@ -135,6 +138,8 @@ namespace AddressesAPI.Tests.V2.Helper
             if (request?.Town != null) randomAddressRecord.Town = request.Town;
             if (request?.Street != null) randomAddressRecord.Street = request.Street;
             if (request?.PaonStartNumber != null) randomAddressRecord.PaonStartNumber = request.PaonStartNumber;
+            if (request?.PropertyChangeDate != null) randomAddressRecord.PropertyChangeDate = request.PropertyChangeDate;
+            if (request?.PropertyChangeDate == 0) randomAddressRecord.PropertyChangeDate = null;
             if (request?.BuildingNumber != null)
                 randomAddressRecord.BuildingNumber = ReplaceEmptyStringWithNull(request.BuildingNumber);
             if (request?.UnitNumber != null) randomAddressRecord.UnitNumber = ReplaceEmptyStringWithNull(request.UnitNumber);

@@ -215,6 +215,9 @@
             "ignore_above" : 256
           }
         }
+      },
+      "blpu_last_update_date": {
+        "type": "integer"
       }
     }
   }

@@ -430,18 +430,15 @@ namespace AddressesAPI.Tests.V2.Gateways
         [Test]
         public async Task IfOutOfBoroughFlagIsTrueReturnsAllAddresses()
         {
-            await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
-                addressConfig: new QueryableAddress { OutOfBoroughAddress = true, Gazetteer = "Hackney" }
-            ).ConfigureAwait(true);
-            await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
-                addressConfig: new QueryableAddress { OutOfBoroughAddress = false, Gazetteer = "Hackney" }
-            ).ConfigureAwait(true);
-            await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
-                addressConfig: new QueryableAddress { OutOfBoroughAddress = false, Gazetteer = "National" }
-            ).ConfigureAwait(true);
-            await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
-                addressConfig: new QueryableAddress { OutOfBoroughAddress = true, Gazetteer = "National" }
-            ).ConfigureAwait(true);
+            var savedAddresses = new List<QueryableAddress>
+            {
+                new QueryableAddress {OutOfBoroughAddress = true, Gazetteer = "Hackney"},
+                new QueryableAddress {OutOfBoroughAddress = false, Gazetteer = "Hackney"},
+                new QueryableAddress {OutOfBoroughAddress = false, Gazetteer = "National"},
+                new QueryableAddress {OutOfBoroughAddress = true, Gazetteer = "National"}
+            };
+            await IndexAddresses(savedAddresses).ConfigureAwait(true);
+
             var request = new SearchParameters
             {
                 Page = 1,
@@ -484,6 +481,32 @@ namespace AddressesAPI.Tests.V2.Gateways
             addresses.Count.Should().Be(2);
             addresses.Should().ContainEquivalentOf(addressOne.AddressKey);
             addresses.Should().ContainEquivalentOf(addressTwo.AddressKey);
+        }
+
+        [Test]
+        public async Task WillOnlyReturnAddressesModifiedSinceADate()
+        {
+            var savedAddresses = new List<QueryableAddress>
+            {
+                new QueryableAddress {PropertyChangeDate = 20200523},
+                new QueryableAddress {PropertyChangeDate = 20191204},
+                new QueryableAddress {PropertyChangeDate = 20200801},
+                new QueryableAddress {PropertyChangeDate = 20201203}
+            };
+            savedAddresses = await IndexAddresses(savedAddresses).ConfigureAwait(true);
+
+            var request = new SearchParameters
+            {
+                Page = 1,
+                PageSize = 50,
+                Gazetteer = GlobalConstants.Gazetteer.Both,
+                ModifiedSince = new DateTime(2020, 06, 01),
+            };
+            var (addressKeys, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
+
+            addressKeys.Count.Should().Be(2);
+            addressKeys.Should().Contain(savedAddresses.ElementAt(2).AddressKey);
+            addressKeys.Should().Contain(savedAddresses.ElementAt(3).AddressKey);
         }
         #endregion
 

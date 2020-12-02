@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Threading.Tasks;
 using AddressesAPI.V2.Boundary.Requests;
 using AddressesAPI.V2.Boundary.Responses;
@@ -77,7 +78,10 @@ namespace AddressesAPI.V2.UseCase
                 UsagePrimary = request.UsagePrimary,
                 OutOfBoroughAddress = addressScope != GlobalConstants.AddressScope.HackneyBorough,
                 IncludeParentShells = request.IncludeParentShells,
-                AddressQuery = request.Query
+                AddressQuery = request.Query,
+                ModifiedSince = request.ModifiedSince == null
+                    ? (DateTime?) null
+                    : DateTime.ParseExact(request.ModifiedSince, "yyyy-MM-dd", CultureInfo.InvariantCulture)
             };
         }
     }

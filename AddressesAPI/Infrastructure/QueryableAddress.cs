@@ -82,5 +82,8 @@ namespace AddressesAPI.Infrastructure
         public string UnitNumber { get; set; }
         [Text(Name = "sao_text")]
         public string UnitName { get; set; }
+
+        [Text(Name = "blpu_last_update_date")]
+        public int? PropertyChangeDate { get; set; }
     }
 }

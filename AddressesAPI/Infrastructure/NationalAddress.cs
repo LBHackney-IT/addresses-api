@@ -46,7 +46,7 @@ namespace AddressesAPI.Infrastructure
         public string UsageCode { get; set; }
 
         [Column("blpu_last_update_date")]
-        public int PropertyChangeDate { get; set; }
+        public int? PropertyChangeDate { get; set; }
 
         [Column("usage_description")]
         [MaxLength(160)]

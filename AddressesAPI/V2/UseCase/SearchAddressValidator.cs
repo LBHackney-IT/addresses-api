@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using AddressesAPI.V2.Boundary.Requests;
@@ -32,6 +33,11 @@ namespace AddressesAPI.V2.UseCase
             RuleFor(r => r.Postcode)
                 .Matches(new Regex("^((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]))))( )?(([0-9][A-Za-z]?[A-Za-z]?)?))$"))
                 .WithMessage("Must provide at least the first part of the postcode.");
+
+            RuleFor(r => r.ModifiedSince)
+                .Must(modifiedSince => modifiedSince == null
+                        || DateTime.TryParseExact(modifiedSince, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out _))
+                .WithMessage("Invalid date format. Please provide date in the format YYYY-MM-DD");
 
             RuleFor(r => r)
                 .Must(CheckForAtLeastOneMandatoryFilterPropertyWithHackneyGazetteer)
