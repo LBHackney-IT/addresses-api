@@ -49,7 +49,7 @@ namespace AddressesAPI.Infrastructure.Migrations
                     property_shell = table.Column<bool>(nullable: false),
                     easting = table.Column<double>(nullable: false),
                     northing = table.Column<double>(nullable: false),
-                    unit_number = table.Column<string>(maxLength: 17, nullable: true),
+                    unit_number = table.Column<int?>(maxLength: 17, nullable: true),
                     sao_text = table.Column<string>(maxLength: 90, nullable: true),
                     building_number = table.Column<string>(maxLength: 17, nullable: true),
                     pao_text = table.Column<string>(maxLength: 90, nullable: true),

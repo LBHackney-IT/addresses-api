@@ -101,7 +101,8 @@ namespace AddressesAPI.Tests.V2.Helper
             if (request?.PaonStartNumber == 0) randomAddressRecord.PaonStartNumber = null;
             if (request?.BuildingNumber != null)
                 randomAddressRecord.BuildingNumber = ReplaceEmptyStringWithNull(request.BuildingNumber);
-            if (request?.UnitNumber != null) randomAddressRecord.UnitNumber = ReplaceEmptyStringWithNull(request.UnitNumber);
+            if (request?.UnitNumber != null) randomAddressRecord.UnitNumber = request.UnitNumber;
+            if (request?.UnitNumber == 0) randomAddressRecord.UnitNumber = null;
             if (request?.UnitName != null) randomAddressRecord.UnitName = ReplaceEmptyStringWithNull(request.UnitName);
             if (request?.Line1 != null) randomAddressRecord.Line1 = request.Line1;
             if (request?.Line2 != null) randomAddressRecord.Line2 = request.Line2;

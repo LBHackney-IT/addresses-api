@@ -172,10 +172,9 @@ namespace AddressesAPI.Infrastructure.Migrations
                         .HasColumnType("character varying(90)")
                         .HasMaxLength(90);
 
-                    b.Property<string>("UnitNumber")
+                    b.Property<int?>("UnitNumber")
                         .HasColumnName("unit_number")
-                        .HasColumnType("character varying(17)")
-                        .HasMaxLength(17);
+                        .HasColumnType("integer");
 
                     b.Property<string>("UsageCode")
                         .HasColumnName("blpu_class")
