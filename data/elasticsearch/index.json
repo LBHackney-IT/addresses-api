@@ -142,6 +142,10 @@
             "type" : "text",
             "analyzer": "standard",
             "similarity": "boolean"
+          },
+          "keyword": {
+            "type" : "text",
+            "analyzer" : "whitespace_removed"
           }
         }
       },
