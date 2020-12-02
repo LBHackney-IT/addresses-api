@@ -140,8 +140,12 @@ namespace AddressesAPI.V2.Gateways
                 .Analyzer("standard")
                 .Query(request.AddressQuery)
                 .Operator(Operator.And));
+            var orderedMatch = q.Match(m => m
+                .Field("full_address.keyword")
+                .Analyzer("whitespace_removed")
+                .Query(request.AddressQuery));
 
-            return (fuzzyMatchText && exactlyMatchNumbers) || (exactMatch);
+            return (fuzzyMatchText && exactlyMatchNumbers) || (exactMatch) || orderedMatch;
         }
 
         private static SortDescriptor<QueryableAddress> SortResults(SortDescriptor<QueryableAddress> srt)

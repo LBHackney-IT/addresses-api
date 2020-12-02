@@ -749,6 +749,56 @@ namespace AddressesAPI.Tests.V2.Gateways
         }
 
         [Test]
+        public async Task ItWillOrderMatchesInTheCorrectOrderOverMatchesWillSearchTermsSpreadOut()
+        {
+            var savedAddresses = new List<QueryableAddress>
+            {
+                new QueryableAddress
+                {
+                    Street = "ETON COLLEGE ROAD",
+                    Line1 = "FLAT 12",
+                    Line2 = " ETON RISE",
+                    Line3 = " ETON COLLEGE ROAD",
+                    Line4 = "LONDON",
+                    PaonStartNumber = null,
+                    UnitNumber = "12",
+                    UnitName = "Flat 12",
+                    BuildingNumber = "",
+                    Town = "LONDON",
+                    Postcode = "NW3 2DE"
+                },
+                new QueryableAddress
+                {
+                    Street = "READING LANE",
+                    Line1 = "FLAT A",
+                    Line2 = "12 ETON ROAD",
+                    PaonStartNumber = 12,
+                    UnitNumber = null,
+                    UnitName = "A",
+                    BuildingNumber = "12",
+                    Line3 = "LONDON",
+                    Line4 = "NW3 4SS",
+                    Town = "LONDON",
+                    Postcode = "NW3 4SS"
+                },
+            };
+            savedAddresses = await IndexAddresses(savedAddresses).ConfigureAwait(true);
+
+            var request = new SearchParameters
+            {
+                Page = 1,
+                PageSize = 50,
+                Gazetteer = GlobalConstants.Gazetteer.Both,
+                AddressQuery = "12 eton road"
+            };
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
+
+            addresses.Count.Should().Be(2);
+            addresses.ElementAt(0).Should().BeEquivalentTo(savedAddresses.ElementAt(1).AddressKey);
+            addresses.ElementAt(1).Should().BeEquivalentTo(savedAddresses.ElementAt(0).AddressKey);
+        }
+
+        [Test]
         public async Task WillFirstlyOrderByTown()
         {
             var savedAddresses = new List<QueryableAddress>
