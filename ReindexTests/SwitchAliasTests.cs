@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Amazon.Lambda.SQSEvents;
 using Amazon.SQS;
@@ -26,6 +27,26 @@ namespace ReindexTests
         {
             _sqsClientMock = new Mock<IAmazonSQS>();
             _classUnderTest = new Handler(_sqsClientMock.Object, "./../../../../data/elasticsearch/index.json");
+        }
+
+        [Test]
+        public async Task IfTaskNoLongerExistsSwitchAliasReturnsWithoutReaddingMessageToTheQueue()
+        {
+            CreateIndexWithConfig("initialindex", "{}");
+            var alias = _fixture.Create<string>();
+            await AssignToAlias(alias, "initialindex");
+
+            var sqsMessage = new SqsMessage
+            {
+                alias = alias,
+                taskId = "HSYFGEWUIFGEWUIFG:34256",
+                deleteAfterReindex = true
+            };
+
+            await _classUnderTest.SwitchAlias(SqsEvent(sqsMessage), null);
+
+            _sqsClientMock.Verify(x => x.SendMessageAsync(It.IsAny<SendMessageRequest>(), It.IsAny<CancellationToken>()),
+                Times.Never);
         }
 
         [Test]

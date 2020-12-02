@@ -31,7 +31,7 @@ functions:
     name: ${self:service}-reindex-es-alias-${self:provider.stage}
     handler: Reindex::Reindex.Handler::ReindexAlias
     role: lambdaExecutionRole
-    timeout: 20
+    timeout: 60
     package:
       artifact: ./Reindex/bin/release/netcoreapp3.1/reindex-es-alias.zip
     environment:
@@ -41,6 +41,7 @@ functions:
     name: ${self:service}-switch-es-alias-after-reindex-${self:provider.stage}
     handler: Reindex::Reindex.Handler::SwitchAlias
     role: lambdaExecutionRole
+    timeout: 30
     package:
       artifact: ./Reindex/bin/release/netcoreapp3.1/reindex-es-alias.zip
     environment:
