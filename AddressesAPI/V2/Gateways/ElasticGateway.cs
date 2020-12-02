@@ -155,9 +155,8 @@ namespace AddressesAPI.V2.Gateways
                 .Ascending(f => f.Town)
                 .Field(f => f.Field(n => n.Postcode).Missing("_last"))
                 .Ascending(f => f.Street)
-                .Field(f => f.Field("paon_start_num.sort").Ascending().Missing("_last"))
-                .Field(f => f.Field("building_number.sort").Ascending().Missing("_last"))
-                .Field(f => f.Field("unit_number.sort").Ascending().Missing("_last"))
+                .Field(f => f.Field(n => n.PaonStartNumber).Ascending().Missing("_last"))
+                .Field(f => f.Field(n => n.UnitNumber).Ascending().Missing("_last"))
                 .Field(f => f.Field(n => n.UnitName).Ascending().Missing("_last"));
         }
 
