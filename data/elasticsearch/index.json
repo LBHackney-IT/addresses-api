@@ -110,22 +110,26 @@
       },
       "line1" : {
         "type" : "text",
-        "analyzer": "address_text",
-        "copy_to": "full_address"
+        "analyzer": "standard",
+        "copy_to": "full_address",
+        "similarity": "boolean"
       },
       "line2" : {
         "type" : "text",
-        "analyzer": "address_text",
+        "analyzer": "standard",
+        "similarity": "boolean",
         "copy_to": "full_address"
       },
       "line3" : {
         "type" : "text",
-        "analyzer": "address_text",
-        "copy_to": "full_address"
+        "analyzer": "standard",
+        "copy_to": "full_address",
+        "similarity": "boolean"
       },
       "line4" : {
         "type" : "text",
-        "analyzer": "address_text",
+        "analyzer": "standard",
+        "similarity": "boolean",
         "copy_to": "full_address"
       },
       "full_address" : {
@@ -142,10 +146,6 @@
             "type" : "text",
             "analyzer": "standard",
             "similarity": "boolean"
-          },
-          "keyword": {
-            "type" : "text",
-            "analyzer" : "whitespace_removed"
           }
         }
       },

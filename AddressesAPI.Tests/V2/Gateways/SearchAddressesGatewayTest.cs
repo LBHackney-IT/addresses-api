@@ -797,8 +797,10 @@ namespace AddressesAPI.Tests.V2.Gateways
             addresses.ElementAt(1).Should().BeEquivalentTo(savedAddresses.ElementAt(0).AddressKey);
         }
 
-        [Test]
-        public async Task ItWillOrderMatchesInTheCorrectOrderOverMatchesWillSearchTermsSpreadOut()
+        [TestCase("eton road")]
+        [TestCase("12 eton road london")]
+        [TestCase("12 eton road")]
+        public async Task ItWillOrderMatchesInTheCorrectOrderOverMatchesWillSearchTermsSpreadOut(string query)
         {
             var savedAddresses = new List<QueryableAddress>
             {
@@ -838,7 +840,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 Page = 1,
                 PageSize = 50,
                 Gazetteer = GlobalConstants.Gazetteer.Both,
-                AddressQuery = "12 eton road"
+                AddressQuery = query
             };
             var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
