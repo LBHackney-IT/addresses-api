@@ -80,7 +80,6 @@ module "postgres_db_staging" {
   project_name         = "platform apis"
 }
 
-
 /*    ELASTICSEARCH SETUP    */
 
 module "elasticsearch_db_staging" {
@@ -106,27 +105,27 @@ data "aws_ssm_parameter" "addresses_elasticsearch_domain" {
 
 /*    DMS SETUP    */
 data "aws_iam_policy_document" "dms-assume-role-policy" {
-    statement {
-        actions = ["sts:AssumeRole"]
+  statement {
+    actions = ["sts:AssumeRole"]
 
-        principals {
-            type        = "Service"
-            identifiers = ["dms.amazonaws.com"]
-        }
+    principals {
+      type        = "Service"
+      identifiers = ["dms.amazonaws.com"]
     }
+  }
 }
 
 resource "aws_iam_role" "dms_service_role" {
-    name               = "dms_service_role"
-    path               = "/system/"
-    assume_role_policy = data.aws_iam_policy_document.dms-assume-role-policy.json
+  name               = "dms_service_role"
+  path               = "/system/"
+  assume_role_policy = data.aws_iam_policy_document.dms-assume-role-policy.json
 }
 
 resource "aws_iam_policy" "es_policy" {
-    name        = "DMS_Elasticsearch_Addresses_API"
-    description = "A policy allowing you CRUD operations on addresses API elasticsearch cluster"
+  name        = "DMS_Elasticsearch_Addresses_API"
+  description = "A policy allowing you CRUD operations on addresses API elasticsearch cluster"
 
-    policy = <<EOF
+  policy = <<EOF
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -147,8 +146,8 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "attach_policy" {
-    role       = aws_iam_role.dms_service_role.name
-    policy_arn = aws_iam_policy.es_policy.arn
+  role       = aws_iam_role.dms_service_role.name
+  policy_arn = aws_iam_policy.es_policy.arn
 }
 
 resource "aws_dms_endpoint" "address_elasticsearch" {
