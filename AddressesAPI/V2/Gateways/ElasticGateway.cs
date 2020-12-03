@@ -114,6 +114,7 @@ namespace AddressesAPI.V2.Gateways
                    && SearchStreet(request, q)
                    && SearchCrossReferencedUprns(request, q)
                    && FilterParentShells(request, q)
+                   && FilterByModifiedSinceDate(request, q)
                    && SearchAddressFullText(request, q);
         }
 
@@ -172,6 +173,16 @@ namespace AddressesAPI.V2.Gateways
 
             return null;
         }
+
+        private static QueryContainer FilterByModifiedSinceDate(SearchParameters request, QueryContainerDescriptor<QueryableAddress> q)
+        {
+            if (request.ModifiedSince == null) return null;
+
+            var date = Convert.ToInt32(request.ModifiedSince.Value.ToString("yyyyMMdd"));
+            return q.Range(r => r.Field(f => f.PropertyChangeDate)
+                .GreaterThanOrEquals(date));
+        }
+
 
         private static QueryContainer HasAParentShell(QueryContainerDescriptor<QueryableAddress> q)
         {

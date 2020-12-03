@@ -92,6 +92,32 @@ namespace AddressesAPI.Tests.V2.E2ETests
             returnedAddress.Data.Addresses.First().AddressKey.Should().Be(addressKey);
         }
 
+        [Test]
+        public async Task CanSearchAddressesThatHaveBeenModifiedSinceADate()
+        {
+            var randomDate = _faker.Date.Past(3);
+
+            var addressModifiedAfterOne = await AddAddressModifiedOnDate("E8", Convert.ToInt32(randomDate.AddDays(32).ToString("yyyyMMdd")))
+                .ConfigureAwait(true);
+            var addressModifiedAfterTwo = await AddAddressModifiedOnDate("E8", Convert.ToInt32(randomDate.AddDays(1).ToString("yyyyMMdd")))
+                    .ConfigureAwait(true);
+            var addressModifiedBeforeOne = await AddAddressModifiedOnDate("E8", Convert.ToInt32(randomDate.AddDays(-106).ToString("yyyyMMdd")))
+                .ConfigureAwait(true);
+            var addressModifiedBeforeTwo = await AddAddressModifiedOnDate("E8", Convert.ToInt32(randomDate.AddDays(-50).ToString("yyyyMMdd")))
+                .ConfigureAwait(true);
+
+            var queryString = $"postcode=E8&modified_since={randomDate:yyyy-MM-dd}&Format=Detailed&address_scope=national";
+
+            var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
+            response.StatusCode.Should().Be(200);
+
+            var returnedAddress = await response.ConvertToSearchAddressResponseObject().ConfigureAwait(true);
+            returnedAddress.Data.Addresses.Count.Should().Be(2);
+            var returnedKeys = returnedAddress.Data.Addresses.Select(a => a.AddressKey).ToList();
+            returnedKeys.Should().Contain(addressModifiedAfterOne.AddressKey);
+            returnedKeys.Should().Contain(addressModifiedAfterTwo.AddressKey);
+        }
+
         [TestCase("green street")]
         [TestCase("green str")]
         [TestCase("green road")]
@@ -310,6 +336,16 @@ namespace AddressesAPI.Tests.V2.E2ETests
                 await TestDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, addressKey, randomAddress)
                     .ConfigureAwait(true);
             }
+        }
+
+        private async Task<NationalAddress> AddAddressModifiedOnDate(string postcode, int date)
+        {
+            return await TestDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, request: new NationalAddress
+            {
+                PropertyChangeDate = date,
+                Postcode = postcode
+            })
+                .ConfigureAwait(true);
         }
 
         private async Task<HttpResponseMessage> CallEndpointWithQueryParameters(string query)

@@ -260,6 +260,27 @@ namespace AddressesAPI.Tests.V2.UseCase
             _classUnderTest.ShouldNotHaveValidationErrorFor(x => x.RequestFields, request);
         }
 
+        [TestCase("20203102")]
+        [TestCase("02/04/2020")]
+        [TestCase("20200231")]
+        [TestCase("2020-31-02")]
+        public void GivenADateInTheWrongFormat_WhenCallingValidation_ItReturnsAnError(string date)
+        {
+            var request = new SearchAddressRequest() { ModifiedSince = date };
+
+            _classUnderTest.ShouldHaveValidationErrorFor(x => x.ModifiedSince, request)
+                .WithErrorMessage("Invalid date format. Please provide date in the format YYYY-MM-DD");
+        }
+
+        [TestCase("2020-02-27")]
+        [TestCase("2017-12-05")]
+        public void GivenADateInTheCorrectFormat_WhenCallingValidation_ItReturnsNotError(string date)
+        {
+            var request = new SearchAddressRequest() { ModifiedSince = date };
+
+            _classUnderTest.ShouldNotHaveValidationErrorFor(x => x.ModifiedSince, request);
+        }
+
         #endregion
         #region Request object validation
 

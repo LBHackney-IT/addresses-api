@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace AddressesAPI.V2.Domain
@@ -21,5 +22,6 @@ namespace AddressesAPI.V2.Domain
         public int Page { get; set; }
         public int PageSize { get; set; }
         public string AddressQuery { get; set; }
+        public DateTime? ModifiedSince { get; set; }
     }
 }

@@ -109,6 +109,12 @@ namespace AddressesAPI.V2.Boundary.Requests
         public string CrossRefValue { get; set; }
 
         /// <summary>
+        /// Filter addresses by those which have been modified since the provided date. Date should provided in the format YYYY-MM-DD.
+        /// </summary>
+        [FromQuery(Name = "modified_since")]
+        public string ModifiedSince { get; set; }
+
+        /// <summary>
         /// Page defaults to 1 as paging is 1 index based not 0 index based
         /// </summary>
         public int Page { get; set; } = 1;

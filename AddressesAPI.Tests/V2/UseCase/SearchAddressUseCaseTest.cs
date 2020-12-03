@@ -60,7 +60,8 @@ namespace AddressesAPI.Tests.V2.UseCase
                 USRN = _faker.Random.Int(0, 9999999),
                 IncludeParentShells = _faker.Random.Bool(),
                 CrossRefCode = "123DEF",
-                CrossRefValue = "20000"
+                CrossRefValue = "20000",
+                ModifiedSince = "2019-03-05"
             };
             _searchAddressGateway.Setup(s => s.SearchAddresses(It.Is<SearchParameters>(
                     x =>
@@ -79,7 +80,8 @@ namespace AddressesAPI.Tests.V2.UseCase
                         && x.IncludeParentShells == request.IncludeParentShells
                         && x.CrossRefCode == request.CrossRefCode
                         && x.CrossRefValue == request.CrossRefValue
-                        && x.AddressQuery == request.Query)))
+                        && x.AddressQuery == request.Query
+                        && x.ModifiedSince.Value.ToString("yyyy-MM-dd") == request.ModifiedSince)))
                 .ReturnsAsync((new List<string>(), 1)).Verifiable();
 
             _classUnderTest.ExecuteAsync(request);
