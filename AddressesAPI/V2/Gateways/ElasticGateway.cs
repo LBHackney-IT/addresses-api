@@ -164,9 +164,10 @@ namespace AddressesAPI.V2.Gateways
         {
             if (!request.IncludeParentShells)
             {
-                return q.Term(t => t
+                return q.Terms(t => t
                     .Field(f => f.PropertyShell)
-                    .Value(false));
+                    .Terms(false)
+                    );
             }
 
             return null;
@@ -183,8 +184,8 @@ namespace AddressesAPI.V2.Gateways
         {
             return request.OutOfBoroughAddress
                 ? null
-                : (!q.Match(m => m.Field(f => f.Gazetteer).Query("national"))
-                  && q.Term(t => t.Field(f => f.OutOfBoroughAddress).Value(false)));
+                : (!q.Terms(m => m.Field(f => f.Gazetteer).Terms("national"))
+                  && q.Terms(t => t.Field(f => f.OutOfBoroughAddress).Terms(false)));
         }
 
         private static QueryContainer SearchGazetteer(SearchParameters request, QueryContainerDescriptor<QueryableAddress> q)
@@ -223,18 +224,18 @@ namespace AddressesAPI.V2.Gateways
         {
             if (request.Usrn == null) return null;
 
-            return q.Term(t => t
+            return q.Terms(t => t
                 .Field(f => f.USRN)
-                .Value(request.Usrn));
+                .Terms(request.Usrn));
         }
 
         private static QueryContainer SearchUprns(SearchParameters request, QueryContainerDescriptor<QueryableAddress> q)
         {
             if (request.Uprn == null) return null;
 
-            return q.Term(t => t
+            return q.Terms(t => t
                 .Field(f => f.UPRN)
-                .Value(request.Uprn));
+                .Terms(request.Uprn));
         }
 
         private static QueryContainer SearchCrossReferencedUprns(SearchParameters request, QueryContainerDescriptor<QueryableAddress> q)
