@@ -35,7 +35,7 @@ It takes the following input
 }
 ```
 
-- `alias` Is the alias name you want to be assigned to the newly created index. It should be the alias that you search against. In our case it will be `hackeny_addresses` or `national_addresses`.
+- `alias` Is the alias name you want to be assigned to the newly created index. It should be the alias that you search against. In our case it will be `hackney_addresses` or `national_addresses`.
 - `fromIndex` (Optional) is the index that you want to move data from into the new index.
 >Note
 >  - When running this on the schedule to copy data from the DMS created indices into the managed indices, `fromIndex` should be set to `hackney_address` or `national_address` (the names of the DMS created indices).
@@ -57,4 +57,3 @@ The second lambda function is triggered by messages being added to the SQS queue
 5. The alias is added to the new index that has just been created and populated with data.
 6. The task document is deleted from elasticsearch.
 7. If `deleteAfterReindex` is `true`, any indexes that were attached to the alias are deleted leaving just the newly created index. Note that if the `fromIndex` index does not have the `alias` attached to it then it won't be deleted.
-
