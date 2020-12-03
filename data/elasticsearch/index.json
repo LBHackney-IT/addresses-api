@@ -206,6 +206,9 @@
       },
       "blpu_last_update_date": {
         "type": "integer"
+      },
+      "blpu_start_date": {
+        "type": "integer"
       }
     }
   }

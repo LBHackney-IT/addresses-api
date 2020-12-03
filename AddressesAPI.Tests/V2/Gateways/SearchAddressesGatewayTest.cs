@@ -508,6 +508,32 @@ namespace AddressesAPI.Tests.V2.Gateways
             addressKeys.Should().Contain(savedAddresses.ElementAt(2).AddressKey);
             addressKeys.Should().Contain(savedAddresses.ElementAt(3).AddressKey);
         }
+
+        [Test]
+        public async Task WillOnlyReturnAddressesModifiedSinceADateIfTheyAreNewlyCreated()
+        {
+            var savedAddresses = new List<QueryableAddress>
+            {
+                new QueryableAddress {PropertyChangeDate = 20200523, PropertyStartDate = 20190523},
+                new QueryableAddress {PropertyChangeDate = 20191204, PropertyStartDate = 20190523},
+                new QueryableAddress {PropertyStartDate = 20200801, PropertyChangeDate = null},
+                new QueryableAddress {PropertyStartDate = 20201203, PropertyChangeDate = null}
+            };
+            savedAddresses = await IndexAddresses(savedAddresses).ConfigureAwait(true);
+
+            var request = new SearchParameters
+            {
+                Page = 1,
+                PageSize = 50,
+                Gazetteer = GlobalConstants.Gazetteer.Both,
+                ModifiedSince = new DateTime(2020, 06, 01),
+            };
+            var (addressKeys, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
+
+            addressKeys.Count.Should().Be(2);
+            addressKeys.Should().Contain(savedAddresses.ElementAt(2).AddressKey);
+            addressKeys.Should().Contain(savedAddresses.ElementAt(3).AddressKey);
+        }
         #endregion
 
         #region parentShells

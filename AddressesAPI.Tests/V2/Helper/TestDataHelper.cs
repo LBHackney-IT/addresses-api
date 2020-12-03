@@ -51,6 +51,7 @@ namespace AddressesAPI.Tests.V2.Helper
                 BuildingNumber = address.BuildingNumber,
                 PropertyShell = address.PropertyShell,
                 PropertyChangeDate = address.PropertyChangeDate,
+                PropertyStartDate = address.PropertyStartDate,
                 UsageCode = address.UsageCode,
                 UsagePrimary = address.UsagePrimary,
                 AddressChangeDate = address.AddressChangeDate,
@@ -102,16 +103,16 @@ namespace AddressesAPI.Tests.V2.Helper
             if (request?.PaonStartNumber == 0) randomAddressRecord.PaonStartNumber = null;
             if (request?.PropertyChangeDate != null) randomAddressRecord.PropertyChangeDate = request.PropertyChangeDate;
             if (request?.PropertyChangeDate == 0) randomAddressRecord.PropertyChangeDate = null;
+            if (request?.PropertyStartDate != null) randomAddressRecord.PropertyStartDate = request.PropertyStartDate;
             if (request?.BuildingNumber != null)
                 randomAddressRecord.BuildingNumber = ReplaceEmptyStringWithNull(request.BuildingNumber);
-            if (request?.UnitNumber != null) randomAddressRecord.UnitNumber = request.UnitNumber;
-            if (request?.UnitNumber == 0) randomAddressRecord.UnitNumber = null;
             if (request?.UnitName != null) randomAddressRecord.UnitName = ReplaceEmptyStringWithNull(request.UnitName);
             if (request?.Line1 != null) randomAddressRecord.Line1 = request.Line1;
             if (request?.Line2 != null) randomAddressRecord.Line2 = request.Line2;
             if (request?.Line3 != null) randomAddressRecord.Line3 = request.Line3;
             if (request?.Line4 != null) randomAddressRecord.Line4 = request.Line4;
             randomAddressRecord.ParentUPRN = (request?.ParentUPRN).GetValueOrDefault() == 0 ? null : request.ParentUPRN;
+            randomAddressRecord.UnitNumber = (request?.UnitNumber).GetValueOrDefault() == 0 ? null : request.UnitNumber;
             randomAddressRecord.PropertyShell = request?.PropertyShell ?? false;
             return randomAddressRecord;
         }
