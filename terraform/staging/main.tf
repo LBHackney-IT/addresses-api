@@ -191,8 +191,13 @@ module "address-es-dms" {
   migration_type               = "full-load-and-cdc"
   replication_instance_arn     = "arn:aws:dms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rep:DNTOW6TGQEGCAOWQMZYHQRTWAA"
   replication_task_indentifier = "addresses-api-es-dms-task"
-  task_settings                = file("${path.module}/task_settings.json")
-  source_endpoint_arn          = module.source_db_endpoint.dms_endpoint_arn
-  target_endpoint_arn          = aws_dms_endpoint.address_elasticsearch.endpoint_arn
-  task_table_mappings          = file("${path.module}/selection_rules.json")
+  task_settings = templatefile("${path.module}/task_settings.json",
+    {
+      dms_replication_instance_name = "staging-dms-instance",
+      dms_instance_task_resource    = "2374SA74Z4BGD3UW4DZNUD5H2C43W4CXXQC56ZI"
+    }
+  )
+  source_endpoint_arn = module.source_db_endpoint.dms_endpoint_arn
+  target_endpoint_arn = aws_dms_endpoint.address_elasticsearch.endpoint_arn
+  task_table_mappings = file("${path.module}/selection_rules.json")
 }
