@@ -129,6 +129,7 @@ namespace AddressesAPI.V2.Gateways
                 .Query(request.AddressQuery)
                 .Analyzer("address_text")
                 .Fuzziness(Fuzziness.Auto)
+                .Boost(0)
                 .Operator(Operator.And)
             );
             // This will ensure that numbers are matched exactly.
