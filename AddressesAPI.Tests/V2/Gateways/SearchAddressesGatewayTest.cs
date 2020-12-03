@@ -850,6 +850,48 @@ namespace AddressesAPI.Tests.V2.Gateways
         }
 
         [Test]
+        public async Task AnotherTest()
+        {
+            var savedAddresses = new List<QueryableAddress>
+            {
+                new QueryableAddress
+                {
+                    UnitName = "HOSPICE",
+                    Street = "MARE STREET",
+                    Town = "LONDON",
+                    Postcode = "E8 4SA",
+                    Line1 = "HOSPICE",
+                    Line2 = " ST JOSEPHS HOSPICE",
+                    Line3 = " MARE STREET",
+                    Line4 = " HACKNEY"
+                },
+                new QueryableAddress
+                {
+                    Street = "MARE STREET",
+                    Town = "LONDON",
+                    Postcode = "E8 1DU",
+                    Line1 = "ST JOHNS GARDENS",
+                    Line2 = " MARE STREET",
+                    Line3 = " HACKNEY",
+                    Line4 = " LONDON"
+                }
+            };
+            savedAddresses = await IndexAddresses(savedAddresses).ConfigureAwait(true);
+
+            var request = new SearchParameters
+            {
+                Page = 1,
+                PageSize = 50,
+                Gazetteer = GlobalConstants.Gazetteer.Both,
+                AddressQuery = "mare street"
+            };
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
+
+            addresses.Count.Should().Be(2);
+            addresses.ElementAt(0).Should().BeEquivalentTo(savedAddresses.ElementAt(1).AddressKey);
+            addresses.ElementAt(1).Should().BeEquivalentTo(savedAddresses.ElementAt(0).AddressKey);
+        }
+        [Test]
         public async Task WillFirstlyOrderByTown()
         {
             var savedAddresses = new List<QueryableAddress>
