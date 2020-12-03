@@ -79,7 +79,7 @@ namespace AddressesAPI.Infrastructure
         [Text(Name = "paon_start_num")]
         public short? PaonStartNumber { get; set; }
         [Text(Name = "unit_number")]
-        public string UnitNumber { get; set; }
+        public int? UnitNumber { get; set; }
         [Text(Name = "sao_text")]
         public string UnitName { get; set; }
 

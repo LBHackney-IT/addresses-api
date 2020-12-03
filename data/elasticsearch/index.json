@@ -153,15 +153,7 @@
         "type" : "boolean"
       },
       "paon_start_num" : {
-        "type" : "keyword",
-        "fields": {
-          "sort": {
-            "type": "icu_collation_keyword",
-            "index": false,
-            "numeric": true,
-            "case_level": false
-          }
-        }
+        "type" : "integer"
       },
       "parent_uprn" : {
         "type" : "long"
@@ -192,15 +184,7 @@
         "type" : "keyword"
       },
       "unit_number" : {
-        "type" : "keyword",
-        "fields": {
-          "sort": {
-            "type": "icu_collation_keyword",
-            "index": false,
-            "numeric": true,
-            "case_level": false
-          }
-        }
+        "type" : "integer"
       },
       "blpu_class" : {
         "type" : "text",

@@ -23,7 +23,8 @@ namespace AddressesAPI.Tests.V2.Factories
             var exceptions = new Dictionary<string, object>
             {
                 {"CommercialOccupier", addressEntity.Organisation},
-                {"OutOfBoroughAddress", false}
+                {"OutOfBoroughAddress", false},
+                {"UnitNumber", addressEntity.UnitNumber.ToString()}
             };
             address.ShouldBeEquivalentToExpectedObjectWithExceptions(addressEntity, exceptions);
         }

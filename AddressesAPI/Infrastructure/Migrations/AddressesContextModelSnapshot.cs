@@ -19,7 +19,7 @@ namespace AddressesAPI.Infrastructure.Migrations
                 .HasAnnotation("ProductVersion", "3.1.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            modelBuilder.Entity("AddressesAPI.V1.Infrastructure.CrossReference", b =>
+            modelBuilder.Entity("AddressesAPI.Infrastructure.CrossReference", b =>
                 {
                     b.Property<string>("CrossRefKey")
                         .HasColumnName("xref_key")
@@ -54,7 +54,7 @@ namespace AddressesAPI.Infrastructure.Migrations
                     b.ToTable("hackney_xref","dbo");
                 });
 
-            modelBuilder.Entity("AddressesAPI.V1.Infrastructure.HackneyAddress", b =>
+            modelBuilder.Entity("AddressesAPI.Infrastructure.HackneyAddress", b =>
                 {
                     b.Property<string>("AddressKey")
                         .HasColumnName("lpi_key")
@@ -205,10 +205,9 @@ namespace AddressesAPI.Infrastructure.Migrations
                         .HasColumnType("character varying(90)")
                         .HasMaxLength(90);
 
-                    b.Property<string>("UnitNumber")
+                    b.Property<int?>("UnitNumber")
                         .HasColumnName("unit_number")
-                        .HasColumnType("character varying(17)")
-                        .HasMaxLength(17);
+                        .HasColumnType("integer");
 
                     b.Property<string>("UsageCode")
                         .HasColumnName("blpu_class")
@@ -235,7 +234,7 @@ namespace AddressesAPI.Infrastructure.Migrations
                     b.ToTable("hackney_address","dbo");
                 });
 
-            modelBuilder.Entity("AddressesAPI.V1.Infrastructure.NationalAddress", b =>
+            modelBuilder.Entity("AddressesAPI.Infrastructure.NationalAddress", b =>
                 {
                     b.Property<string>("AddressKey")
                         .HasColumnName("lpi_key")
@@ -386,10 +385,9 @@ namespace AddressesAPI.Infrastructure.Migrations
                         .HasColumnType("character varying(90)")
                         .HasMaxLength(90);
 
-                    b.Property<string>("UnitNumber")
+                    b.Property<int?>("UnitNumber")
                         .HasColumnName("unit_number")
-                        .HasColumnType("character varying(17)")
-                        .HasMaxLength(17);
+                        .HasColumnType("integer");
 
                     b.Property<string>("UsageCode")
                         .HasColumnName("blpu_class")

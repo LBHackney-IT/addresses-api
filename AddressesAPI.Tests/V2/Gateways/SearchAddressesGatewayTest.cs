@@ -736,7 +736,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                     Line3 = null,
                     Line4 = null,
                     PaonStartNumber = 10,
-                    UnitNumber = "10",
+                    UnitNumber = 10,
                     BuildingNumber = "10",
                     Town = "hackney",
                     Postcode = "E3 4TT"
@@ -747,7 +747,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                     Line1 = "Flat 2",
                     Line2 = "10 Greenwood Drive",
                     PaonStartNumber = 10,
-                    UnitNumber = "2",
+                    UnitNumber = 2,
                     BuildingNumber = "10",
                     Line3 = null,
                     Line4 = null,
@@ -784,7 +784,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                     Line3 = " ETON COLLEGE ROAD",
                     Line4 = "LONDON",
                     PaonStartNumber = null,
-                    UnitNumber = "12",
+                    UnitNumber = 12,
                     UnitName = "Flat 12",
                     BuildingNumber = "",
                     Town = "LONDON",
@@ -901,80 +901,9 @@ namespace AddressesAPI.Tests.V2.Gateways
         {
             var savedAddresses = new List<QueryableAddress>
             {
-                new QueryableAddress { Town = "town a", Postcode = "", Street = "B Street", PaonStartNumber = 3 },
+                new QueryableAddress { Town = "town a", Postcode = "", Street = "B Street", PaonStartNumber = 30 },
                 new QueryableAddress { Town = "town a", Postcode = "", Street = "B Street", PaonStartNumber = 0 },
                 new QueryableAddress { Town = "town a", Postcode = "", Street = "B Street", PaonStartNumber = 5 }
-            };
-            savedAddresses = await IndexAddresses(savedAddresses).ConfigureAwait(true);
-
-            var request = new SearchParameters
-            {
-                Page = 1,
-                PageSize = 50,
-                Gazetteer = GlobalConstants.Gazetteer.Both,
-            };
-            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
-
-            addresses.Count.Should().Be(3);
-            addresses.ElementAt(0).Should().BeEquivalentTo(savedAddresses.ElementAt(0).AddressKey);
-            addresses.ElementAt(1).Should().BeEquivalentTo(savedAddresses.ElementAt(2).AddressKey);
-            addresses.ElementAt(2).Should().BeEquivalentTo(savedAddresses.ElementAt(1).AddressKey);
-        }
-
-        [Test]
-        public async Task WillFifthlyOrderByPresenceAndOrderOfBuildingNumber()
-        {
-            var savedAddresses = new List<QueryableAddress>
-            {
-                new QueryableAddress { Town = "town a", Postcode = "", Street = "B Street", PaonStartNumber = 1, BuildingNumber = "" },
-                new QueryableAddress { Town = "town a", Postcode = "", Street = "B Street", PaonStartNumber = 1, BuildingNumber = "9" },
-                new QueryableAddress { Town = "town a", Postcode = "", Street = "B Street", PaonStartNumber = 1, BuildingNumber = "79" }
-            };
-            savedAddresses = await IndexAddresses(savedAddresses).ConfigureAwait(true);
-
-            var request = new SearchParameters
-            {
-                Page = 1,
-                PageSize = 50,
-                Gazetteer = GlobalConstants.Gazetteer.Both,
-            };
-            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
-
-            addresses.Count.Should().Be(3);
-            addresses.ElementAt(0).Should().BeEquivalentTo(savedAddresses.ElementAt(1).AddressKey);
-            addresses.ElementAt(1).Should().BeEquivalentTo(savedAddresses.ElementAt(2).AddressKey);
-            addresses.ElementAt(2).Should().BeEquivalentTo(savedAddresses.ElementAt(0).AddressKey);
-        }
-
-        [Test]
-        public async Task WillSixthOrderByPresenceAndOrderOfUnitNumber()
-        {
-            var savedAddresses = new List<QueryableAddress>
-            {
-                new QueryableAddress {
-                    Town = "town a",
-                    Postcode = "",
-                    Street = "B Street",
-                    PaonStartNumber = 1,
-                    BuildingNumber = "78",
-                    UnitNumber = "43"
-                },
-                new QueryableAddress {
-                    Town = "town a",
-                    Postcode = "",
-                    Street = "B Street",
-                    PaonStartNumber = 1,
-                    BuildingNumber = "78",
-                    UnitNumber = ""
-                },
-                new QueryableAddress {
-                    Town = "town a",
-                    Postcode = "",
-                    Street = "B Street",
-                    PaonStartNumber = 1,
-                    BuildingNumber = "78",
-                    UnitNumber = "23"
-                }
             };
             savedAddresses = await IndexAddresses(savedAddresses).ConfigureAwait(true);
 
@@ -993,7 +922,7 @@ namespace AddressesAPI.Tests.V2.Gateways
         }
 
         [Test]
-        public async Task WillInTheSeventhCaseOrderByPresenceAndOrderOfUnitName()
+        public async Task WillFifthlyOrderByPresenceAndOrderOfUnitNumber()
         {
             var savedAddresses = new List<QueryableAddress>
             {
@@ -1002,8 +931,50 @@ namespace AddressesAPI.Tests.V2.Gateways
                     Postcode = "",
                     Street = "B Street",
                     PaonStartNumber = 1,
-                    BuildingNumber = "78",
-                    UnitNumber = "43",
+                    UnitNumber = 4
+                },
+                new QueryableAddress {
+                    Town = "town a",
+                    Postcode = "",
+                    Street = "B Street",
+                    PaonStartNumber = 1,
+                    UnitNumber = null
+                },
+                new QueryableAddress {
+                    Town = "town a",
+                    Postcode = "",
+                    Street = "B Street",
+                    PaonStartNumber = 1,
+                    UnitNumber = 23
+                }
+            };
+            savedAddresses = await IndexAddresses(savedAddresses).ConfigureAwait(true);
+
+            var request = new SearchParameters
+            {
+                Page = 1,
+                PageSize = 50,
+                Gazetteer = GlobalConstants.Gazetteer.Both,
+            };
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
+
+            addresses.Count.Should().Be(3);
+            addresses.ElementAt(0).Should().BeEquivalentTo(savedAddresses.ElementAt(0).AddressKey);
+            addresses.ElementAt(1).Should().BeEquivalentTo(savedAddresses.ElementAt(2).AddressKey);
+            addresses.ElementAt(2).Should().BeEquivalentTo(savedAddresses.ElementAt(1).AddressKey);
+        }
+
+        [Test]
+        public async Task WillInTheSixthCaseOrderByPresenceAndOrderOfUnitName()
+        {
+            var savedAddresses = new List<QueryableAddress>
+            {
+                new QueryableAddress {
+                    Town = "town a",
+                    Postcode = "",
+                    Street = "B Street",
+                    PaonStartNumber = 1,
+                    UnitNumber = 43,
                     UnitName = "J name"
                 },
                 new QueryableAddress {
@@ -1011,8 +982,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                     Postcode = "",
                     Street = "B Street",
                     PaonStartNumber = 1,
-                    BuildingNumber = "78",
-                    UnitNumber = "43",
+                    UnitNumber = 43,
                     UnitName = "A name"
                 },
                 new QueryableAddress {
@@ -1020,8 +990,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                     Postcode = "",
                     Street = "B Street",
                     PaonStartNumber = 1,
-                    BuildingNumber = "78",
-                    UnitNumber = "43",
+                    UnitNumber = 43,
                     UnitName = ""
                 }
             };
@@ -1142,7 +1111,6 @@ namespace AddressesAPI.Tests.V2.Gateways
             var postcodes = GenerateRandomOrderedListOfWordsOfMaxLength(count, 8);
             var streets = GenerateRandomOrderedListOfWordsOfMaxLength(count, 100);
             var buildingNumbers = GenerateRandomOrderedListOfWordsOfMaxLength(count, 17);
-            var unitNumbers = GenerateRandomOrderedListOfWordsOfMaxLength(count, 17);
             var unitNames = GenerateRandomOrderedListOfWordsOfMaxLength(count, 90);
             var records = new List<QueryableAddress>();
             for (var i = 0; i < count; i++)
@@ -1153,7 +1121,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                     Postcode = postcodes.ElementAt(i),
                     Street = streets.ElementAt(i),
                     BuildingNumber = buildingNumbers.ElementAt(i),
-                    UnitNumber = unitNumbers.ElementAt(i),
+                    UnitNumber = Convert.ToInt16($"{i}{_faker.Random.Int(10, 99)}"),
                     UnitName = unitNames.ElementAt(i),
                     PaonStartNumber = Convert.ToInt16($"{i}{_faker.Random.Int(10, 99)}")
                 }).ConfigureAwait(true));
