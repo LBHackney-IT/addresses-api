@@ -37,6 +37,19 @@ functions:
     environment:
       SQS_QUEUE_URL: ${ssm:/addresses-api/${self:provider.stage}/reindexing-queue}
       ELASTICSEARCH_DOMAIN_URL: ${ssm:/addresses-api/${self:provider.stage}/elasticsearch-domain}
+    events:
+      - schedule:
+          rate: cron(0 01 * * ? *)
+          input:
+            alias: "hackney_addresses"
+            fromIndex: "hackney_address"
+            deleteAfterReindex: true
+      - schedule:
+          rate: cron(0 02 * * ? *)
+          input:
+            alias: "national_addresses"
+            fromIndex: "national_address"
+            deleteAfterReindex: true
   switchElasticsearchAliasAfterReindex:
     name: ${self:service}-switch-es-alias-after-reindex-${self:provider.stage}
     handler: Reindex::Reindex.Handler::SwitchAlias
