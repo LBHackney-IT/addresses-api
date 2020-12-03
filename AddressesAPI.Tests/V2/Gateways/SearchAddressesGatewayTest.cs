@@ -856,24 +856,23 @@ namespace AddressesAPI.Tests.V2.Gateways
             {
                 new QueryableAddress
                 {
-                    UnitName = "HOSPICE",
                     Street = "MARE STREET",
                     Town = "LONDON",
-                    Postcode = "E8 4SA",
-                    Line1 = "HOSPICE",
-                    Line2 = " ST JOSEPHS HOSPICE",
-                    Line3 = " MARE STREET",
-                    Line4 = " HACKNEY"
+                    Postcode = "E8 3QE",
+                    Line1 = "HOUENG NAN MINI MART",
+                    Line2 = " 185-187 MARE STREET",
+                    Line3 = " HACKNEY",
+                    Line4 = " LONDON"
                 },
                 new QueryableAddress
                 {
                     Street = "MARE STREET",
                     Town = "LONDON",
                     Postcode = "E8 1DU",
-                    Line1 = "ST JOHNS GARDENS",
-                    Line2 = " MARE STREET",
-                    Line3 = " HACKNEY",
-                    Line4 = " LONDON"
+                    Line1 = "ARRIVA LONDON NORTH",
+                    Line2 = " BUS GARAGE AND OFFICES",
+                    Line3 = " MARE STREET",
+                    Line4 = " HACKNEY"
                 }
             };
             savedAddresses = await IndexAddresses(savedAddresses).ConfigureAwait(true);
