@@ -85,5 +85,8 @@ namespace AddressesAPI.Infrastructure
 
         [Text(Name = "blpu_last_update_date")]
         public int? PropertyChangeDate { get; set; }
+
+        [Text(Name = "blpu_start_date")]
+        public int PropertyStartDate { get; set; }
     }
 }

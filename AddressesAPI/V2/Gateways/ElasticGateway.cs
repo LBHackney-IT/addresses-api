@@ -180,9 +180,10 @@ namespace AddressesAPI.V2.Gateways
 
             var date = Convert.ToInt32(request.ModifiedSince.Value.ToString("yyyyMMdd"));
             return q.Range(r => r.Field(f => f.PropertyChangeDate)
-                .GreaterThanOrEquals(date));
+                       .GreaterThanOrEquals(date))
+                   || q.Range(r => r.Field(f => f.PropertyStartDate)
+                       .GreaterThanOrEquals(date));
         }
-
 
         private static QueryContainer HasAParentShell(QueryContainerDescriptor<QueryableAddress> q)
         {
