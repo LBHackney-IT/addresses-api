@@ -164,9 +164,10 @@ namespace AddressesAPI.V2.Gateways
         {
             if (!request.IncludeParentShells)
             {
-                return q.Term(t => t
+                return q.Terms(t => t
                     .Field(f => f.PropertyShell)
-                    .Value(false));
+                    .Terms(false)
+                    );
             }
 
             return null;
