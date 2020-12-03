@@ -60,6 +60,7 @@ namespace AddressesAPI.V2.Factories
                 PropertyStartDate = domain.PropertyStartDate,
                 PropertyEndDate = domain.PropertyEndDate,
                 PropertyChangeDate = domain.PropertyChangeDate,
+                PaoStartNum = domain.PaoStartNum
             };
         }
 

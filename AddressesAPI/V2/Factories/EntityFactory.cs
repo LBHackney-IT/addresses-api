@@ -50,6 +50,7 @@ namespace AddressesAPI.V2.Factories
                 Town = addressEntity.Town,
                 UPRN = addressEntity.UPRN,
                 Postcode = addressEntity.Postcode,
+                PaoStartNum = addressEntity.PaonStartNumber
             };
         }
 
@@ -93,6 +94,7 @@ namespace AddressesAPI.V2.Factories
                 Town = addressEntity.Town,
                 UPRN = addressEntity.UPRN,
                 Postcode = addressEntity.Postcode,
+                PaoStartNum = addressEntity.PaonStartNumber
             };
         }
 

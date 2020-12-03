@@ -131,5 +131,7 @@ namespace AddressesAPI.V2.Boundary.Responses.Data
         /// Only included if format query parameter is set to detailed.
         /// </summary>
         public int? PropertyChangeDate { get; set; }
+
+        public short? PaoStartNum { get; set; }
     }
 }

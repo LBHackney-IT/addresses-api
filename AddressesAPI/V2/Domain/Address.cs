@@ -41,5 +41,6 @@ namespace AddressesAPI.V2.Domain
         public string Town { get; set; }
         public string Postcode { get; set; }
         public long UPRN { get; set; }
+        public short? PaoStartNum { get; set; }
     }
 }
