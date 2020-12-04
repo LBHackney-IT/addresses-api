@@ -93,6 +93,7 @@ module "elasticsearch_db_staging" {
   es_version       = "7.8"
   encrypt_at_rest  = "false"
   instance_type    = "t2.small.elasticsearch"
+  instance_count   = "1"
   ebs_enabled      = "true"
   ebs_volume_size  = "10"
   region           = data.aws_region.current.name
