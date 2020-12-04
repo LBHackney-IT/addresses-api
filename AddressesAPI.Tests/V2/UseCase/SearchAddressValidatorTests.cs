@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using AddressesAPI.V2;
 using AddressesAPI.V2.Boundary.Requests;
 using AddressesAPI.V2.UseCase;
+using Bogus;
 using FluentAssertions;
 using FluentValidation.TestHelper;
 using NUnit.Framework;
@@ -431,6 +432,28 @@ namespace AddressesAPI.Tests.V2.UseCase
             var request = new SearchAddressRequest() { CrossRefCode = crossRefCode, CrossRefValue = value };
 
             _classUnderTest.TestValidate(request).Result.Errors.Should().NotContain("You must provide both the code and a value, when searching by a cross reference");
+        }
+
+        [Test]
+        public void GivenRequestWithNegativePageValue_WhenCallingValidation_ItReturnsAnError()
+        {
+            var negativeValue = new Faker().Random.Int(-128, -1);
+
+            var request = new SearchAddressRequest() { Page = negativeValue };
+
+            _classUnderTest.ShouldHaveValidationErrorFor(x => x.Page, request)
+                .WithErrorMessage("Invalid page value. Page number can not be a negative value");
+        }
+
+        [Test]
+        public void GivenRequestWithNegativePageSize_WhenCallingValidation_ItReturnsAnError()
+        {
+            var negativeValue = new Faker().Random.Int(-128, -1);
+
+            var request = new SearchAddressRequest() { PageSize = negativeValue };
+
+            _classUnderTest.ShouldHaveValidationErrorFor(x => x.PageSize, request)
+                .WithErrorMessage("Invalid Page Size value. Page Size can not be a negative value");
         }
 
         #endregion
