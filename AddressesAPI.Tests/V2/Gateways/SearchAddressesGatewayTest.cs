@@ -858,7 +858,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 {
                     Street = "MARE STREET",
                     Town = "LONDON",
-                    Postcode = "E8 3QE",
+                    PaonStartNumber = 2,
                     Line1 = "MINI MART",
                     Line2 = " 185-187 MARE STREET",
                     Line3 = " HACKNEY",
@@ -868,7 +868,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 {
                     Street = "MARE STREET",
                     Town = "LONDON",
-                    Postcode = "E8 1DU",
+                    PaonStartNumber = 1,
                     Line1 = "ST JOHNS GARDENS",
                     Line2 = " MARE STREET",
                     Line3 = " HACKNEY",
@@ -916,38 +916,13 @@ namespace AddressesAPI.Tests.V2.Gateways
         }
 
         [Test]
-        public async Task WillSecondlyOrderByPostcodePresence()
-        {
-            var savedAddresses = new List<QueryableAddress>
-            {
-                new QueryableAddress { Town = "town a", Postcode = "" },
-                new QueryableAddress { Town = "town a", Postcode = "E3 4TT" },
-                new QueryableAddress { Town = "town b" }
-            };
-            savedAddresses = await IndexAddresses(savedAddresses).ConfigureAwait(true);
-
-            var request = new SearchParameters
-            {
-                Page = 1,
-                PageSize = 50,
-                Gazetteer = GlobalConstants.Gazetteer.Both,
-            };
-            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
-
-            addresses.Count.Should().Be(3);
-            addresses.ElementAt(0).Should().BeEquivalentTo(savedAddresses.ElementAt(1).AddressKey);
-            addresses.ElementAt(1).Should().BeEquivalentTo(savedAddresses.ElementAt(0).AddressKey);
-            addresses.ElementAt(2).Should().BeEquivalentTo(savedAddresses.ElementAt(2).AddressKey);
-        }
-
-        [Test]
-        public async Task WillThirdlyOrderByStreet()
+        public async Task WillSecondlyOrderByStreet()
         {
             var savedAddresses = new List<QueryableAddress>
             {
                 new QueryableAddress { Town = "town b" },
-                new QueryableAddress { Town = "town a", Postcode = "", Street = "B Street" },
-                new QueryableAddress { Town = "town a", Postcode = "", Street = "A Street" }
+                new QueryableAddress { Town = "town a", Street = "B Street" },
+                new QueryableAddress { Town = "town a", Street = "A Street" }
             };
             savedAddresses = await IndexAddresses(savedAddresses).ConfigureAwait(true);
 
@@ -966,13 +941,13 @@ namespace AddressesAPI.Tests.V2.Gateways
         }
 
         [Test]
-        public async Task WillFourthlyOrderByPresenceAndOrderOfPaonStartNumber()
+        public async Task WillThirdlyOrderByPresenceAndOrderOfPaonStartNumber()
         {
             var savedAddresses = new List<QueryableAddress>
             {
-                new QueryableAddress { Town = "town a", Postcode = "", Street = "B Street", PaonStartNumber = 30 },
-                new QueryableAddress { Town = "town a", Postcode = "", Street = "B Street", PaonStartNumber = 0 },
-                new QueryableAddress { Town = "town a", Postcode = "", Street = "B Street", PaonStartNumber = 5 }
+                new QueryableAddress { Town = "town a", Street = "B Street", PaonStartNumber = 30 },
+                new QueryableAddress { Town = "town a", Street = "B Street", PaonStartNumber = 0 },
+                new QueryableAddress { Town = "town a", Street = "B Street", PaonStartNumber = 5 }
             };
             savedAddresses = await IndexAddresses(savedAddresses).ConfigureAwait(true);
 
@@ -991,27 +966,24 @@ namespace AddressesAPI.Tests.V2.Gateways
         }
 
         [Test]
-        public async Task WillFifthlyOrderByPresenceAndOrderOfUnitNumber()
+        public async Task WillFourthlyOrderByPresenceAndOrderOfUnitNumber()
         {
             var savedAddresses = new List<QueryableAddress>
             {
                 new QueryableAddress {
                     Town = "town a",
-                    Postcode = "",
                     Street = "B Street",
                     PaonStartNumber = 1,
                     UnitNumber = 4
                 },
                 new QueryableAddress {
                     Town = "town a",
-                    Postcode = "",
                     Street = "B Street",
                     PaonStartNumber = 1,
                     UnitNumber = null
                 },
                 new QueryableAddress {
                     Town = "town a",
-                    Postcode = "",
                     Street = "B Street",
                     PaonStartNumber = 1,
                     UnitNumber = 23
@@ -1034,13 +1006,12 @@ namespace AddressesAPI.Tests.V2.Gateways
         }
 
         [Test]
-        public async Task WillInTheSixthCaseOrderByPresenceAndOrderOfUnitName()
+        public async Task WillFifthlyOrderByPresenceAndOrderOfUnitName()
         {
             var savedAddresses = new List<QueryableAddress>
             {
                 new QueryableAddress {
                     Town = "town a",
-                    Postcode = "",
                     Street = "B Street",
                     PaonStartNumber = 1,
                     UnitNumber = 43,
@@ -1048,7 +1019,6 @@ namespace AddressesAPI.Tests.V2.Gateways
                 },
                 new QueryableAddress {
                     Town = "town a",
-                    Postcode = "",
                     Street = "B Street",
                     PaonStartNumber = 1,
                     UnitNumber = 43,
@@ -1056,7 +1026,6 @@ namespace AddressesAPI.Tests.V2.Gateways
                 },
                 new QueryableAddress {
                     Town = "town a",
-                    Postcode = "",
                     Street = "B Street",
                     PaonStartNumber = 1,
                     UnitNumber = 43,
