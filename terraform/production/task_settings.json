@@ -8,7 +8,7 @@
     "LobMaxSize": 0,
     "InlineLobMaxSize": 0,
     "LoadMaxFileSize": 0,
-    "ParallelLoadThreads": 5,
+    "ParallelLoadThreads": 6,
     "ParallelLoadBufferSize": 1000,
     "BatchApplyEnabled": false,
     "TaskRecoveryTableEnabled": false,
