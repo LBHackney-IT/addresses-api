@@ -122,31 +122,49 @@ namespace AddressesAPI.V2.Gateways
         {
             if (request.AddressQuery == null) return null;
 
+            // This query will return addresses which have all of the search terms somewhere in the addresses, with a degree
+            // of fuzziness and using allowed synonyms.
             var fuzzyMatchText = q.Match(c => c
                 .Field(f => f.FullAddress)
                 .Query(request.AddressQuery)
                 .Analyzer("address_text")
                 .Fuzziness(Fuzziness.Auto)
+                .Boost(0)
                 .Operator(Operator.And)
             );
+            // This will ensure that numbers are matched exactly.
             var exactlyMatchNumbers = q.Match(m => m
                 .Field("full_address.extracted_numbers")
                 .ZeroTermsQuery(ZeroTermsQuery.All)
                 .Analyzer("extract_number_analyzer")
                 .Query(request.AddressQuery)
             );
-
+            // This will boost the score of addresses which have exact matches of all search terms (i.e. no synonyms or fuzziness).
             var exactMatch = q.Match(m => m
                 .Field("full_address.exact_text")
                 .Analyzer("standard")
                 .Query(request.AddressQuery)
                 .Operator(Operator.And));
-            var orderedMatch = q.Match(m => m
-                .Field("full_address.keyword")
-                .Analyzer("whitespace_removed")
+            // This will boost the score for addresses which have the exact search string, in the correct order, in one of the address lines.
+            var orderedMatch = q.MatchPhrase(m => m
+                .Field("full_address.exact_text")
+                .Analyzer("standard")
+                .Query(request.AddressQuery));
+            // This will boost the score for addresses which for which one of the address lines appears in full and in the correct order
+            // in the search string.
+            var matchFullLines = q.MultiMatch(m => m
+                .Fields(c => c
+                    .Field(f => f.Line1)
+                    .Field(f => f.Line2)
+                    .Field(f => f.Line3)
+                    .Field(f => f.Line4)
+                )
+                .Analyzer("standard")
+                .TieBreaker(0.0)
+                .ZeroTermsQuery(ZeroTermsQuery.All)
                 .Query(request.AddressQuery));
 
-            return (fuzzyMatchText && exactlyMatchNumbers) || (exactMatch) || orderedMatch;
+            return (fuzzyMatchText && exactlyMatchNumbers && matchFullLines) || (orderedMatch) || (exactMatch);
         }
 
         private static SortDescriptor<QueryableAddress> SortResults(SortDescriptor<QueryableAddress> srt)
