@@ -16,7 +16,7 @@ shell:
 
 .PHONY: test
 test:
-	docker-compose up test-database & docker-compose build addresses-api-test && docker-compose up addresses-api-test
+	docker-compose build addresses-api-test && docker-compose up -d test-elasticsearch && docker-compose up addresses-api-test
 
 .PHONY: migrate-dev-database
 migrate-dev-database:

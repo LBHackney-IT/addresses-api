@@ -27,6 +27,12 @@ namespace AddressesAPI.V2.UseCase
                 .Must(format => Enum.TryParse<GlobalConstants.Format>(format, true, out _))
                 .WithMessage("Value for Format is not valid. It should be either Simple or Detailed");
 
+            RuleFor((r => r.Page)).GreaterThan(0)
+                .WithMessage("Invalid page value. Page number can not be a negative value");
+
+            RuleFor(x => x.PageSize)
+                .GreaterThan(0).WithMessage("Invalid Page Size value. Page Size can not be a negative value");
+
             RuleFor(x => x.PageSize)
                 .LessThan(51).WithMessage("PageSize cannot exceed 50");
 
