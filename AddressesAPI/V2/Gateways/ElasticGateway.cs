@@ -172,7 +172,6 @@ namespace AddressesAPI.V2.Gateways
             return srt
                 .Descending(SortSpecialField.Score)
                 .Ascending(f => f.Town)
-                .Field(f => f.Field(n => n.Postcode).Missing("_last"))
                 .Ascending(f => f.Street)
                 .Field(f => f.Field(n => n.PaonStartNumber).Ascending().Missing("_last"))
                 .Field(f => f.Field(n => n.UnitNumber).Ascending().Missing("_last"))
