@@ -86,11 +86,12 @@ module "elasticsearch_db_production" {
   environment_name = "production"
   port             = 443
   domain_name      = "addresses-api-es"
-  subnet_ids       = [tolist(data.aws_subnet_ids.production.ids)[0]]
+  subnet_ids       = [tolist(data.aws_subnet_ids.production.ids)[0], tolist(data.aws_subnet_ids.production.ids)[1]]
   project_name     = "addresses-api"
   es_version       = "7.8"
   encrypt_at_rest  = "true"
   instance_type    = "t3.small.elasticsearch"
+  instance_count   = "2"
   ebs_enabled      = "true"
   ebs_volume_size  = "10"
   region           = data.aws_region.current.name
