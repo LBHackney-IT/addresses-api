@@ -275,6 +275,8 @@ namespace AddressesAPI.Tests.V2.E2ETests
             response.StatusCode.Should().Be(400);
         }
 
+        [TestCase("page_size=-40", "PageSize", "Invalid Page Size value. Page Size can not be a negative value")]
+        [TestCase("page=-2", "Page", "Invalid page value. Page number can not be a negative value")]
         [TestCase("page_size=100", "PageSize", "PageSize cannot exceed 50")]
         [TestCase("postcode=12376", "Postcode", "Must provide at least the first part of the postcode.")]
         [TestCase("address_scope=national&street=hackneyroad", "", "You must provide at least one of (query, uprn, usrn, postcode), when address_scope is 'national'.")]
