@@ -68,7 +68,8 @@ module "postgres_db_production" {
   db_engine            = "postgres"
   db_engine_version    = "11.8"
   db_instance_class    = "db.t3.micro"
-  db_allocated_storage = 100
+  db_allocated_storage = 200
+  db_max_allocated_storage = 500
   maintenance_window   = "sun:10:00-sun:10:30"
   db_username          = data.aws_ssm_parameter.addresses_postgres_username.value
   db_password          = data.aws_ssm_parameter.addresses_postgres_db_password.value
@@ -90,7 +91,7 @@ module "elasticsearch_db_production" {
   project_name     = "addresses-api"
   es_version       = "7.8"
   encrypt_at_rest  = "true"
-  instance_type    = "t3.small.elasticsearch"
+  instance_type    = "t3.medium.elasticsearch"
   instance_count   = "2"
   ebs_enabled      = "true"
   ebs_volume_size  = "10"
