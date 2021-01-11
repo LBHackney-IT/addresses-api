@@ -63,18 +63,6 @@ namespace AddressesAPI.Infrastructure.Migrations
                         .HasColumnType("character varying(14)")
                         .HasMaxLength(14);
 
-                    b.Property<int>("AddressChangeDate")
-                        .HasColumnName("lpi_last_update_date")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("AddressEndDate")
-                        .HasColumnName("lpi_end_date")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("AddressStartDate")
-                        .HasColumnName("lpi_start_date")
-                        .HasColumnType("integer");
-
                     b.Property<string>("AddressStatus")
                         .HasColumnName("lpi_logical_status")
                         .HasColumnType("character varying(18)")
@@ -242,18 +230,6 @@ namespace AddressesAPI.Infrastructure.Migrations
                         .HasColumnName("lpi_key")
                         .HasColumnType("character varying(14)")
                         .HasMaxLength(14);
-
-                    b.Property<int>("AddressChangeDate")
-                        .HasColumnName("lpi_last_update_date")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("AddressEndDate")
-                        .HasColumnName("lpi_end_date")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("AddressStartDate")
-                        .HasColumnName("lpi_start_date")
-                        .HasColumnType("integer");
 
                     b.Property<string>("AddressStatus")
                         .HasColumnName("lpi_logical_status")

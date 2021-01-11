@@ -10,9 +10,6 @@ namespace AddressesAPI.Infrastructure.Migrations
                 @"DROP VIEW ""dbo.combined_address"";
                 CREATE VIEW dbo.combined_address AS SELECT hackney_address.lpi_key,
                     hackney_address.lpi_logical_status,
-                    hackney_address.lpi_start_date,
-                    hackney_address.lpi_end_date,
-                    hackney_address.lpi_last_update_date,
                     hackney_address.usrn,
                     hackney_address.uprn,
                     hackney_address.parent_uprn,
@@ -49,9 +46,6 @@ namespace AddressesAPI.Infrastructure.Migrations
                    FROM dbo.hackney_address UNION ALL
                 SELECT national_address.lpi_key,
                     national_address.lpi_logical_status,
-                    national_address.lpi_start_date,
-                    national_address.lpi_end_date,
-                    national_address.lpi_last_update_date,
                     national_address.usrn,
                     national_address.uprn,
                     national_address.parent_uprn,

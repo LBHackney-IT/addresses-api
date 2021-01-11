@@ -13,18 +13,15 @@ namespace AddressesAPI.Infrastructure.Migrations
                 {
                     lpi_key = table.Column<string>(maxLength: 14, nullable: false),
                     lpi_logical_status = table.Column<string>(maxLength: 18, nullable: true),
-                    lpi_start_date = table.Column<int>(nullable: false),
-                    lpi_end_date = table.Column<int>(nullable: false),
-                    lpi_last_update_date = table.Column<int>(nullable: false),
                     usrn = table.Column<int>(nullable: true),
                     uprn = table.Column<long>(nullable: false),
                     parent_uprn = table.Column<long>(nullable: true),
                     blpu_start_date = table.Column<int>(nullable: false),
                     blpu_end_date = table.Column<int>(nullable: false),
-                    blpu_class = table.Column<string>(maxLength: 4, nullable: true),
+                    blpu_class = table.Column<string>(maxLength: 6, nullable: true),
                     blpu_last_update_date = table.Column<int>(nullable: false),
-                    usage_description = table.Column<string>(maxLength: 160, nullable: true),
-                    usage_primary = table.Column<string>(maxLength: 160, nullable: true),
+                    usage_description = table.Column<string>(maxLength: 550, nullable: true),
+                    usage_primary = table.Column<string>(maxLength: 50, nullable: true),
                     property_shell = table.Column<bool>(nullable: false),
                     easting = table.Column<double>(nullable: false),
                     northing = table.Column<double>(nullable: false),
@@ -45,10 +42,10 @@ namespace AddressesAPI.Infrastructure.Migrations
                     latitude = table.Column<double>(nullable: false),
                     gazetteer = table.Column<string>(maxLength: 8, nullable: true),
                     organisation = table.Column<string>(maxLength: 100, nullable: true),
-                    line1 = table.Column<string>(maxLength: 200, nullable: true),
-                    line2 = table.Column<string>(maxLength: 200, nullable: true),
-                    line3 = table.Column<string>(maxLength: 200, nullable: true),
-                    line4 = table.Column<string>(maxLength: 100, nullable: true)
+                    line1 = table.Column<string>(maxLength: 500, nullable: true),
+                    line2 = table.Column<string>(maxLength: 500, nullable: true),
+                    line3 = table.Column<string>(maxLength: 500, nullable: true),
+                    line4 = table.Column<string>(maxLength: 500, nullable: true)
                 },
                 constraints: table =>
                 {
