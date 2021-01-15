@@ -197,7 +197,7 @@ namespace AddressesAPI.Infrastructure.Migrations
 
                     b.Property<string>("UnitNumber")
                         .HasColumnName("unit_number")
-                        .HasColumnType("character varying(17)")
+                        .HasColumnType("smallint")
                         .HasMaxLength(17);
 
                     b.Property<string>("UsageCode")
@@ -366,7 +366,7 @@ namespace AddressesAPI.Infrastructure.Migrations
 
                     b.Property<string>("UnitNumber")
                         .HasColumnName("unit_number")
-                        .HasColumnType("character varying(17)")
+                        .HasColumnType("smallint")
                         .HasMaxLength(17);
 
                     b.Property<string>("UsageCode")

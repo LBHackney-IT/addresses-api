@@ -197,7 +197,7 @@ namespace AddressesAPI.Infrastructure.Migrations
 
                     b.Property<int?>("UnitNumber")
                         .HasColumnName("unit_number")
-                        .HasColumnType("integer");
+                        .HasColumnType("smallint");
 
                     b.Property<string>("UsageCode")
                         .HasColumnName("blpu_class")
@@ -365,7 +365,7 @@ namespace AddressesAPI.Infrastructure.Migrations
 
                     b.Property<int?>("UnitNumber")
                         .HasColumnName("unit_number")
-                        .HasColumnType("integer");
+                        .HasColumnType("smallint");
 
                     b.Property<string>("UsageCode")
                         .HasColumnName("blpu_class")
