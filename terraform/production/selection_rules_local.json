@@ -1,0 +1,122 @@
+{
+  "rules": [
+    {
+      "rule-type": "selection",
+      "rule-id": "1",
+      "rule-name": "1",
+      "object-locator": {
+        "schema-name": "%",
+        "table-name": "hackney_address"
+      },
+      "rule-action": "include"
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "3",
+      "rule-name": "3",
+      "rule-action": "remove-column",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "%",
+        "table-name": "hackney_address",
+        "column-name": "postcode_nospace"
+      }
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "5",
+      "rule-name": "5",
+      "rule-action": "remove-column",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "%",
+        "table-name": "hackney_address",
+        "column-name": "organisation"
+      }
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "7",
+      "rule-name": "7",
+      "rule-action": "remove-column",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "%",
+        "table-name": "hackney_address",
+        "column-name": "latitude"
+      }
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "9",
+      "rule-name": "9",
+      "rule-action": "remove-column",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "%",
+        "table-name": "hackney_address",
+        "column-name": "longitude"
+      }
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "11",
+      "rule-name": "11",
+      "rule-action": "remove-column",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "%",
+        "table-name": "hackney_address",
+        "column-name": "planning_use_class"
+      }
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "13",
+      "rule-name": "13",
+      "rule-action": "remove-column",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "%",
+        "table-name": "hackney_address",
+        "column-name": "ward"
+      }
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "15",
+      "rule-name": "15",
+      "rule-action": "remove-column",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "%",
+        "table-name": "hackney_address",
+        "column-name": "locality"
+      }
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "17",
+      "rule-name": "17",
+      "rule-action": "remove-column",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "%",
+        "table-name": "hackney_address",
+        "column-name": "northing"
+      }
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "19",
+      "rule-name": "19",
+      "rule-action": "remove-column",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "%",
+        "table-name": "hackney_address",
+        "column-name": "easting"
+      }
+    }
+  ]
+}
