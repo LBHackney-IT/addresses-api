@@ -15,7 +15,7 @@ namespace AddressesAPI.V1
 
         public enum Gazetteer
         {
-            Hackney,
+            Local,
             Both
         };
     }
