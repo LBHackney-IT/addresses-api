@@ -47,16 +47,16 @@ namespace ReindexTests
         [MaxLength(8)]
         public string Gazetteer { get; set; }
 
-        [MaxLength(200)]
+        [MaxLength(500)]
         public string Line1 { get; set; }
 
-        [MaxLength(200)]
+        [MaxLength(500)]
         public string Line2 { get; set; }
 
-        [MaxLength(200)]
+        [MaxLength(500)]
         public string Line3 { get; set; }
 
-        [MaxLength(100)]
+        [MaxLength(500)]
         public string Line4 { get; set; }
 
         public short? PaonStartNumber { get; set; }
