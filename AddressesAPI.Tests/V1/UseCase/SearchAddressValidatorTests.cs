@@ -379,7 +379,7 @@ namespace AddressesAPI.Tests.V1.UseCase
         {
             var request = new SearchAddressRequest { Gazetteer = gazetteer };
             _classUnderTest.ShouldHaveValidationErrorFor(x => x.Gazetteer, request)
-                .WithErrorMessage("Value for the parameter is not valid. It should be either Hackney or Both.");
+                .WithErrorMessage("Value for the parameter is not valid. It should be either 'Local' or 'Both'.");
         }
 
         [TestCase("Local")]

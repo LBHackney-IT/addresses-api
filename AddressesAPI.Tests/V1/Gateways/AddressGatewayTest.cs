@@ -352,12 +352,13 @@ namespace AddressesAPI.Tests.V1.Gateways
             addresses.First().Should().BeEquivalentTo(savedAddress.ToDomain());
         }
 
-        [TestCase("Local")]
-        [TestCase("local")]
-        public void CanSearchOnlyLocalHackneyAddressesCaseInsensitively(string gazetteer)
+
+        [TestCase("Hackney")]
+        [TestCase("hackney")]
+        public void CanSearchOnlyLocalHackneyAddressesCaseInsensitively(string gazetteerDatabaseValue)
         {
             var savedAddress = TestEfDataHelper.InsertAddress(DatabaseContext,
-                request: new NationalAddress { Gazetteer = gazetteer }
+                request: new NationalAddress { Gazetteer = gazetteerDatabaseValue }
             );
             TestEfDataHelper.InsertAddress(DatabaseContext,
                 request: new NationalAddress { Gazetteer = "National" }

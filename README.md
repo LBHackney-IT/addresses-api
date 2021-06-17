@@ -27,9 +27,23 @@ To serve the application, run it using your IDE of choice, we use Visual Studio 
 
 The application can also be served locally using Docker. It will be available on port 3000.
 
+The postgres database connection string is an environment variable, CONNECTION_STRING.
+
+Similarly, the elastic search URL is in an environment variable, ELASTICSEARCH_DOMAIN_URL.
+
+You can set the environment variables in launchSettings.json, but don't commit local values to git.
+
+On windows you can set global environment variables instead (note you will need to reboot for gloal environment variables to update).
+
+Local variables (in launchSettings.json) will trump global ones.
+
+There is a make file that can be used for launch. Make can be problematic to install on windows, but it is possible.
+
 ```sh
 make build && make serve
 ```
+
+If not using your own local instances, you can use the databases provided in the project that contain seed data:
 
 #### Setting up the development database
 
@@ -68,10 +82,11 @@ Or locally if you prefer:
 dotnet test
 ```
 
-In order to configure the local test database you should first run:
+If not using make, you should start the test databases in their docker containers before running the unit tests
 
 ```sh
 docker-compose up -d test-database
+docker-compose up -d test-elasticsearch
 ```
 
 The migrations for the test database are run as part of the initial test setup.

@@ -19,8 +19,8 @@ namespace AddressesAPI.V1.UseCase
                 .WithMessage("Value for the parameter is not valid.");
 
             RuleFor(r => r.Gazetteer)
-                .Must(gazetteer => gazetteer.ToLower() == "local" || Enum.TryParse<GlobalConstants.Gazetteer>(gazetteer, true, out _))
-                .WithMessage("Value for the parameter is not valid. It should be either Hackney or Both.");
+                .Must(gazetteer => gazetteer.ToLower() == "local" || gazetteer.ToLower() == "both")
+                .WithMessage("Value for the parameter is not valid. It should be either 'Local' or 'Both'.");
 
             RuleFor(r => r.Format)
                 .Must(format => Enum.TryParse<GlobalConstants.Format>(format, true, out _))
