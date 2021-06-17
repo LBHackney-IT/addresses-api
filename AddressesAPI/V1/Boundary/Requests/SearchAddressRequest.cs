@@ -43,11 +43,11 @@ namespace AddressesAPI.V1.Boundary.Requests
                 //This logic needs reworking
                 _gazetteer = value;
 
-                if (_gazetteer == GlobalConstants.Gazetteer.Local.ToString())
+                if (_gazetteer.ToLowerInvariant() == GlobalConstants.Gazetteer.Local.ToString().ToLowerInvariant())
                 {
                     HackneyGazetteerOutOfBoroughAddress = false;
                 }
-                else if (_gazetteer == GlobalConstants.Gazetteer.Both.ToString())
+                else if (_gazetteer.ToLowerInvariant() == GlobalConstants.Gazetteer.Both.ToString().ToLowerInvariant())
                 {
                     HackneyGazetteerOutOfBoroughAddress = null;
                 }

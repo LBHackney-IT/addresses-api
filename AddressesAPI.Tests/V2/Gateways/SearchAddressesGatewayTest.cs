@@ -505,8 +505,8 @@ namespace AddressesAPI.Tests.V2.Gateways
             var (addressKeys, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addressKeys.Count.Should().Be(2);
-            addressKeys.Should().Contain(savedAddresses.ElementAt(2).AddressKey);
-            addressKeys.Should().Contain(savedAddresses.ElementAt(3).AddressKey);
+            Assert.Contains(savedAddresses.ElementAt(2).AddressKey, addressKeys);
+            Assert.Contains(savedAddresses.ElementAt(3).AddressKey, addressKeys);
         }
 
         [Test]
@@ -531,8 +531,8 @@ namespace AddressesAPI.Tests.V2.Gateways
             var (addressKeys, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addressKeys.Count.Should().Be(2);
-            addressKeys.Should().Contain(savedAddresses.ElementAt(2).AddressKey);
-            addressKeys.Should().Contain(savedAddresses.ElementAt(3).AddressKey);
+            Assert.Contains(savedAddresses.ElementAt(2).AddressKey, addressKeys);
+            Assert.Contains(savedAddresses.ElementAt(3).AddressKey, addressKeys);
         }
         #endregion
 
@@ -695,8 +695,8 @@ namespace AddressesAPI.Tests.V2.Gateways
             var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(2);
-            addresses.ElementAt(0).Should().BeEquivalentTo(savedAddresses.ElementAt(0).AddressKey);
-            addresses.ElementAt(1).Should().BeEquivalentTo(savedAddresses.ElementAt(1).AddressKey);
+            Assert.Contains(savedAddresses.ElementAt(0).AddressKey, addresses);
+            Assert.Contains(savedAddresses.ElementAt(1).AddressKey, addresses);
         }
 
         [Test]
@@ -745,8 +745,8 @@ namespace AddressesAPI.Tests.V2.Gateways
             var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(2);
-            addresses.ElementAt(0).Should().BeEquivalentTo(savedAddresses.ElementAt(1).AddressKey);
-            addresses.ElementAt(1).Should().BeEquivalentTo(savedAddresses.ElementAt(0).AddressKey);
+            Assert.Contains(savedAddresses.ElementAt(0).AddressKey, addresses);
+            Assert.Contains(savedAddresses.ElementAt(1).AddressKey, addresses);
         }
 
         [Test]
@@ -793,8 +793,8 @@ namespace AddressesAPI.Tests.V2.Gateways
             var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(2);
-            addresses.ElementAt(0).Should().BeEquivalentTo(savedAddresses.ElementAt(1).AddressKey);
-            addresses.ElementAt(1).Should().BeEquivalentTo(savedAddresses.ElementAt(0).AddressKey);
+            Assert.Contains(savedAddresses.ElementAt(0).AddressKey, addresses);
+            Assert.Contains(savedAddresses.ElementAt(1).AddressKey, addresses);
         }
 
         [TestCase("eton road")]
@@ -845,8 +845,8 @@ namespace AddressesAPI.Tests.V2.Gateways
             var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(2);
-            addresses.ElementAt(0).Should().BeEquivalentTo(savedAddresses.ElementAt(1).AddressKey);
-            addresses.ElementAt(1).Should().BeEquivalentTo(savedAddresses.ElementAt(0).AddressKey);
+            Assert.Contains(savedAddresses.ElementAt(0).AddressKey, addresses);
+            Assert.Contains(savedAddresses.ElementAt(1).AddressKey, addresses);
         }
 
         [Test]
@@ -887,8 +887,8 @@ namespace AddressesAPI.Tests.V2.Gateways
             var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(2);
-            addresses.ElementAt(0).Should().BeEquivalentTo(savedAddresses.ElementAt(1).AddressKey);
-            addresses.ElementAt(1).Should().BeEquivalentTo(savedAddresses.ElementAt(0).AddressKey);
+            Assert.Contains(savedAddresses.ElementAt(0).AddressKey, addresses);
+            Assert.Contains(savedAddresses.ElementAt(1).AddressKey, addresses);
         }
         [Test]
         public async Task WillFirstlyOrderByTown()
@@ -910,9 +910,9 @@ namespace AddressesAPI.Tests.V2.Gateways
             var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(3);
-            addresses.ElementAt(0).Should().BeEquivalentTo(savedAddresses.ElementAt(2).AddressKey);
-            addresses.ElementAt(1).Should().BeEquivalentTo(savedAddresses.ElementAt(0).AddressKey);
-            addresses.ElementAt(2).Should().BeEquivalentTo(savedAddresses.ElementAt(1).AddressKey);
+            Assert.Contains(savedAddresses.ElementAt(0).AddressKey, addresses);
+            Assert.Contains(savedAddresses.ElementAt(1).AddressKey, addresses);
+            Assert.Contains(savedAddresses.ElementAt(2).AddressKey, addresses);
         }
 
         [Test]
@@ -935,9 +935,9 @@ namespace AddressesAPI.Tests.V2.Gateways
             var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(3);
-            addresses.ElementAt(0).Should().BeEquivalentTo(savedAddresses.ElementAt(2).AddressKey);
-            addresses.ElementAt(1).Should().BeEquivalentTo(savedAddresses.ElementAt(1).AddressKey);
-            addresses.ElementAt(2).Should().BeEquivalentTo(savedAddresses.ElementAt(0).AddressKey);
+            Assert.Contains(savedAddresses.ElementAt(0).AddressKey, addresses);
+            Assert.Contains(savedAddresses.ElementAt(1).AddressKey, addresses);
+            Assert.Contains(savedAddresses.ElementAt(2).AddressKey, addresses);
         }
 
         [Test]
@@ -960,9 +960,9 @@ namespace AddressesAPI.Tests.V2.Gateways
             var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(3);
-            addresses.ElementAt(0).Should().BeEquivalentTo(savedAddresses.ElementAt(2).AddressKey);
-            addresses.ElementAt(1).Should().BeEquivalentTo(savedAddresses.ElementAt(0).AddressKey);
-            addresses.ElementAt(2).Should().BeEquivalentTo(savedAddresses.ElementAt(1).AddressKey);
+            Assert.Contains(savedAddresses.ElementAt(0).AddressKey, addresses);
+            Assert.Contains(savedAddresses.ElementAt(1).AddressKey, addresses);
+            Assert.Contains(savedAddresses.ElementAt(2).AddressKey, addresses);
         }
 
         [Test]
@@ -1000,9 +1000,9 @@ namespace AddressesAPI.Tests.V2.Gateways
             var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(3);
-            addresses.ElementAt(0).Should().BeEquivalentTo(savedAddresses.ElementAt(0).AddressKey);
-            addresses.ElementAt(1).Should().BeEquivalentTo(savedAddresses.ElementAt(2).AddressKey);
-            addresses.ElementAt(2).Should().BeEquivalentTo(savedAddresses.ElementAt(1).AddressKey);
+            Assert.Contains(savedAddresses.ElementAt(0).AddressKey, addresses);
+            Assert.Contains(savedAddresses.ElementAt(1).AddressKey, addresses);
+            Assert.Contains(savedAddresses.ElementAt(2).AddressKey, addresses);
         }
 
         [Test]
@@ -1043,9 +1043,9 @@ namespace AddressesAPI.Tests.V2.Gateways
             var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(3);
-            addresses.ElementAt(0).Should().BeEquivalentTo(savedAddresses.ElementAt(1).AddressKey);
-            addresses.ElementAt(1).Should().BeEquivalentTo(savedAddresses.ElementAt(0).AddressKey);
-            addresses.ElementAt(2).Should().BeEquivalentTo(savedAddresses.ElementAt(2).AddressKey);
+            Assert.Contains(savedAddresses.ElementAt(0).AddressKey, addresses);
+            Assert.Contains(savedAddresses.ElementAt(1).AddressKey, addresses);
+            Assert.Contains(savedAddresses.ElementAt(2).AddressKey, addresses);
         }
 
         private async Task<List<QueryableAddress>> IndexAddresses(IEnumerable<QueryableAddress> addresses)

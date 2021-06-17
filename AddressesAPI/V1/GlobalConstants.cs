@@ -13,6 +13,8 @@ namespace AddressesAPI.V1
             Detailed
         };
 
+        public const string GazetteerDatabaseValueForLocal = "Hackney";
+
         public enum Gazetteer
         {
             Local,
