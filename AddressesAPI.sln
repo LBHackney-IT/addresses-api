@@ -1,13 +1,39 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AddressesAPI", "AddressesAPI\AddressesAPI.csproj", "{6F482163-3F51-487F-8F7D-37A1D4DAEA8B}"
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31402.337
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AddressesAPI", "AddressesAPI\AddressesAPI.csproj", "{6F482163-3F51-487F-8F7D-37A1D4DAEA8B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AddressesAPI.Tests", "AddressesAPI.Tests\AddressesAPI.Tests.csproj", "{DE8E4E61-EB76-416B-8417-E8F2F6A0C0D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AddressesAPI.Tests", "AddressesAPI.Tests\AddressesAPI.Tests.csproj", "{DE8E4E61-EB76-416B-8417-E8F2F6A0C0D3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reindex", "Reindex\Reindex.csproj", "{C09C3ADE-1A80-466A-95D7-D45F733EAD92}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reindex", "Reindex\Reindex.csproj", "{C09C3ADE-1A80-466A-95D7-D45F733EAD92}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReindexTests", "ReindexTests\ReindexTests.csproj", "{7E783D03-26A5-40CA-B13A-41F87D337116}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReindexTests", "ReindexTests\ReindexTests.csproj", "{7E783D03-26A5-40CA-B13A-41F87D337116}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Terraform", "Terraform", "{D3B84E5D-58BB-43D4-9108-E2514139F241}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "development", "development", "{7ED1F666-2D50-4791-9B2E-DBFB8D26A2C1}"
+	ProjectSection(SolutionItems) = preProject
+		terraform\development\main.tf = terraform\development\main.tf
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "production", "production", "{38B88FE3-2E47-441B-855F-62741D69DA6F}"
+	ProjectSection(SolutionItems) = preProject
+		terraform\production\alarms.tf = terraform\production\alarms.tf
+		terraform\production\main.tf = terraform\production\main.tf
+		terraform\production\selection_rules_local.json = terraform\production\selection_rules_local.json
+		terraform\production\selection_rules_national.json = terraform\production\selection_rules_national.json
+		terraform\production\task_settings.json = terraform\production\task_settings.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "staging", "staging", "{D45581E7-8E92-44D3-9B1B-16ECDC0932B1}"
+	ProjectSection(SolutionItems) = preProject
+		terraform\staging\alarms.tf = terraform\staging\alarms.tf
+		terraform\staging\main.tf = terraform\staging\main.tf
+		terraform\staging\selection_rules.json = terraform\staging\selection_rules.json
+		terraform\staging\task_settings.json = terraform\staging\task_settings.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,5 +57,16 @@ Global
 		{7E783D03-26A5-40CA-B13A-41F87D337116}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7E783D03-26A5-40CA-B13A-41F87D337116}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7E783D03-26A5-40CA-B13A-41F87D337116}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7ED1F666-2D50-4791-9B2E-DBFB8D26A2C1} = {D3B84E5D-58BB-43D4-9108-E2514139F241}
+		{38B88FE3-2E47-441B-855F-62741D69DA6F} = {D3B84E5D-58BB-43D4-9108-E2514139F241}
+		{D45581E7-8E92-44D3-9B1B-16ECDC0932B1} = {D3B84E5D-58BB-43D4-9108-E2514139F241}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {235AF6C0-0DC4-4AA0-95C4-08A6157CAD6D}
 	EndGlobalSection
 EndGlobal
