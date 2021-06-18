@@ -69,7 +69,7 @@ module "postgres_db_staging" {
   subnet_ids           = data.aws_subnet_ids.staging.ids
   db_engine            = "postgres"
   db_engine_version    = "11.8"
-  db_instance_class    = "db.t2.micro"
+  db_instance_class    = "db.t3.micro"
   db_allocated_storage = 500
   maintenance_window   = "sun:10:00-sun:10:30"
   db_username          = data.aws_ssm_parameter.addresses_postgres_username.value
