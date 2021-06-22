@@ -77,7 +77,7 @@ namespace AddressesAPI.V2.UseCase
                 UsageCode = request.UsageCode,
                 UsagePrimary = request.UsagePrimary,
                 OutOfBoroughAddress = addressScope != GlobalConstants.AddressScope.HackneyBorough,
-                IncludeParentShells = request.IncludeParentShells,
+                IncludePropertyShells = request.IncludePropertyShells,
                 AddressQuery = request.Query,
                 ModifiedSince = request.ModifiedSince == null
                     ? (DateTime?) null

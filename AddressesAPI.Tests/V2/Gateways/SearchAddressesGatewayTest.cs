@@ -553,7 +553,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 PageSize = 50,
                 Gazetteer = GlobalConstants.Gazetteer.Both,
                 Postcode = addressToMatch.Postcode,
-                IncludeParentShells = false
+                IncludePropertyShells = false
             };
             var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
@@ -576,7 +576,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 PageSize = 50,
                 Gazetteer = GlobalConstants.Gazetteer.Both,
                 Postcode = addressToMatch.Postcode,
-                IncludeParentShells = true
+                IncludePropertyShells = true
             };
             var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
@@ -605,7 +605,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 PageSize = 2,
                 Gazetteer = GlobalConstants.Gazetteer.Both,
                 Postcode = addressOneToMatch.Postcode,
-                IncludeParentShells = true
+                IncludePropertyShells = true
             };
             var (addresses, totalCount) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
@@ -630,7 +630,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 PageSize = 50,
                 Gazetteer = GlobalConstants.Gazetteer.Both,
                 Postcode = addressToMatch.Postcode,
-                IncludeParentShells = true
+                IncludePropertyShells = true
             };
             var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
@@ -657,7 +657,7 @@ namespace AddressesAPI.Tests.V2.Gateways
                 PageSize = 50,
                 Gazetteer = GlobalConstants.Gazetteer.Both,
                 Postcode = postcode,
-                IncludeParentShells = false
+                IncludePropertyShells = false
             };
             var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 

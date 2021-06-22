@@ -16,7 +16,7 @@ namespace AddressesAPI.V2.Domain
         public string UsageCode { get; set; }
         public IEnumerable<string> AddressStatus { get; set; }
         public bool OutOfBoroughAddress { get; set; }
-        public bool IncludeParentShells { get; set; }
+        public bool IncludePropertyShells { get; set; }
         public string CrossRefCode { get; set; }
         public string CrossRefValue { get; set; }
         public int Page { get; set; }

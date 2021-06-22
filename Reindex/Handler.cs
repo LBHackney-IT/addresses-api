@@ -18,6 +18,11 @@ namespace Reindex
 {
     public class Handler
     {
+        private const int MinimumQueueDelaySeconds = 600;
+
+        // This is an AWS maximum
+        private const int MaximumDelaySeconds = 900;
+
         private ElasticClient _elasticSearchClient;
         private string _indexFilePath;
         private IAmazonSQS _sqsClient;
@@ -58,7 +63,7 @@ namespace Reindex
             var indexName = request.fromIndex
                             ?? (await _elasticSearchClient.GetIndicesPointingToAliasAsync(alias))?.First();
 
-            LambdaLogger.Log($"Current Index name for alias {alias}: {indexName}");
+            this.Log($"Current Index name for alias {alias}: {indexName}");
 
             var indexConfig = request.config ?? await File.ReadAllTextAsync(_indexFilePath);
 
@@ -66,61 +71,73 @@ namespace Reindex
 
             _elasticSearchClient.LowLevel.Indices.Create<BytesResponse>(newIndexName, indexConfig);
 
-            LambdaLogger.Log($"Created new index with name {newIndexName}");
+            this.Log($"Created new index with name {newIndexName}");
 
             var response = _elasticSearchClient.ReindexOnServer(r => r
                 .Source(s => s.Index(Indices.Index(indexName)))
                 .Destination(d => d.Index(newIndexName))
                 .WaitForCompletion(false));
-            LambdaLogger.Log($"{response.DebugInformation}");
-            LambdaLogger.Log($"Re-indexed task ID {response.Task.FullyQualifiedId}");
+            this.Log($"{response.DebugInformation}");
+            this.Log($"Re-indexed task ID {response.Task.FullyQualifiedId}");
 
             var sqsMessage = new SqsMessage
             {
                 alias = alias,
                 newIndex = newIndexName,
                 taskId = response.Task.FullyQualifiedId,
-                deleteAfterReindex = request.deleteAfterReindex
+                deleteAfterReindex = request.deleteAfterReindex,
+                timeCreated = DateTime.Now
             };
 
             var sqsResponse = await SendSqsMessageToQueue(JsonConvert.SerializeObject(sqsMessage));
-            LambdaLogger.Log($"Sent task ID to sqs queue messageId: {sqsResponse?.MessageId}");
+            this.Log($"Sent task ID to sqs queue messageId: {sqsResponse?.MessageId}");
         }
 
         public async Task SwitchAlias(SQSEvent sqsEvent, ILambdaContext context)
         {
             var message = sqsEvent.Records.FirstOrDefault()?.Body;
+
             if (message == null) return;
+
             var data = JsonConvert.DeserializeObject<SqsMessage>(message);
-            LambdaLogger.Log($"Received SQS message {message}");
+            this.Log($"Received SQS message {message}");
+
+            // Ensure that we have a gap between messages to prevent a possible billing issue
+            if (!MessageTimingIsValid(data))
+            {
+                this.Log($"Received SQS message too early - message timestamp {data.timeCreated}, time now {DateTime.Now}. Terminating to prevent possible message build up.");
+                return;
+            }
+
             var task = await _elasticSearchClient.Tasks.GetTaskAsync(new TaskId(data.taskId));
-            LambdaLogger.Log(JsonConvert.SerializeObject(task));
+            this.Log(JsonConvert.SerializeObject(task));
 
             if (task.ApiCall.HttpStatusCode == 404) return;
             if (!task.Completed)
             {
-                LambdaLogger.Log("Task has not completed: re-adding message to queue");
-                var sqsResponse = await SendSqsMessageToQueue(message);
-                LambdaLogger.Log($"Re-sent task ID to sqs queue messageId: {sqsResponse.MessageId}");
+                this.Log("Task has not completed: re-adding message to queue");
+                data.timeCreated = DateTime.Now;
+                var sqsResponse = await SendSqsMessageToQueue(JsonConvert.SerializeObject(data));
+                this.Log($"Re-sent task ID to sqs queue messageId: {sqsResponse.MessageId}");
                 return;
             }
 
             if (task.GetResponse<ReindexOnServerResponse>().Failures.Any())
             {
-                LambdaLogger.Log("Failures when reindxing");
+                this.Log("Failures when reindxing");
                 foreach (var bulkIndexByScrollFailure in task.GetResponse<ReindexOnServerResponse>().Failures)
                 {
-                    LambdaLogger.Log(bulkIndexByScrollFailure.Cause.Reason);
+                    this.Log(bulkIndexByScrollFailure.Cause.Reason);
                 }
             }
 
             var indices = await RemoveAllReferencesToAlias(data.alias);
 
             await _elasticSearchClient.Indices.PutAliasAsync(Indices.Index(data.newIndex), data.alias);
-            LambdaLogger.Log($"Address alias {data.alias} to index {data.newIndex}");
+            this.Log($"Address alias {data.alias} to index {data.newIndex}");
 
             await _elasticSearchClient.DeleteAsync<TaskId>(data.taskId, d => d.Index(".tasks"));
-            LambdaLogger.Log($"Deleted Task document with ID {data.taskId}");
+            this.Log($"Deleted Task document with ID {data.taskId}");
 
             if (data.deleteAfterReindex)
             {
@@ -142,7 +159,7 @@ namespace Reindex
             foreach (var index in indicesForAlias)
             {
                 await _elasticSearchClient.Indices.DeleteAliasAsync(Indices.Index(index), alias);
-                LambdaLogger.Log($"Removed alias {alias} from index {index}");
+                this.Log($"Removed alias {alias} from index {index}");
             }
 
             return indicesForAlias;
@@ -150,23 +167,66 @@ namespace Reindex
 
         private async Task<SendMessageResponse> SendSqsMessageToQueue(string message)
         {
-            var delaySeconds = 600;
-            try
-            {
-                delaySeconds = Convert.ToInt32(Environment.GetEnvironmentVariable("SQS_MESSAGE_DELAY"));
-            }
-            catch (Exception)
-            {
-                LambdaLogger.Log("SQS_MESSAGE_DELAY either not found or not an integer, using default of 600s");
-            }
-
             var sqsRequest = new SendMessageRequest
             {
-                DelaySeconds = delaySeconds,
+                DelaySeconds = GetSqsMessageDelaySeconds(),
                 MessageBody = message,
                 QueueUrl = _sqsQueue,
             };
             return await _sqsClient.SendMessageAsync(sqsRequest);
+        }
+
+        /// <summary>
+        /// Calculates the delay in seconds for the queue message that checks if the indexing is complete.
+        /// There was a bug where delaySeconds was being set to zero becuase the SQS_MESSAGE_DELAY
+        /// environment variable was missing. This led to a very high AWS bill from message spamming.
+        /// Thus, this code has been refactored to ensure a minimum delay of 600 seconds (10 minutes).
+        /// </summary>
+        /// <returns></returns>
+        public int GetSqsMessageDelaySeconds()
+        {
+            var delaySeconds = MinimumQueueDelaySeconds;
+            try
+            {
+                var configuredMessageDelay = Environment.GetEnvironmentVariable("SQS_MESSAGE_DELAY");
+                // Must check for null, as  Convert.ToInt32(null) does NOT throw, it returns 0.
+                if (configuredMessageDelay != null)
+                {
+                    delaySeconds = Convert.ToInt32(configuredMessageDelay);
+                }
+            }
+            catch (Exception)
+            {
+                this.Log($"SQS_MESSAGE_DELAY either not found or not an integer, using default of {MinimumQueueDelaySeconds}s");
+                delaySeconds = MinimumQueueDelaySeconds;
+            }
+
+            // Check min and max
+            if (delaySeconds < MinimumQueueDelaySeconds)
+            {
+                delaySeconds = MinimumQueueDelaySeconds;
+            }
+            if (delaySeconds > MaximumDelaySeconds)
+            {
+                delaySeconds = MaximumDelaySeconds;
+            }
+
+            return delaySeconds;
+        }
+
+        public bool MessageTimingIsValid(SqsMessage message)
+        {
+            // Ensure that we have a gap between messages to prevent a possible billing issue
+            if (message.timeCreated > DateTime.Now.AddSeconds(-MinimumQueueDelaySeconds))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        protected virtual void Log(string message)
+        {
+            LambdaLogger.Log(message);
         }
     }
 }

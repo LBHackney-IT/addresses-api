@@ -58,7 +58,7 @@ namespace AddressesAPI.Tests.V2.UseCase
                 PageSize = _faker.Random.Int(10, 40),
                 UPRN = _faker.Random.Long(0, 9999999999),
                 USRN = _faker.Random.Int(0, 9999999),
-                IncludeParentShells = _faker.Random.Bool(),
+                IncludePropertyShells = _faker.Random.Bool(),
                 CrossRefCode = "123DEF",
                 CrossRefValue = "20000",
                 ModifiedSince = "2019-03-05"
@@ -77,7 +77,7 @@ namespace AddressesAPI.Tests.V2.UseCase
                         && x.PageSize == request.PageSize
                         && x.UsageCode == request.UsageCode
                         && x.UsagePrimary == request.UsagePrimary
-                        && x.IncludeParentShells == request.IncludeParentShells
+                        && x.IncludePropertyShells == request.IncludePropertyShells
                         && x.CrossRefCode == request.CrossRefCode
                         && x.CrossRefValue == request.CrossRefValue
                         && x.AddressQuery == request.Query

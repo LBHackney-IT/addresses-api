@@ -90,11 +90,10 @@ namespace AddressesAPI.V2.Boundary.Requests
         public string AddressStatus { get; set; }
 
         /// <summary>
-        /// Whether or not to include parent shells of addresses which match
-        /// the search criteria, or just return the addresses themselves.
+        /// Whether or not to include property shells in the results.
         /// </summary>
-        [FromQuery(Name = "include_parent_shells")]
-        public bool IncludeParentShells { get; set; } = false;
+        [FromQuery(Name = "include_property_shells")]
+        public bool IncludePropertyShells { get; set; } = false;
 
         /// <summary>
         /// Filter addresses by a specific cross reference. Must be used together with `cross_ref_value`.
