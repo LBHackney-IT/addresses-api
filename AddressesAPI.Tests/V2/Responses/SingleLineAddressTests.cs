@@ -16,7 +16,7 @@ namespace AddressesAPI.Tests.V2.Gateways
         [TestCase(Line1, Line2, Line3, Line4, Town, Postcode, Line1 + ", " + Line2 + ", " + Line3 + ", " + Line4 + ", " + Town + ", " + Postcode)]
         [TestCase("", Line2, Line3, Line4, Town, Postcode, Line2 + ", " + Line3 + ", " + Line4 + ", " + Town + ", " + Postcode)]
         [TestCase(Line1, Line2, Line3, "", Town, Postcode, Line1 + ", " + Line2 + ", " + Line3 + ", " + Town + ", " + Postcode)]
-        [TestCase(Line1, Line2, Line3, Line4, Town, "", Line1 + ", " + Line2 + ", " + Line3 + ", " + Line4 + ", " + Town )]
+        [TestCase(Line1, Line2, Line3, Line4, Town, "", Line1 + ", " + Line2 + ", " + Line3 + ", " + Line4 + ", " + Town)]
         [TestCase("", "", "", "", "", "", "")]
         public void SingleLineAddress_WithVariousData_ReturnsCorrectResult(
             string line1,
