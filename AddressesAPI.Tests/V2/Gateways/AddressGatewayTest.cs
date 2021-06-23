@@ -155,7 +155,7 @@ namespace AddressesAPI.Tests.V2.Gateways
         }
 
         [Test]
-        public void ItWillReturnNullIfAddressWithAMatchingKeyDoesNotExistInTheDatabase()
+         public void ItWillReturnNullIfAddressWithAMatchingKeyDoesNotExistInTheDatabase()
         {
             var addressKey = _faker.Random.String2(14);
 

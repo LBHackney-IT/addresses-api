@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using AddressesAPI.Infrastructure;
 using AddressesAPI.Tests.V2.Helper;
+using AddressesAPI.V2.Boundary.Responses.Data;
 using AddressesAPI.V2.Boundary.Responses.Metadata;
 using AutoFixture;
 using Bogus;
@@ -175,12 +176,24 @@ namespace AddressesAPI.Tests.V2.E2ETests
             response.StatusCode.Should().Be(200);
 
             var data = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
+
+            var addressRepsonse = new AddressResponse()
+            {
+                Line1 = addressDetails.Line1,
+                Line2 = addressDetails.Line2,
+                Line3 = addressDetails.Line3,
+                Line4 = addressDetails.Line4,
+                Town = addressDetails.Town,
+                Postcode = addressDetails.Postcode
+            };
+
             data.Should().BeEquivalentTo(
                 "{\"data\":" +
                 "{\"address\":[" +
                     $"{{\"line1\":\"{addressDetails.Line1}\",\"line2\":\"{addressDetails.Line2}\"," +
                     $"\"line3\":\"{addressDetails.Line3}\",\"line4\":\"{addressDetails.Line4}\"," +
                     $"\"town\":\"{addressDetails.Town}\",\"postcode\":\"{addressDetails.Postcode}\"," +
+                    $"\"singleLineAddress\":\"{addressRepsonse.SingleLineAddress}\"," +
                     $"\"UPRN\":{addressDetails.UPRN}}}" +
                 "],\"pageCount\":1,\"totalCount\":1},\"statusCode\":200}");
         }
@@ -231,13 +244,30 @@ namespace AddressesAPI.Tests.V2.E2ETests
             returnedAddress.Data.Addresses.First().AddressKey.Should().Be(hackneyInBorough.AddressKey);
         }
 
-        [Test]
-        public async Task CanIncludeParentShellsInARequest()
+        [TestCase("parent shell", true, 2)]
+        [TestCase("something,parent shell,something else", true, 2)]
+        [TestCase("parent shell,something else", true, 2)]
+        [TestCase("something,parent shell", true, 2)]
+        [TestCase("parent shell", false, 1)]
+        [TestCase("something,parent shell,something else", false, 1)]
+        [TestCase("parent shell,something else", false, 1)]
+        [TestCase("something,parent shell", false, 1)]
+        [TestCase("property shell", false, 2)]
+        [TestCase("something,property shell,something else", true, 2)]
+        [TestCase("something,something else", true, 2)]
+        [TestCase("", true, 2)]
+        [TestCase("something,property shell,something else", false, 2)]
+        [TestCase("something,something else", false, 2)]
+        [TestCase("", false, 2)]
+        public async Task IncludeOrExlcudePropertyShellsInARequest(string primaryUsage, bool includePropertyShell, int expectedCount)
         {
+            const string postCode = "AB11 1AB";
             var blockAddressKey = _faker.Random.String2(14);
             var blockOfFlats = new NationalAddress
             {
                 UPRN = _faker.Random.Int(1, 287987129),
+                UsagePrimary = primaryUsage,
+                Postcode = postCode
             };
             await TestDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, blockAddressKey, blockOfFlats)
                 .ConfigureAwait(true);
@@ -246,25 +276,43 @@ namespace AddressesAPI.Tests.V2.E2ETests
             var flat = new NationalAddress
             {
                 ParentUPRN = blockOfFlats.UPRN,
+                Postcode = postCode
             };
             var flatRecord = await TestDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, flatAddressKey, flat)
                 .ConfigureAwait(true);
 
             await AddSomeRandomAddressToTheDatabase().ConfigureAwait(true);
 
-            var queryString = $"UPRN={flatRecord.UPRN}&Format=Detailed&include_parent_shells=true&address_scope=national";
+            var propertyShellQuery = includePropertyShell ? "&include_property_shells=true" : "";
+            var queryString = $"postcode={postCode}&Format=Detailed{propertyShellQuery}&address_scope=national";
 
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);
 
             var returnedAddress = await response.ConvertToSearchAddressResponseObject()
                 .ConfigureAwait(true);
-            returnedAddress.Data.Addresses.Count.Should().Be(2);
+
+            returnedAddress.Data.Addresses.Count.Should().Be(expectedCount);
 
             var returnedUprns = returnedAddress.Data.Addresses
                 .Select(x => x.UPRN).ToList();
-            returnedUprns.Should().Contain(blockOfFlats.UPRN);
-            returnedUprns.Should().Contain(flatRecord.UPRN);
+
+            if (expectedCount >= 2)
+            {
+                returnedUprns.Should().Contain(blockOfFlats.UPRN);
+                returnedUprns.Should().Contain(flatRecord.UPRN);
+            }
+            else if (expectedCount == 1)
+            {
+                if (includePropertyShell)
+                {
+                    returnedUprns.Should().Contain(flatRecord.UPRN);
+                }
+                else
+                {
+                    returnedUprns.Should().Contain(flatRecord.UPRN);
+                }
+            }
         }
 
         [Test]

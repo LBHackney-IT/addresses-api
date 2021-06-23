@@ -66,19 +66,18 @@ namespace AddressesAPI.V2.Gateways
                    && FilterOutOfBoroughAddresses(request, q)
                    && SearchStreet(request, q)
                    && SearchCrossReferencedUprns(request, q)
-                   && FilterPropertyShells(request, q)
+                   && FilterParentShells(request, q)
                    && FilterByModifiedSinceDate(request, q)
                    && SearchAddressFullText(request, q);
         }
 
-        private static QueryContainer FilterPropertyShells(SearchParameters request, QueryContainerDescriptor<QueryableAddress> q)
+        private static QueryContainer FilterParentShells(SearchParameters request, QueryContainerDescriptor<QueryableAddress> q)
         {
             if (!request.IncludePropertyShells)
             {
-                return q.Terms(t => t
-                    .Field(f => f.UsagePrimary.ToLower().Contains("parent shell"))
-                    .Terms(false)
-                    );
+                var searchUsagePrimary = !q.MatchPhrase(t =>
+                            t.Field(f => f.UsagePrimary).Query("parent shell"));
+                return searchUsagePrimary;
             }
 
             return null;

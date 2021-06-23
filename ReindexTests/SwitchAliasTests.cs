@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -66,6 +67,7 @@ namespace ReindexTests
             sqsMessage.alias.Should().Be(alias);
 
             System.Threading.Thread.Sleep(1000);
+            sqsMessage.timeCreated = DateTime.Now.AddSeconds(-600);
             await _classUnderTest.SwitchAlias(SqsEvent(sqsMessage), null);
 
             var indices = await ElasticsearchClient.GetIndicesPointingToAliasAsync(alias);
@@ -87,6 +89,7 @@ namespace ReindexTests
 
             await _classUnderTest.ReindexAlias(new ReindexRequest { alias = alias }, null);
             System.Threading.Thread.Sleep(1000);
+            sqsMessage.timeCreated = DateTime.Now.AddSeconds(-600);
             await _classUnderTest.SwitchAlias(SqsEvent(sqsMessage), null);
 
             var task = await ElasticsearchClient.Tasks.GetTaskAsync(new TaskId(sqsMessage.taskId));
@@ -108,6 +111,8 @@ namespace ReindexTests
             await _classUnderTest.ReindexAlias(new ReindexRequest { alias = alias }, null);
             System.Threading.Thread.Sleep(1000);
             sqsMessage.deleteAfterReindex = true;
+
+            sqsMessage.timeCreated = DateTime.Now.AddSeconds(-600);
             await _classUnderTest.SwitchAlias(SqsEvent(sqsMessage), null);
 
             var index = await ElasticsearchClient.Indices.GetAsync(Indices.Index("initialindex"));
