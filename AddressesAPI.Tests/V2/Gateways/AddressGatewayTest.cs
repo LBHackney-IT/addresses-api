@@ -1,10 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using AddressesAPI.Infrastructure;
 using AddressesAPI.Tests.V2.Helper;
 using AddressesAPI.V2;
-using AddressesAPI.V2.Domain;
 using AddressesAPI.V2.Factories;
 using AddressesAPI.V2.Gateways;
 using Bogus;
@@ -155,7 +153,7 @@ namespace AddressesAPI.Tests.V2.Gateways
         }
 
         [Test]
-         public void ItWillReturnNullIfAddressWithAMatchingKeyDoesNotExistInTheDatabase()
+        public void ItWillReturnNullIfAddressWithAMatchingKeyDoesNotExistInTheDatabase()
         {
             var addressKey = _faker.Random.String2(14);
 
