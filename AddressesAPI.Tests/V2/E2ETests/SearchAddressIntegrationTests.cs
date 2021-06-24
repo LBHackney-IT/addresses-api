@@ -306,7 +306,7 @@ namespace AddressesAPI.Tests.V2.E2ETests
             {
                 if (includePropertyShell)
                 {
-                    returnedUprns.Should().Contain(flatRecord.UPRN);
+                    returnedUprns.Should().Contain(blockOfFlats.UPRN);
                 }
                 else
                 {
