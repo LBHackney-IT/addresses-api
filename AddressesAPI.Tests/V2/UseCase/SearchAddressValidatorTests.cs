@@ -252,7 +252,7 @@ namespace AddressesAPI.Tests.V2.UseCase
         }
 
         [TestCase("cross_ref_code", "cross_ref_value", "postcode", "RM3 0FS")]
-        [TestCase("include_parent_shells", "address_status", "postcode", "E3 1QW")]
+        [TestCase("include_property_shells", "address_status", "postcode", "E3 1QW")]
         public void GivenValidFilterParametersContainingUnderscores_WhenCallingValidation_ItReturnsNoErrors(string queryParameter1, string queryParameter2, string queryParameter3, string postcode)
         {
             var queryStringParameters = new List<string>() { queryParameter1, queryParameter2, queryParameter3 };

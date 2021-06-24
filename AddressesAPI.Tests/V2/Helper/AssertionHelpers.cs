@@ -58,14 +58,14 @@ namespace AddressesAPI.Tests.V2.Helper
                         if (prop.Name != propertyName) continue;
                         prop.GetValue(received).Should().Be(expectedResult,
                             $"field {prop.Name} should be match value given in exceptions");
-                        return;
+                        break;
                     }
+                    break;
                 }
 
                 prop.GetValue(received).Should()
                     .Be(expected.GetType().GetProperty(prop.Name)?.GetValue(expected),
                         $"field {prop.Name} should be equivalent to expected object");
-
             }
         }
     }

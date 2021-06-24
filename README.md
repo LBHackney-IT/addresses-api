@@ -82,12 +82,14 @@ Or locally if you prefer:
 dotnet test
 ```
 
-If not using make, you should start the test databases in their docker containers before running the unit tests
+If not using make, or to debug the tests in visual studio, start the test databases in their docker containers before starting the tests
 
 ```sh
 docker-compose up -d test-database
 docker-compose up -d test-elasticsearch
 ```
+
+NOTE - if you have a local version of postgres installed (and it is running on the default port 5432), you will need to stop it else the unit tests will fail - the docker postgres also runs on port 5432 and there will be a clash. In windows, go to services and stop the postgres server service.
 
 The migrations for the test database are run as part of the initial test setup.
 

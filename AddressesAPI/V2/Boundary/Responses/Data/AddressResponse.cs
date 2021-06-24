@@ -11,6 +11,35 @@ namespace AddressesAPI.V2.Boundary.Responses.Data
         public string Line4 { get; set; }
         public string Town { get; set; }
         public string Postcode { get; set; }
+
+        /// <summary>
+        /// Requirement to return the address on a single line, comma separated, to save work in client applications.
+        /// </summary>
+        public string SingleLineAddress
+        {
+            get
+            {
+                // Build comma separated address
+                var ret =
+                    GetAddressComponent(Line1) +
+                    GetAddressComponent(Line2) +
+                    GetAddressComponent(Line3) +
+                    GetAddressComponent(Line4) +
+                    GetAddressComponent(Town) +
+                    GetAddressComponent(Postcode);
+                // Remove trailing comma
+                if (ret.EndsWith(", "))
+                {
+                    ret = ret.Remove(ret.Length - 2, 2);
+                }
+                return ret;
+            }
+        }
+        private string GetAddressComponent(string component)
+        {
+            return string.IsNullOrWhiteSpace(component) ? "" : component + ", ";
+        }
+
         [JsonProperty("UPRN")]
         public long UPRN { get; set; }
 

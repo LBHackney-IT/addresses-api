@@ -1,3 +1,5 @@
+using System;
+
 namespace Reindex
 {
     public class SqsMessage
@@ -6,5 +8,6 @@ namespace Reindex
         public string newIndex { get; set; }
         public string alias { get; set; }
         public bool deleteAfterReindex { get; set; }
+        public DateTime timeCreated { get; set; }
     }
 }

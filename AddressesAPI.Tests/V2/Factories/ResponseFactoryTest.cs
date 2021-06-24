@@ -5,6 +5,7 @@ using AddressesAPI.V2.Factories;
 using AutoFixture;
 using FluentAssertions;
 using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace AddressesAPI.Tests.V2.Factories
 {
@@ -14,9 +15,25 @@ namespace AddressesAPI.Tests.V2.Factories
         [Test]
         public void MapsAnAddressDomainDirectlyToAnAddressResponse()
         {
+            // Arrange
             var domain = _fixture.Create<Address>();
             var response = domain.ToResponse();
-            response.ShouldBeEquivalentToExpectedObjectWithExceptions(domain);
+            // make an exception for SingleLineAddress
+            var address = new AddressResponse()
+            {
+                Line1 = domain.Line1,
+                Line2 = domain.Line2,
+                Line3 = domain.Line3,
+                Line4 = domain.Line4,
+                Town = domain.Town,
+                Postcode = domain.Postcode,
+            };
+
+            // Act
+            var exceptions = new Dictionary<string, object>() { { "SingleLineAddress", address.SingleLineAddress } };
+
+            // Assert
+            response.ShouldBeEquivalentToExpectedObjectWithExceptions(domain, exceptions);
         }
 
         [Test]

@@ -553,116 +553,12 @@ namespace AddressesAPI.Tests.V2.Gateways
                 PageSize = 50,
                 Gazetteer = GlobalConstants.Gazetteer.Both,
                 Postcode = addressToMatch.Postcode,
-                IncludeParentShells = false
+                IncludePropertyShells = false
             };
             var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
 
             addresses.Count.Should().Be(1);
             addresses.Should().ContainEquivalentOf(addressToMatch.AddressKey);
-        }
-
-        [Test]
-        public async Task IfSetToIncludeParentShellsIncludeImmediateParentShells()
-        {
-            var parentShell = await TestDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
-            var addressToMatch = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
-                addressConfig: new QueryableAddress { ParentUPRN = parentShell.UPRN }
-            ).ConfigureAwait(true);
-            await TestDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
-
-            var request = new SearchParameters
-            {
-                Page = 1,
-                PageSize = 50,
-                Gazetteer = GlobalConstants.Gazetteer.Both,
-                Postcode = addressToMatch.Postcode,
-                IncludeParentShells = true
-            };
-            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
-
-            addresses.Count.Should().Be(2);
-            addresses.Should().ContainEquivalentOf(addressToMatch.AddressKey);
-            addresses.Should().ContainEquivalentOf(parentShell.AddressKey);
-        }
-
-        [Test]
-        public async Task IfSetToIncludeParentShellsWillIncludeParentShellsInTotalCount()
-        {
-            var parentShell = await TestDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
-            var addressOneToMatch = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
-                addressConfig: new QueryableAddress { ParentUPRN = parentShell.UPRN }
-            ).ConfigureAwait(true);
-            var parentShellTwo = await TestDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
-            var addressTwoToMatch = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
-                addressConfig: new QueryableAddress { ParentUPRN = parentShellTwo.UPRN, Postcode = addressOneToMatch.Postcode }
-            ).ConfigureAwait(true);
-
-            await TestDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
-
-            var request = new SearchParameters
-            {
-                Page = 1,
-                PageSize = 2,
-                Gazetteer = GlobalConstants.Gazetteer.Both,
-                Postcode = addressOneToMatch.Postcode,
-                IncludeParentShells = true
-            };
-            var (addresses, totalCount) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
-
-            addresses.Count.Should().Be(2);
-            totalCount.Should().Be(4);
-        }
-
-        [Test]
-        public async Task IfSetToIncludeParentShellsIncludeParentShellsOfParentsShells()
-        {
-            var grandParentShell = await TestDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
-            var parentShell = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
-                addressConfig: new QueryableAddress { ParentUPRN = grandParentShell.UPRN }).ConfigureAwait(true);
-            var addressToMatch = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
-                addressConfig: new QueryableAddress { ParentUPRN = parentShell.UPRN }
-            ).ConfigureAwait(true);
-            await TestDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
-
-            var request = new SearchParameters
-            {
-                Page = 1,
-                PageSize = 50,
-                Gazetteer = GlobalConstants.Gazetteer.Both,
-                Postcode = addressToMatch.Postcode,
-                IncludeParentShells = true
-            };
-            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
-
-            addresses.Count.Should().Be(3);
-            addresses.Should().ContainEquivalentOf(addressToMatch.AddressKey);
-            addresses.Should().ContainEquivalentOf(parentShell.AddressKey);
-            addresses.Should().ContainEquivalentOf(grandParentShell.AddressKey);
-        }
-
-        [TestCase("E8 7JH")]
-        [TestCase("N1 5TH")]
-        public async Task IfSetToExcludeParentShellsWillNotReturnAnyParentShells(string postcode)
-        {
-            var parentShell = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
-                addressConfig: new QueryableAddress { PropertyShell = true, Postcode = postcode }
-            ).ConfigureAwait(true);
-            var notAParentShell = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
-                addressConfig: new QueryableAddress { PropertyShell = false, Postcode = postcode }
-            ).ConfigureAwait(true);
-
-            var request = new SearchParameters
-            {
-                Page = 1,
-                PageSize = 50,
-                Gazetteer = GlobalConstants.Gazetteer.Both,
-                Postcode = postcode,
-                IncludeParentShells = false
-            };
-            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
-
-            addresses.Count.Should().Be(1);
-            addresses.Should().ContainEquivalentOf(notAParentShell.AddressKey);
         }
 
         #endregion
