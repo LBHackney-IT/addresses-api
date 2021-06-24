@@ -22,7 +22,7 @@ namespace ReindexTests.MessageQueue
                 timeCreated = DateTime.Now.AddSeconds(-timeDelaySeconds)
             };
 
-            var handler = new HandlerTestDouble();
+            var handler = HandlerTestDouble.HandlerTestDoubleFactory();
 
             handler.MessageTimingIsValid(message).Should().Be(false);
         }
@@ -41,7 +41,7 @@ namespace ReindexTests.MessageQueue
                 timeCreated = DateTime.Now.AddSeconds(-timeDelaySeconds)
             };
 
-            var handler = new HandlerTestDouble();
+            var handler = HandlerTestDouble.HandlerTestDoubleFactory();
 
             handler.MessageTimingIsValid(message).Should().Be(true);
         }
@@ -58,16 +58,16 @@ namespace ReindexTests.MessageQueue
         public void GetSqsMessageDelaySeconds_VariousEnvironmentSettings_ReturnsCorrectDelay(int? value, int expectedReturn)
         {
             Environment.SetEnvironmentVariable("SQS_MESSAGE_DELAY", value?.ToString());
-            var handler = new HandlerTestDouble();
+            var handler = HandlerTestDouble.HandlerTestDoubleFactory();
 
             handler.GetSqsMessageDelaySeconds().Should().Be(expectedReturn);
         }
 
         [Test]
-        public void GetSqsMessageDelaySeconds_InvalidEnvironmentSetting_ReturnsMinimumDelayANdLogsMessage()
+        public void GetSqsMessageDelaySeconds_InvalidEnvironmentSetting_ReturnsMinimumDelayAndLogsMessage()
         {
             Environment.SetEnvironmentVariable("SQS_MESSAGE_DELAY", "invalid-will-throw-exception");
-            var handler = new HandlerTestDouble();
+            var handler = HandlerTestDouble.HandlerTestDoubleFactory();
 
             handler.GetSqsMessageDelaySeconds().Should().Be(600);
             handler.LastError.Should().Be("SQS_MESSAGE_DELAY either not found or not an integer, using default of 600s");

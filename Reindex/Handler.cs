@@ -34,7 +34,6 @@ namespace Reindex
             _indexFilePath = "./index.json";
             _sqsQueue = Environment.GetEnvironmentVariable("SQS_QUEUE_URL");
             _sqsClient = new AmazonSQSClient();
-
         }
 
         //This constructor is used for testing
