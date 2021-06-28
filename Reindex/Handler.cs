@@ -124,16 +124,16 @@ namespace Reindex
                 // Ensure we don't try too many times
                 if (data.attempts > MaxAttempts)
                 {
-                    this.Log($"Too many attempts have been detected - maximum number is {MaxAttempts}. Stopping. Terminating to prevent possible message build up");
+                    this.Log($"Too many attempts have been detected - maximum number is {MaxAttempts}. Terminating to prevent possible message build up");
                     return;
                 }
 
                 var task = await _elasticSearchClient.Tasks.GetTaskAsync(new TaskId(data.taskId));
-                this.Log(JsonConvert.SerializeObject(task));
+                this.Log("GetTaskAsync response: " + JsonConvert.SerializeObject(task));
 
                 if (task.ApiCall.HttpStatusCode == 404)
                 {
-                    this.Log($"Task has not been found, assumed already completed. {task.IsValid}, Error: {task.ServerError}, DebugInfo: {task.DebugInformation}");
+                    this.Log($"Task has not been found, assumed already completed. IsValid: {task.IsValid}, Error: {task.ServerError}, DebugInfo: {task.DebugInformation}");
                 }
                 else
                 {
@@ -163,6 +163,9 @@ namespace Reindex
                             this.Log($"No detailed failure reasons given for reindexing failure");
                         }
                     }
+
+                    var deleteResponse = await _elasticSearchClient.DeleteAsync<TaskId>(data.taskId, d => d.Index(".tasks"));
+                    this.Log($"Deleted Task document with ID {data.taskId}, IsValid: {deleteResponse.IsValid}, Error: {deleteResponse.ServerError}, DebugInfo: {deleteResponse.DebugInformation}");
                 }
 
                 this.Log($"Removing references to alias {data.alias}:");
@@ -170,9 +173,6 @@ namespace Reindex
 
                 var putResponse = await _elasticSearchClient.Indices.PutAliasAsync(Indices.Index(data.newIndex), data.alias);
                 this.Log($"Added address alias {data.alias} to index {data.newIndex}, IsValid: {putResponse.IsValid}, Error: {putResponse.ServerError}, DebugInfo: {putResponse.DebugInformation}");
-
-                var deleteResponse = await _elasticSearchClient.DeleteAsync<TaskId>(data.taskId, d => d.Index(".tasks"));
-                this.Log($"Deleted Task document with ID {data.taskId}, IsValid: {deleteResponse.IsValid}, Error: {deleteResponse.ServerError}, DebugInfo: {deleteResponse.DebugInformation}");
 
                 if (data.deleteAfterReindex)
                 {
