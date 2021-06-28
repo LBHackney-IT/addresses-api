@@ -23,6 +23,8 @@ namespace Reindex
         // This is an AWS maximum
         private const int MaximumDelaySeconds = 900;
 
+        private const int MaxAttempts = 10;
+
         private ElasticClient _elasticSearchClient;
         private string _indexFilePath;
         private IAmazonSQS _sqsClient;
@@ -58,89 +60,124 @@ namespace Reindex
 
         public async Task ReindexAlias(ReindexRequest request, ILambdaContext context)
         {
-            var alias = request.alias;
-            var indexName = request.fromIndex
-                            ?? (await _elasticSearchClient.GetIndicesPointingToAliasAsync(alias))?.First();
-
-            this.Log($"Current Index name for alias {alias}: {indexName}");
-
-            var indexConfig = request.config ?? await File.ReadAllTextAsync(_indexFilePath);
-
-            var newIndexName = alias + "_" + DateTime.Now.ToString("yyyyMMddhhmm");
-
-            _elasticSearchClient.LowLevel.Indices.Create<BytesResponse>(newIndexName, indexConfig);
-
-            this.Log($"Created new index with name {newIndexName}");
-
-            var response = _elasticSearchClient.ReindexOnServer(r => r
-                .Source(s => s.Index(Indices.Index(indexName)))
-                .Destination(d => d.Index(newIndexName))
-                .WaitForCompletion(false));
-            this.Log($"{response.DebugInformation}");
-            this.Log($"Re-indexed task ID {response.Task.FullyQualifiedId}");
-
-            var sqsMessage = new SqsMessage
+            try
             {
-                alias = alias,
-                newIndex = newIndexName,
-                taskId = response.Task.FullyQualifiedId,
-                deleteAfterReindex = request.deleteAfterReindex,
-                timeCreated = DateTime.Now
-            };
+                var alias = request.alias;
+                var indexName = request.fromIndex
+                                ?? (await _elasticSearchClient.GetIndicesPointingToAliasAsync(alias))?.First();
 
-            var sqsResponse = await SendSqsMessageToQueue(JsonConvert.SerializeObject(sqsMessage));
-            this.Log($"Sent task ID to sqs queue messageId: {sqsResponse?.MessageId}");
+                this.Log($"Current Index name for alias {alias}: {indexName}");
+
+                var indexConfig = request.config ?? await File.ReadAllTextAsync(_indexFilePath);
+
+                var newIndexName = alias + "_" + DateTime.Now.ToString("yyyyMMddhhmm");
+
+                _elasticSearchClient.LowLevel.Indices.Create<BytesResponse>(newIndexName, indexConfig);
+
+                this.Log($"Created new index with name {newIndexName}");
+
+                var response = _elasticSearchClient.ReindexOnServer(r => r
+                    .Source(s => s.Index(Indices.Index(indexName)))
+                    .Destination(d => d.Index(newIndexName))
+                    .WaitForCompletion(false));
+                this.Log($"{response.DebugInformation}");
+                this.Log($"Re-indexed task ID {response.Task.FullyQualifiedId}");
+
+                var sqsMessage = new SqsMessage
+                {
+                    alias = alias,
+                    newIndex = newIndexName,
+                    taskId = response.Task.FullyQualifiedId,
+                    deleteAfterReindex = request.deleteAfterReindex,
+                    timeCreated = DateTime.Now,
+                    attempts = 1
+                };
+
+                var sqsResponse = await SendSqsMessageToQueue(JsonConvert.SerializeObject(sqsMessage));
+                this.Log($"Sent task ID to sqs queue messageId: {sqsResponse?.MessageId}");
+            }
+            catch (Exception ex)
+            {
+                // We must handle exceptions to prevent AWS retrying on error
+                this.Log($"Exception caught in ReindexAlias {ex.Message}, {ex.StackTrace}, {ex.Source}");
+            }
         }
 
         public async Task SwitchAlias(SQSEvent sqsEvent, ILambdaContext context)
         {
-            var message = sqsEvent.Records.FirstOrDefault()?.Body;
-
-            if (message == null) return;
-
-            var data = JsonConvert.DeserializeObject<SqsMessage>(message);
-            this.Log($"Received SQS message {message}");
-
-            // Ensure that we have a gap between messages to prevent a possible billing issue
-            if (!MessageTimingIsValid(data))
+            try
             {
-                this.Log($"Received SQS message too early - message timestamp {data.timeCreated}, time now {DateTime.Now}. Terminating to prevent possible message build up.");
-                return;
-            }
+                var message = sqsEvent.Records.FirstOrDefault()?.Body;
 
-            var task = await _elasticSearchClient.Tasks.GetTaskAsync(new TaskId(data.taskId));
-            this.Log(JsonConvert.SerializeObject(task));
+                if (message == null) return;
 
-            if (task.ApiCall.HttpStatusCode == 404) return;
-            if (!task.Completed)
-            {
-                this.Log("Task has not completed: re-adding message to queue");
-                data.timeCreated = DateTime.Now;
-                var sqsResponse = await SendSqsMessageToQueue(JsonConvert.SerializeObject(data));
-                this.Log($"Re-sent task ID to sqs queue messageId: {sqsResponse.MessageId}");
-                return;
-            }
+                var data = JsonConvert.DeserializeObject<SqsMessage>(message);
+                this.Log($"Received SQS message {message}");
 
-            if (task.GetResponse<ReindexOnServerResponse>().Failures.Any())
-            {
-                this.Log("Failures when reindxing");
-                foreach (var bulkIndexByScrollFailure in task.GetResponse<ReindexOnServerResponse>().Failures)
+                // Ensure that we have a gap between messages to prevent a possible billing issue
+                if (!MessageTimingIsValid(data))
                 {
-                    this.Log(bulkIndexByScrollFailure.Cause.Reason);
+                    this.Log($"Received SQS message too early - message timestamp {data.timeCreated}, time now {DateTime.Now}. Terminating to prevent possible message build up");
+                    return;
+                }
+
+                // Ensure we don't try too many times
+                if (data.attempts > MaxAttempts)
+                {
+                    this.Log($"Too many attempts have been detected - maximum number is {MaxAttempts}. Stopping. Terminating to prevent possible message build up");
+                    return;
+                }
+
+                var task = await _elasticSearchClient.Tasks.GetTaskAsync(new TaskId(data.taskId));
+                this.Log(JsonConvert.SerializeObject(task));
+
+                if (task.ApiCall.HttpStatusCode == 404) return;
+                if (!task.Completed)
+                {
+                    this.Log("Task has not completed: re-adding message to queue");
+                    data.timeCreated = DateTime.Now;
+                    data.attempts += 1;
+                    var sqsResponse = await SendSqsMessageToQueue(JsonConvert.SerializeObject(data));
+                    this.Log($"Re-sent task ID to sqs queue messageId: {sqsResponse.MessageId}");
+                    return;
+                }
+
+                if (task.GetResponse<ReindexOnServerResponse>().Failures.Any())
+                {
+                    var response = task.GetResponse<ReindexOnServerResponse>();
+                    this.Log("Failures when reindxing, IsValid: {response.IsValid}, Error: {response.ServerError}, Updated: {response.Updated}, DebugInfo: {response.DebugInformation}");
+                    if (response.Failures != null)
+                    {
+                        foreach (var bulkIndexByScrollFailure in task.GetResponse<ReindexOnServerResponse>().Failures)
+                        {
+                            this.Log(bulkIndexByScrollFailure.Cause.Reason);
+                        }
+                    }
+                    else
+                    {
+                        this.Log($"No detailed failure reasons given for reindexing failure");
+                    }
+                }
+
+                this.Log($"Removing references to alias {data.alias}:");
+                var indices = await RemoveAllReferencesToAlias(data.alias);
+
+                var putResponse = await _elasticSearchClient.Indices.PutAliasAsync(Indices.Index(data.newIndex), data.alias);
+                this.Log($"Added address alias {data.alias} to index {data.newIndex}, IsValid: {putResponse.IsValid}, Error: {putResponse.ServerError}, DebugInfo: {putResponse.DebugInformation}");
+
+                var deleteResponse = await _elasticSearchClient.DeleteAsync<TaskId>(data.taskId, d => d.Index(".tasks"));
+                this.Log($"Deleted Task document with ID {data.taskId}, IsValid: {deleteResponse.IsValid}, Error: {deleteResponse.ServerError}, DebugInfo: {deleteResponse.DebugInformation}");
+
+                if (data.deleteAfterReindex)
+                {
+                    this.Log($"Removing indices for alias {data.alias}:");
+                    await RemoveAllIndicesForAlias(indices);
                 }
             }
-
-            var indices = await RemoveAllReferencesToAlias(data.alias);
-
-            await _elasticSearchClient.Indices.PutAliasAsync(Indices.Index(data.newIndex), data.alias);
-            this.Log($"Address alias {data.alias} to index {data.newIndex}");
-
-            await _elasticSearchClient.DeleteAsync<TaskId>(data.taskId, d => d.Index(".tasks"));
-            this.Log($"Deleted Task document with ID {data.taskId}");
-
-            if (data.deleteAfterReindex)
+            catch (Exception ex)
             {
-                await RemoveAllIndicesForAlias(indices);
+                // We must handle exceptions to prevent AWS retrying on error
+                this.Log($"Exception caught in SwitchAlias {ex.Message}, {ex.StackTrace}, {ex.Source}");
             }
         }
 
@@ -148,7 +185,8 @@ namespace Reindex
         {
             foreach (var index in indices)
             {
-                await _elasticSearchClient.Indices.DeleteAsync(Indices.Index(index));
+                var response = await _elasticSearchClient.Indices.DeleteAsync(Indices.Index(index));
+                this.Log($"    Removed index {index}, IsValid: {response.IsValid}, Error: {response.ServerError}, DebugInfo: {response.DebugInformation}");
             }
         }
 
@@ -158,7 +196,7 @@ namespace Reindex
             foreach (var index in indicesForAlias)
             {
                 await _elasticSearchClient.Indices.DeleteAliasAsync(Indices.Index(index), alias);
-                this.Log($"Removed alias {alias} from index {index}");
+                this.Log($"    Removed alias {alias} from index {index}");
             }
 
             return indicesForAlias;
