@@ -15,8 +15,7 @@
       "launchUrl": "api/v1/healthcheck/ping",
       "applicationUrl": "http://localhost:5000",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "CONNECTION_STRING": "User ID=addressapi_admin;Password=mr9E~WePR}S5Cr&~;Host=localhost;Port=5432;Database=addresses_api;"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       }
     }
   }

@@ -145,7 +145,7 @@ namespace Reindex
                 if (task.GetResponse<ReindexOnServerResponse>().Failures.Any())
                 {
                     var response = task.GetResponse<ReindexOnServerResponse>();
-                    this.Log("Failures when reindxing, IsValid: {response.IsValid}, Error: {response.ServerError}, Updated: {response.Updated}, DebugInfo: {response.DebugInformation}");
+                    this.Log($"Failures when reindxing, IsValid: {response.IsValid}, Error: {response.ServerError}, Updated: {response.Updated}, DebugInfo: {response.DebugInformation}");
                     if (response.Failures != null)
                     {
                         foreach (var bulkIndexByScrollFailure in task.GetResponse<ReindexOnServerResponse>().Failures)
