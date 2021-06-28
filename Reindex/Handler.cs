@@ -131,31 +131,37 @@ namespace Reindex
                 var task = await _elasticSearchClient.Tasks.GetTaskAsync(new TaskId(data.taskId));
                 this.Log(JsonConvert.SerializeObject(task));
 
-                if (task.ApiCall.HttpStatusCode == 404) return;
-                if (!task.Completed)
+                if (task.ApiCall.HttpStatusCode == 404)
                 {
-                    this.Log("Task has not completed: re-adding message to queue");
-                    data.timeCreated = DateTime.Now;
-                    data.attempts += 1;
-                    var sqsResponse = await SendSqsMessageToQueue(JsonConvert.SerializeObject(data));
-                    this.Log($"Re-sent task ID to sqs queue messageId: {sqsResponse.MessageId}");
-                    return;
+                    this.Log($"Task has not been found, assumed already completed. {task.IsValid}, Error: {task.ServerError}, DebugInfo: {task.DebugInformation}");
                 }
-
-                if (task.GetResponse<ReindexOnServerResponse>().Failures.Any())
+                else
                 {
-                    var response = task.GetResponse<ReindexOnServerResponse>();
-                    this.Log($"Failures when reindxing, IsValid: {response.IsValid}, Error: {response.ServerError}, Updated: {response.Updated}, DebugInfo: {response.DebugInformation}");
-                    if (response.Failures != null)
+                    if (!task.Completed)
                     {
-                        foreach (var bulkIndexByScrollFailure in task.GetResponse<ReindexOnServerResponse>().Failures)
-                        {
-                            this.Log(bulkIndexByScrollFailure.Cause.Reason);
-                        }
+                        this.Log("Task has not completed: re-adding message to queue");
+                        data.timeCreated = DateTime.Now;
+                        data.attempts += 1;
+                        var sqsResponse = await SendSqsMessageToQueue(JsonConvert.SerializeObject(data));
+                        this.Log($"Re-sent task ID to sqs queue messageId: {sqsResponse.MessageId}");
+                        return;
                     }
-                    else
+
+                    if (task.GetResponse<ReindexOnServerResponse>().Failures.Any())
                     {
-                        this.Log($"No detailed failure reasons given for reindexing failure");
+                        var response = task.GetResponse<ReindexOnServerResponse>();
+                        this.Log($"Failures when reindxing, IsValid: {response.IsValid}, Error: {response.ServerError}, Updated: {response.Updated}, DebugInfo: {response.DebugInformation}");
+                        if (response.Failures != null)
+                        {
+                            foreach (var bulkIndexByScrollFailure in task.GetResponse<ReindexOnServerResponse>().Failures)
+                            {
+                                this.Log(bulkIndexByScrollFailure.Cause.Reason);
+                            }
+                        }
+                        else
+                        {
+                            this.Log($"No detailed failure reasons given for reindexing failure");
+                        }
                     }
                 }
 
@@ -195,8 +201,8 @@ namespace Reindex
             var indicesForAlias = await _elasticSearchClient.GetIndicesPointingToAliasAsync(alias);
             foreach (var index in indicesForAlias)
             {
-                await _elasticSearchClient.Indices.DeleteAliasAsync(Indices.Index(index), alias);
-                this.Log($"    Removed alias {alias} from index {index}");
+                var response = await _elasticSearchClient.Indices.DeleteAliasAsync(Indices.Index(index), alias);
+                this.Log($"    Removed alias {alias} from index {index}, IsValid: {response.IsValid}, Error: {response.ServerError}, DebugInfo: {response.DebugInformation}");
             }
 
             return indicesForAlias;
