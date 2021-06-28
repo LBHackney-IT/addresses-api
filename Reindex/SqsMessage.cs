@@ -9,5 +9,6 @@ namespace Reindex
         public string alias { get; set; }
         public bool deleteAfterReindex { get; set; }
         public DateTime timeCreated { get; set; }
+        public int attempts { get; set; }
     }
 }
