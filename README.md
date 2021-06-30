@@ -144,10 +144,13 @@ After which make the necessary changes to the context, then create the migration
 
 FxCop runs code analysis when the Solution is built.
 
+
 Both the API and Test projects have been set up to **treat all warnings from the code analysis as errors** and therefore, fail the build.
 
 However, we can select which errors to suppress by setting the severity of the responsible rule to none, e.g `dotnet_analyzer_diagnostic.<Category-or-RuleId>.severity = none`, within the `.editorconfig` file.
 Documentation on how to do this can be found [here](https://docs.microsoft.com/en-us/visualstudio/code-quality/use-roslyn-analyzers?view=vs-2019).
+
+*NOTE* FxCop is now deprecated by Microsoft, and a different code analysis tool is run as part of the build pipeline in circleci. It would be good to align these, as currently it is possible to check in code that has no issues locally only to have it rejected by the circleci static analysis.
 
 ## Agreed Testing Approach
 
