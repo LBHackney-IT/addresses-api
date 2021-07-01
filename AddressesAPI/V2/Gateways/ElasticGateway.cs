@@ -131,18 +131,7 @@ namespace AddressesAPI.V2.Gateways
                 .ZeroTermsQuery(ZeroTermsQuery.All)
                 .Query(request.AddressQuery));
 
-            // This allows partial matching on postcode (this isn't a requirement for the other components of the address).
-            // It assumes the postcode is the last component of request.AddressQuery (if it isn't it shouldn't have any impact).
-            var components = request.AddressQuery.Split(',');
-            if (components != null && components.Length > 0)
-            {
-                var matchPartialPostcode = SearchPostcodes(components[components.Length - 1].Trim(), q);
-                return (fuzzyMatchText && exactlyMatchNumbers) || (orderedMatch) || (exactMatch) || (matchPartialPostcode);
-            }
-            else
-            {
-                return (fuzzyMatchText && exactlyMatchNumbers && matchFullLines) || (orderedMatch) || (exactMatch);
-            }
+            return (fuzzyMatchText && exactlyMatchNumbers && matchFullLines) || (orderedMatch) || (exactMatch);
         }
 
         private static SortDescriptor<QueryableAddress> SortResults(SortDescriptor<QueryableAddress> srt)
@@ -190,13 +179,8 @@ namespace AddressesAPI.V2.Gateways
 
         private static QueryContainer SearchPostcodes(SearchParameters request, QueryContainerDescriptor<QueryableAddress> q)
         {
-            return SearchPostcodes(request.Postcode, q);
-        }
-
-        private static QueryContainer SearchPostcodes(string postCode, QueryContainerDescriptor<QueryableAddress> q)
-        {
-            if (string.IsNullOrWhiteSpace(postCode)) return null;
-            var postcodeSearchTerm = postCode?.Replace(" ", "").ToLower();
+            if (string.IsNullOrWhiteSpace(request.Postcode)) return null;
+            var postcodeSearchTerm = request.Postcode?.Replace(" ", "").ToLower();
             var searchPostcodes = q.Wildcard(m =>
                 m.Field(f => f.Postcode).Value($"{postcodeSearchTerm}*"));
             return searchPostcodes;
