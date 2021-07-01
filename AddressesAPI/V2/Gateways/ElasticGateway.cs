@@ -33,13 +33,17 @@ namespace AddressesAPI.V2.Gateways
                 .TrackTotalHits() // This instructs elasticsearch to return the total number of documents that matched before paging was applied.
                 .Explain()
             ).ConfigureAwait(true);
+            if (searchResponse != null)
+            {
+                LambdaLogger.Log($"DebugInformation: {searchResponse.DebugInformation}, Isvalid: {searchResponse.IsValid}, OriginalException.Message: {searchResponse.OriginalException?.Message}");
+            }
             LambdaLogger.Log(searchResponse.ApiCall.DebugInformation);
             LambdaLogger.Log($"Received {searchResponse.Documents.Count} documents");
             var addressKeys = searchResponse.Documents
                 .Select(a => a.AddressKey).ToList();
-            var totalCount = searchResponse.HitsMetadata.Total.Value;
+            var totalCount = searchResponse?.HitsMetadata?.Total?.Value;
 
-            return (addressKeys, totalCount);
+            return (addressKeys, totalCount ?? 0);
         }
 
         /// <summary>
