@@ -15,12 +15,7 @@
       "launchUrl": "api/v1/healthcheck/ping",
       "applicationUrl": "http://localhost:5000",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "CONNECTION_STRING": "Host=127.0.0.1;Database=testdb;Username=postgres;Password=mypassword;"
-
-
-
-
+        "ASPNETCORE_ENVIRONMENT": "Development"
       }
     }
   }
