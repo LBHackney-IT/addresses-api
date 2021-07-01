@@ -123,13 +123,26 @@ namespace AddressesAPI.V2.Gateways
                     .Field(f => f.Line2)
                     .Field(f => f.Line3)
                     .Field(f => f.Line4)
+                    .Field(f => f.Town)
+                    .Field(f => f.Postcode)
                 )
                 .Analyzer("standard")
                 .TieBreaker(0.0)
                 .ZeroTermsQuery(ZeroTermsQuery.All)
                 .Query(request.AddressQuery));
 
-            return (fuzzyMatchText && exactlyMatchNumbers && matchFullLines) || (orderedMatch) || (exactMatch);
+            // This allows partial matching on postcode (this isn't a requirement for the other components of the address).
+            // It assumes the postcode is the last component of request.AddressQuery (if it isn't it shouldn't have any impact).
+            var components = request.AddressQuery.Split(',');
+            if (components != null && components.Length > 0)
+            {
+                var matchPartialPostcode = SearchPostcodes(components[components.Length - 1].Trim(), q);
+                return (fuzzyMatchText && exactlyMatchNumbers) || (orderedMatch) || (exactMatch) || (matchPartialPostcode);
+            }
+            else
+            {
+                return (fuzzyMatchText && exactlyMatchNumbers && matchFullLines) || (orderedMatch) || (exactMatch);
+            }
         }
 
         private static SortDescriptor<QueryableAddress> SortResults(SortDescriptor<QueryableAddress> srt)
@@ -177,9 +190,13 @@ namespace AddressesAPI.V2.Gateways
 
         private static QueryContainer SearchPostcodes(SearchParameters request, QueryContainerDescriptor<QueryableAddress> q)
         {
-            if (string.IsNullOrWhiteSpace(request.Postcode)) return null;
-            var postcodeSearchTerm = request.Postcode?.Replace(" ", "").ToLower();
+            return SearchPostcodes(request.Postcode, q);
+        }
 
+        private static QueryContainer SearchPostcodes(string postCode, QueryContainerDescriptor<QueryableAddress> q)
+        {
+            if (string.IsNullOrWhiteSpace(postCode)) return null;
+            var postcodeSearchTerm = postCode?.Replace(" ", "").ToLower();
             var searchPostcodes = q.Wildcard(m =>
                 m.Field(f => f.Postcode).Value($"{postcodeSearchTerm}*"));
             return searchPostcodes;
