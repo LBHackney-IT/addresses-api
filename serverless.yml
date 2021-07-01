@@ -24,7 +24,7 @@ functions:
           method: ANY
           private: true
           cors: true
-          authorizer: 
+          authorizer:
             arn: ${ssm:/platform-apis-lambda-authorizer-arn}
             type: request
   reindexElasticsearchAlias:
