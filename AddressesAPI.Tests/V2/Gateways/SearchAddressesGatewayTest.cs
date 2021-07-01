@@ -191,7 +191,7 @@ namespace AddressesAPI.Tests.V2.Gateways
         [TestCase("340", "green road", "hackney", "london", null, null, "green road hackney")]
         [TestCase("340", "green road", "hackney", "london", null, null, "green street")]
         [TestCase("340", "green road", "hackney", "london", null, null, "grean road")]
-        [TestCase("Flat A", "100 Mare Street", "Islington", "LDN", null, null, "100A Mare Street")] 
+        [TestCase("Flat A", "100 Mare Street", "Islington", "LDN", null, null, "100A Mare Street")]
         [TestCase("6", "St James's road", "Islington", "LDN", null, null, "6 St Jamess road")]
         [TestCase("6", "St James's road", "Islington", "LDN", null, null, "6 St James road")]
         [TestCase("GROUND FLOOR FLAT", "210 Mare Street", "Hackney", "London", null, null, "210 Mare Street")]
@@ -200,7 +200,7 @@ namespace AddressesAPI.Tests.V2.Gateways
         [TestCase("7 Eton House", "Leigh Road", "Islington", null, "London", "N5 1SR", "7 eto house, Lonon")]
         [TestCase("7 Eton Road", null, null, null, "Birmingham", "B12 8AY", "7 etn road, birminghm")]
         [TestCase("16 Holly Court", "Surrograte Street", null, null, "Attleborough", "NR17 2AW", "Attlborogh, NR17 2AW")]
-        public async Task WillMatchPartialAndFuzzySearches(string line1, string line2, string line3, string line4, string town, string postcode, string searchTerm) 
+        public async Task WillMatchPartialAndFuzzySearches(string line1, string line2, string line3, string line4, string town, string postcode, string searchTerm)
         {
             var savedAddress = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
                 addressConfig: new QueryableAddress
