@@ -50,6 +50,7 @@ namespace AddressesAPI.Tests.V2.Gateways
         [TestCase("E1 4JH", "E1  4JH")]
         [TestCase("E8 4TT", "e8 4tt")]
         [TestCase("E7 4TT", "e7")]
+        [TestCase("E7 4TT", "e7 4")]
         public async Task WillSearchPostcodeForAMatch(string savedPostcode, string postcodeSearch)
         {
             var savedAddress = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
@@ -140,20 +141,66 @@ namespace AddressesAPI.Tests.V2.Gateways
             addresses.First().Should().BeEquivalentTo(savedAddress.AddressKey);
         }
 
-        [TestCase("340", "green road", "hackney", "london", "green road")]
-        [TestCase("340", "green road", "hackney", "london", "hackney")]
-        [TestCase("340", "green road", "hackney", "london", "london")]
-        [TestCase("340 green road", null, "hackney", "london", "green road")]
-        [TestCase("340", "green road", "hackney", "london", "green road hackney")]
-        [TestCase("340", "green road", "hackney", "london", "green street")]
-        [TestCase("340", "green road", "hackney", "london", "grean road")]
-        [TestCase("Flat A", "100 Mare Street", "Islington", "LDN", "100A Mare Street")]
-        [TestCase("6", "St James's road", "Islington", "LDN", "6 St Jamess road")]
-        [TestCase("6", "St James's road", "Islington", "LDN", "6 St James road")]
-        [TestCase("GROUND FLOOR FLAT", "210 Mare Street", "Hackney", "London", "210 Mare Street")]
-        [TestCase("Flat 7", "Allerton House", "Hackney", "London", "flat 7 alerton house")]
-        [TestCase("Flat 1", "29 Oxford Road", "MOSELEY AND KINGS HEATH", "BIRMINGHAM", "1 29 oxord road")]
-        public async Task WillMatchPartialAndFuzzySearches(string line1, string line2, string line3, string line4, string searchTerm)
+        //Including the town and postcode fields
+        [TestCase("7 Eton House", "Leigh Road", "Islington", null, "London", "N5 1SR", "Lonon")]  //Town
+        [TestCase("7 Eton House", "Leigh Road", "Islington", null, "London", "N5 1SR", "N5 1SR")]  //Postcode
+        [TestCase("7 Eton House", "Leigh Road", "Islington", null, "London", "N5 1SR", "N5")]  //Partial
+        [TestCase("7 Eton House", "Leigh Road", "Islington", null, "London", "N5 1SR", "7 eton road, London")]  //Line1 + Town
+        [TestCase("16 Holly Court", "Surrograte Street", null, null, "Attleborough", "NR17 2AW", "16 Holly Court, Surrograte Street, Attleborough")] //Line1 + Line2 + Town
+        [TestCase("7 Eton House", "Leigh Road", "Islington", null, "London", "N5 1SR", "7 eton road, N5 1SR")] //Line1 + Postcode
+        [TestCase("7 Eton House", "Leigh Road", "Islington", null, "London", "N5 1SR", "7 eton road, N5")] //Line1 + Postcode
+        [TestCase("16 Holly Court", "Surrograte Street", null, null, "Attleborough", "NR17 2AW", "Surrograte Street, NR17")] //Line2 + Partial Postcode
+        [TestCase("7 Eton House", "Leigh Road", "Islington", null, "London", "N5 1SR", "London, N5 1SR")] //Town + Postcode
+        [TestCase("16 Holly Court", "Surrograte Street", null, null, "Attleborough", "NR17 2AW", "Attleborough, NR17 2AW")]//Town + Postcode
+        [TestCase("16 Holly Court", "Surrograte Street", null, null, "Attleborough", "NR17 2AW", "Attleborough, NR17")]//Town + Partial Postcode
+        [TestCase("16 Holly Court", "Surrograte Street", null, null, "Attleborough", "NR17 2AW", "Attleborough, 2AW")]//Town + Partial Postcode
+        [TestCase("16 Holly Court", "Surrograte Street", null, null, "Attleborough", "NR17 2AW", "Attleborough, NR172AW")]//Town + Postcode (No spaces)
+        [TestCase("16 Holly Court", "Surrograte Street", null, null, "Attleborough", "NR17 2AW", "Attleborough, NR1")]//Town + Partial Postcode
+        [TestCase("16 Holly Court", "Surrograte Street", null, null, "Attleborough", "NR17 2AW", "Attleborough, NR17 2")]//Town + Partial Postcode
+        public async Task WillSearchTownAndOrPostcodeFieldsForAMatch(string savedLine1, string savedLine2, string savedLine3, string savedLine4, string savedTown, string savedPostcode, string searchTerm)
+        {
+            var savedAddress = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
+                addressConfig: new QueryableAddress
+                {
+                    Line1 = savedLine1,
+                    Line2 = savedLine2,
+                    Line3 = savedLine3,
+                    Line4 = savedLine4,
+                    Town = savedTown,
+                    Postcode = savedPostcode,
+                }
+            ).ConfigureAwait(true);
+            await TestDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
+            var request = new SearchParameters
+            {
+                Page = 1,
+                PageSize = 50,
+                Gazetteer = GlobalConstants.Gazetteer.Both,
+                AddressQuery = searchTerm
+            };
+            var (addresses, _) = await _classUnderTest.SearchAddresses(request).ConfigureAwait(true);
+
+            addresses.Count.Should().Be(1);
+            addresses.First().Should().BeEquivalentTo(savedAddress.AddressKey);
+        }
+
+        [TestCase("340", "green road", "hackney", "london", null, null, "green road")]
+        [TestCase("340", "green road", "hackney", "london", null, null, "hackney")]
+        [TestCase("340", "green road", "hackney", "london", null, null, "london")]
+        [TestCase("340 green road", null, "hackney", "london", null, null, "green road")]
+        [TestCase("340", "green road", "hackney", "london", null, null, "green road hackney")]
+        [TestCase("340", "green road", "hackney", "london", null, null, "green street")]
+        [TestCase("340", "green road", "hackney", "london", null, null, "grean road")]
+        [TestCase("Flat A", "100 Mare Street", "Islington", "LDN", null, null, "100A Mare Street")] 
+        [TestCase("6", "St James's road", "Islington", "LDN", null, null, "6 St Jamess road")]
+        [TestCase("6", "St James's road", "Islington", "LDN", null, null, "6 St James road")]
+        [TestCase("GROUND FLOOR FLAT", "210 Mare Street", "Hackney", "London", null, null, "210 Mare Street")]
+        [TestCase("Flat 7", "Allerton House", "Hackney", "London", null, null, "flat 7 alerton house")]
+        [TestCase("Flat 1", "29 Oxford Road", "MOSELEY AND KINGS HEATH", "BIRMINGHAM", null, null, "1 29 oxord road")]
+        [TestCase("7 Eton House", "Leigh Road", "Islington", null, "London", "N5 1SR", "7 eto house, Lonon")]
+        [TestCase("7 Eton Road", null, null, null, "Birmingham", "B12 8AY", "7 etn road, birminghm")]
+        [TestCase("16 Holly Court", "Surrograte Street", null, null, "Attleborough", "NR17 2AW", "Attlborogh, NR17 2AW")]
+        public async Task WillMatchPartialAndFuzzySearches(string line1, string line2, string line3, string line4, string town, string postcode, string searchTerm) 
         {
             var savedAddress = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
                 addressConfig: new QueryableAddress
@@ -162,6 +209,8 @@ namespace AddressesAPI.Tests.V2.Gateways
                     Line2 = line2,
                     Line3 = line3,
                     Line4 = line4,
+                    Town = town,
+                    Postcode = postcode,
                 }
             ).ConfigureAwait(true);
             await TestDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);

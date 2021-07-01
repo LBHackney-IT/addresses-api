@@ -72,24 +72,24 @@
     }
   },
   "mappings" : {
-    "properties" : {
-      "lpi_last_update_date" : {
-        "type" : "integer"
+    "properties": {
+      "lpi_last_update_date": {
+        "type": "integer"
       },
-      "lpi_key" : {
-        "type" : "keyword"
+      "lpi_key": {
+        "type": "keyword"
       },
-      "lpi_logical_status" : {
-        "type" : "text",
-        "fields" : {
-          "keyword" : {
-            "type" : "keyword",
-            "ignore_above" : 256
+      "lpi_logical_status": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
           }
         }
       },
-      "building_number" : {
-        "type" : "keyword",
+      "building_number": {
+        "type": "keyword",
         "fields": {
           "sort": {
             "type": "icu_collation_keyword",
@@ -99,41 +99,53 @@
           }
         }
       },
-      "gazetteer" : {
-        "type" : "text",
-        "fields" : {
-          "keyword" : {
-            "type" : "keyword",
-            "ignore_above" : 256
+      "gazetteer": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
           }
         }
       },
-      "line1" : {
-        "type" : "text",
+      "line1": {
+        "type": "text",
         "analyzer": "standard",
         "copy_to": "full_address",
         "similarity": "boolean"
       },
-      "line2" : {
-        "type" : "text",
+      "line2": {
+        "type": "text",
         "analyzer": "standard",
         "similarity": "boolean",
         "copy_to": "full_address"
       },
-      "line3" : {
-        "type" : "text",
+      "line3": {
+        "type": "text",
         "analyzer": "standard",
         "copy_to": "full_address",
         "similarity": "boolean"
       },
-      "line4" : {
-        "type" : "text",
+      "line4": {
+        "type": "text",
         "analyzer": "standard",
         "similarity": "boolean",
         "copy_to": "full_address"
       },
-      "full_address" : {
-        "type" : "text",
+      "town": {
+        "type": "keyword",
+        "similarity": "boolean",
+        "copy_to": "full_address"
+      },
+      "postcode": {
+        "type": "text",
+        "analyzer": "whitespace_removed",
+        "fielddata": true,
+        "similarity": "boolean",
+        "copy_to": "full_address"
+      },
+      "full_address": {
+        "type": "text",
         "analyzer": "address_text",
         "similarity": "boolean",
         "fields": {
@@ -143,64 +155,56 @@
             "similarity": "boolean"
           },
           "exact_text": {
-            "type" : "text",
+            "type": "text",
             "analyzer": "standard",
             "similarity": "boolean"
           }
         }
       },
-      "neverexport" : {
-        "type" : "boolean"
+      "neverexport": {
+        "type": "boolean"
       },
-      "paon_start_num" : {
-        "type" : "integer"
+      "paon_start_num": {
+        "type": "integer"
       },
-      "parent_uprn" : {
-        "type" : "long"
+      "parent_uprn": {
+        "type": "long"
       },
-      "postcode" : {
-        "type" : "text",
-        "analyzer" : "whitespace_removed",
-        "fielddata" : true
+      "property_shell": {
+        "type": "boolean"
       },
-      "property_shell" : {
-        "type" : "boolean"
+      "street_description": {
+        "type": "text",
+        "analyzer": "whitespace_removed",
+        "fielddata": true
       },
-      "street_description" : {
-        "type" : "text",
-        "analyzer" : "whitespace_removed",
-        "fielddata" : true
+      "uprn": {
+        "type": "long"
       },
-      "town" : {
-        "type" : "keyword"
+      "usrn": {
+        "type": "integer"
       },
-      "uprn" : {
-        "type" : "long"
+      "sao_text": {
+        "type": "keyword"
       },
-      "usrn" : {
-        "type" : "integer"
+      "unit_number": {
+        "type": "integer"
       },
-      "sao_text" : {
-        "type" : "keyword"
-      },
-      "unit_number" : {
-        "type" : "integer"
-      },
-      "blpu_class" : {
-        "type" : "text",
-        "fields" : {
-          "keyword" : {
-            "type" : "keyword",
-            "ignore_above" : 256
+      "blpu_class": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
           }
         }
       },
-      "usage_primary" : {
-        "type" : "text",
-        "fields" : {
-          "keyword" : {
-            "type" : "keyword",
-            "ignore_above" : 256
+      "usage_primary": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
           }
         }
       },
