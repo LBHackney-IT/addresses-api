@@ -23,7 +23,7 @@ namespace Reindex
         // This is an AWS maximum
         private const int MaximumDelaySeconds = 900;
 
-        private const int MaxAttempts = 10;
+        private const int MaxAttempts = 50;
 
         private ElasticClient _elasticSearchClient;
         private string _indexFilePath;
