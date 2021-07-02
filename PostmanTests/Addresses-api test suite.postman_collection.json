@@ -1,0 +1,614 @@
+{
+	"info": {
+		"_postman_id": "5c048d85-2277-42cb-aa31-5729ae78673f",
+		"name": "Addresses-api test suite",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "V1",
+			"item": [
+				{
+					"name": "search for a local address with gazetteer=hackney",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "ADD THIS",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{addresses-api-url}}/v1/addresses?gazetteer=hackney&postcode=E81LL",
+							"host": [
+								"{{addresses-api-url}}"
+							],
+							"path": [
+								"v1",
+								"addresses"
+							],
+							"query": [
+								{
+									"key": "gazetteer",
+									"value": "hackney"
+								},
+								{
+									"key": "postcode",
+									"value": "E81LL"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search for a local address with gazetteer=local",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "ADD THIS",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{addresses-api-url}}/v1/addresses?gazetteer=local&postcode=E81LL",
+							"host": [
+								"{{addresses-api-url}}"
+							],
+							"path": [
+								"v1",
+								"addresses"
+							],
+							"query": [
+								{
+									"key": "gazetteer",
+									"value": "local"
+								},
+								{
+									"key": "postcode",
+									"value": "E81LL"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search for a non-local address with gazetteer=both",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "ADD THIS",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{addresses-api-url}}/v1/addresses?gazetteer=both&postcode=E18DE",
+							"host": [
+								"{{addresses-api-url}}"
+							],
+							"path": [
+								"v1",
+								"addresses"
+							],
+							"query": [
+								{
+									"key": "gazetteer",
+									"value": "both"
+								},
+								{
+									"key": "postcode",
+									"value": "E18DE"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search for a local address with gazetteer=both",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "ADD THIS",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{addresses-api-url}}/v1/addresses?gazetteer=both&postcode=E81HH",
+							"host": [
+								"{{addresses-api-url}}"
+							],
+							"path": [
+								"v1",
+								"addresses"
+							],
+							"query": [
+								{
+									"key": "gazetteer",
+									"value": "both"
+								},
+								{
+									"key": "postcode",
+									"value": "E81HH"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search for a non-local address with gazetteer=local",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "ADD THIS",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{addresses-api-url}}/v1/addresses?gazetteer=local&postcode=E18DE",
+							"host": [
+								"{{addresses-api-url}}"
+							],
+							"path": [
+								"v1",
+								"addresses"
+							],
+							"query": [
+								{
+									"key": "gazetteer",
+									"value": "local"
+								},
+								{
+									"key": "postcode",
+									"value": "E18DE"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search for a Hackeny OOB address with gazetteer=local",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "ADD THIS",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{addresses-api-url}}/v1/addresses?uprn=10008465139&gazetteer=local",
+							"host": [
+								"{{addresses-api-url}}"
+							],
+							"path": [
+								"v1",
+								"addresses"
+							],
+							"query": [
+								{
+									"key": "uprn",
+									"value": "10008465139"
+								},
+								{
+									"key": "gazetteer",
+									"value": "local"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search for OOB address when no gaz is selected - default value is both",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "ADD THIS",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{addresses-api-url}}/v1/addresses?uprn=10008465139",
+							"host": [
+								"{{addresses-api-url}}"
+							],
+							"path": [
+								"v1",
+								"addresses"
+							],
+							"query": [
+								{
+									"key": "uprn",
+									"value": "10008465139"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search for a Hackney OOB address with gaz=both",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "ADD THIS",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{addresses-api-url}}/v1/addresses?uprn=10008465139&gazetteer=both",
+							"host": [
+								"{{addresses-api-url}}"
+							],
+							"path": [
+								"v1",
+								"addresses"
+							],
+							"query": [
+								{
+									"key": "uprn",
+									"value": "10008465139"
+								},
+								{
+									"key": "gazetteer",
+									"value": "both"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "V2",
+			"item": [
+				{
+					"name": "Parent shell",
+					"item": [
+						{
+							"name": "Search without property_shell (default)",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "ADD THIS",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{addresses-api-url}}/v2/addresses?postcode=E8",
+									"host": [
+										"{{addresses-api-url}}"
+									],
+									"path": [
+										"v2",
+										"addresses"
+									],
+									"query": [
+										{
+											"key": "postcode",
+											"value": "E8"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Search without property_shell explicitly set to false",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "ADD THIS",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{addresses-api-url}}/v2/addresses?postcode=E8&include_property_shells=false",
+									"host": [
+										"{{addresses-api-url}}"
+									],
+									"path": [
+										"v2",
+										"addresses"
+									],
+									"query": [
+										{
+											"key": "postcode",
+											"value": "E8"
+										},
+										{
+											"key": "include_property_shells",
+											"value": "false"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Search without property_shell true",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "ADD THIS",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{addresses-api-url}}/v2/addresses?postcode=E8&include_property_shells=true",
+									"host": [
+										"{{addresses-api-url}}"
+									],
+									"path": [
+										"v2",
+										"addresses"
+									],
+									"query": [
+										{
+											"key": "postcode",
+											"value": "E8"
+										},
+										{
+											"key": "include_property_shells",
+											"value": "true"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Single line address",
+					"item": [
+						{
+							"name": "Search includes single line address",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "ADD THIS",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{addresses-api-url}}/v2/addresses?postcode=E8 3DP",
+									"host": [
+										"{{addresses-api-url}}"
+									],
+									"path": [
+										"v2",
+										"addresses"
+									],
+									"query": [
+										{
+											"key": "postcode",
+											"value": "E8 3DP"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Full text search",
+					"item": [
+						{
+							"name": "Just postcode",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "ADD THIS",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{addresses-api-url}}/v2/addresses?query=E8 3DP",
+									"host": [
+										"{{addresses-api-url}}"
+									],
+									"path": [
+										"v2",
+										"addresses"
+									],
+									"query": [
+										{
+											"key": "query",
+											"value": "E8 3DP"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Just Town",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "ADD THIS",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{addresses-api-url}}/v2/addresses?query=Hackney",
+									"host": [
+										"{{addresses-api-url}}"
+									],
+									"path": [
+										"v2",
+										"addresses"
+									],
+									"query": [
+										{
+											"key": "query",
+											"value": "Hackney"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Address lines",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "ADD THIS",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{addresses-api-url}}/v2/addresses?query=FLAT A,12 ABERSHAM ROAD,HACKNEY",
+									"host": [
+										"{{addresses-api-url}}"
+									],
+									"path": [
+										"v2",
+										"addresses"
+									],
+									"query": [
+										{
+											"key": "query",
+											"value": "FLAT A,12 ABERSHAM ROAD,HACKNEY"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Full address",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "ADD THIS",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{addresses-api-url}}/v2/addresses?query=FLAT A,12 ABERSHAM ROAD,HACKNEY,E8 2LN",
+									"host": [
+										"{{addresses-api-url}}"
+									],
+									"path": [
+										"v2",
+										"addresses"
+									],
+									"query": [
+										{
+											"key": "query",
+											"value": "FLAT A,12 ABERSHAM ROAD,HACKNEY,E8 2LN"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Full address National, not National search returns 0",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "ADD THIS",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{addresses-api-url}}/v2/addresses?query=9a School Road",
+									"host": [
+										"{{addresses-api-url}}"
+									],
+									"path": [
+										"v2",
+										"addresses"
+									],
+									"query": [
+										{
+											"key": "query",
+											"value": "9a School Road"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Full address National, with National search",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "ADD THIS",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{addresses-api-url}}/v2/addresses?address_scope=National&query=9a School Road",
+									"host": [
+										"{{addresses-api-url}}"
+									],
+									"path": [
+										"v2",
+										"addresses"
+									],
+									"query": [
+										{
+											"key": "address_scope",
+											"value": "National"
+										},
+										{
+											"key": "query",
+											"value": "9a School Road"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	]
+}
