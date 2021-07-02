@@ -4,6 +4,8 @@ The Addresses API let you search the local and national address database. Local 
 
 This API is based on the [HackneyAddressesAPI](https://github.com/LBHackney-IT/HackneyAddressesAPI) with some improvements and updates.
 
+Hackney Addresses API user documentation is available for more information about how the API can be used.
+
 ## Stack
 
 - .NET Core as a web framework.
