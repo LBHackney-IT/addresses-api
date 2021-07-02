@@ -19,6 +19,8 @@ This API is based on the [HackneyAddressesAPI](https://github.com/LBHackney-IT/H
 4. Rename the initial template.
 5. Open it in your IDE.
 
+Note: Additional setup and troubleshooting information can be found in the *docs* file.
+
 ### Development
 
 #### Running the application
