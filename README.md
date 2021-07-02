@@ -169,10 +169,11 @@ Documentation on how to do this can be found [here](https://docs.microsoft.com/e
 After deploying to an environment, there is a postman suite which can be run manually to 'smoke test' everything is working properly.
 This is at *PostmanTests\Addresses-api test suite.postman_collection.json*
 Load this into postman and set a global variable called *addresses-api-url*
-The value of this should be:
- - Production: https://6kb2p9kgb0.execute-api.eu-west-2.amazonaws.com/production/api
- - Staging:    https://f06vos48zl.execute-api.eu-west-2.amazonaws.com/staging/api
-Then you can run through the tests and check the results are as excpected.
+
+The value of this should be set to the appropriate production or staging URL up and including the 'api' bit but without the trailing slash.
+Also, you will need to set the API key in each test - you will need to obtain a suitable key for the environment, they are different for V1 and V2. The key should be pasted into the 'Auth' header in each postman test.
+
+Once set up, you can run through the tests and check the results are as excpected.
 
 ## Agreed Testing Approach
 
