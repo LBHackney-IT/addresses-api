@@ -89,9 +89,19 @@ docker-compose up -d test-database
 docker-compose up -d test-elasticsearch
 ```
 
-NOTE - if you have a local version of postgres installed (and it is running on the default port 5432), you will need to stop it else the unit tests will fail - the docker postgres also runs on port 5432 and there will be a clash. In windows, go to services and stop the postgres server service.
+NOTE - if you have a local version of postgres installed (and it is running on the default port 5432), you will need to stop it else the unit tests will fail - the docker postgres also runs on port 5432 and there will be a clash.
+
+In windows, go to services and stop the postgres server service.
+
+On a Mac, you can check which ports are in use by running
+```sh
+sudo lsof -PiTCP -sTCP:LISTEN
+```
+If postgres is running, you can either uninstall it using the uninstaller or kill the process.
+
 
 The migrations for the test database are run as part of the initial test setup.
+
 
 ### Release process
 
@@ -151,6 +161,16 @@ However, we can select which errors to suppress by setting the severity of the r
 Documentation on how to do this can be found [here](https://docs.microsoft.com/en-us/visualstudio/code-quality/use-roslyn-analyzers?view=vs-2019).
 
 *NOTE* FxCop is now deprecated by Microsoft, and a different code analysis tool is run as part of the build pipeline in circleci. It would be good to align these, as currently it is possible to check in code that has no issues locally only to have it rejected by the circleci static analysis.
+
+### Smoke testing an environment
+
+After deploying to an environment, there is a postman suite which can be run manually to 'smoke test' everything is working properly.
+This is at *PostmanTests\Addresses-api test suite.postman_collection.json*
+Load this into postman and set a global variable called *addresses-api-url*
+The value of this should be:
+ - Production: https://6kb2p9kgb0.execute-api.eu-west-2.amazonaws.com/production/api
+ - Staging:    https://f06vos48zl.execute-api.eu-west-2.amazonaws.com/staging/api
+Then you can run through the tests and check the results are as excpected.
 
 ## Agreed Testing Approach
 
