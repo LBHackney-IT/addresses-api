@@ -17,15 +17,6 @@ namespace AddressesAPI.Infrastructure
         [MaxLength(18)]
         public string AddressStatus { get; set; }
 
-        [Column("lpi_start_date")]
-        public int AddressStartDate { get; set; }
-
-        [Column("lpi_end_date")]
-        public int AddressEndDate { get; set; }
-
-        [Column("lpi_last_update_date")]
-        public int AddressChangeDate { get; set; }
-
         [Column("usrn")]
         public int? USRN { get; set; }
 

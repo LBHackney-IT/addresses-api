@@ -16,15 +16,6 @@ namespace AddressesAPI.Infrastructure
         [MaxLength(18)]
         public string AddressStatus { get; set; }
 
-        [Column("lpi_start_date")]
-        public int AddressStartDate { get; set; }
-
-        [Column("lpi_end_date")]
-        public int AddressEndDate { get; set; }
-
-        [Column("lpi_last_update_date")]
-        public int AddressChangeDate { get; set; }
-
         [Column("usrn")]
         public int? USRN { get; set; }
 
@@ -41,18 +32,18 @@ namespace AddressesAPI.Infrastructure
         public int PropertyEndDate { get; set; }
 
         [Column("blpu_class")]
-        [MaxLength(4)]
+        [MaxLength(6)]
         public string UsageCode { get; set; }
 
         [Column("blpu_last_update_date")]
         public int PropertyChangeDate { get; set; }
 
         [Column("usage_description")]
-        [MaxLength(160)]
+        [MaxLength(550)]
         public string UsageDescription { get; set; }
 
         [Column("usage_primary")]
-        [MaxLength(160)]
+        [MaxLength(50)]
         public string UsagePrimary { get; set; }
 
         [Column("property_shell")]
@@ -128,19 +119,19 @@ namespace AddressesAPI.Infrastructure
         public string Organisation { get; set; }
 
         [Column("line1")]
-        [MaxLength(200)]
+        [MaxLength(500)]
         public string Line1 { get; set; }
 
         [Column("line2")]
-        [MaxLength(200)]
+        [MaxLength(500)]
         public string Line2 { get; set; }
 
         [Column("line3")]
-        [MaxLength(200)]
+        [MaxLength(500)]
         public string Line3 { get; set; }
 
         [Column("line4")]
-        [MaxLength(100)]
+        [MaxLength(500)]
         public string Line4 { get; set; }
     }
 }
