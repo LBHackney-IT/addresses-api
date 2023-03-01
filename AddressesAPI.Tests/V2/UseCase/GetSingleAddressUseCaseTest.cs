@@ -60,7 +60,7 @@ namespace AddressesAPI.Tests.V2.UseCase
             var lpi_key = "ABCDEFGHIJKLMN";
             SetupValidatorToReturnValid();
             _fakeGateway.Setup(s => s.GetSingleAddress("ABCDEFGHIJKLMN"))
-                .Returns((Address) null);
+                .Returns((Address)null);
 
             var request = new GetAddressRequest
             {

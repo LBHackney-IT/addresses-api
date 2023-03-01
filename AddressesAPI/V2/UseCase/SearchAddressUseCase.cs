@@ -80,7 +80,7 @@ namespace AddressesAPI.V2.UseCase
                 IncludePropertyShells = request.IncludePropertyShells,
                 AddressQuery = request.Query,
                 ModifiedSince = request.ModifiedSince == null
-                    ? (DateTime?) null
+                    ? (DateTime?)null
                     : DateTime.ParseExact(request.ModifiedSince, "yyyy-MM-dd", CultureInfo.InvariantCulture)
             };
         }

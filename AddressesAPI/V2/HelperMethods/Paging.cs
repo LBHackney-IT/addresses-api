@@ -10,7 +10,7 @@ namespace AddressesAPI.V2.HelperMethods
             if (totalResultsCount % pageSize == 0)
                 return totalResultsCount / pageSize;
             //eg 101 / 10 = 10.1 so we cast to 10 and add 1 (11)
-            var pageCount = (int) (totalResultsCount / pageSize) + 1;
+            var pageCount = (int)(totalResultsCount / pageSize) + 1;
             if (pageCount == 0)
                 pageCount = 1;
             return pageCount;
