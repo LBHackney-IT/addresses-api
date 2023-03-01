@@ -8,7 +8,6 @@
         <NoWarn>$(NoWarn);1591</NoWarn>
         <CodeAnalysisTreatWarningsAsErrors>false</CodeAnalysisTreatWarningsAsErrors>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
     </PropertyGroup>
 
   <ItemGroup>
