@@ -18,5 +18,5 @@ then
 fi
 
 dotnet restore
-dotnet lambda package --project-location ./Reindex --configuration release --framework netcoreapp3.1 --output-package ./Reindex/bin/release/netcoreapp3.1/reindex-es-alias.zip
-dotnet lambda package --project-location ./AddressesAPI --configuration release --framework netcoreapp3.1 --output-package ./AddressesAPI/bin/release/netcoreapp3.1/addresses-api.zip
+dotnet lambda package --project-location ./Reindex --configuration release --framework net6.0 --output-package ./Reindex/bin/release/net6.0/reindex-es-alias.zip
+dotnet lambda package --project-location ./AddressesAPI --configuration release --framework net6.0 --output-package ./AddressesAPI/bin/release/net6.0/addresses-api.zip
