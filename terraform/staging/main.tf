@@ -68,7 +68,7 @@ module "postgres_db_staging" {
   db_port              = 5502
   subnet_ids           = data.aws_subnet_ids.staging.ids
   db_engine            = "postgres"
-  db_engine_version    = "11.10"
+  db_engine_version    = "11.16"
   db_instance_class    = "db.t3.micro"
   db_allocated_storage = 500
   maintenance_window   = "sun:10:00-sun:10:30"
@@ -183,22 +183,11 @@ module "source_db_endpoint" {
   project_name            = "addresses-api"
   db_username             = data.aws_ssm_parameter.addresses_postgres_username.value
   db_password             = data.aws_ssm_parameter.addresses_postgres_db_password.value
-}
-
-module "address-es-dms" {
-  source                       = "github.com/LBHackney-IT/aws-dms-terraform.git//dms_replication_task"
-  environment_name             = "staging"
-  project_name                 = "addresses-api"
-  migration_type               = "full-load-and-cdc"
-  replication_instance_arn     = "arn:aws:dms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rep:DNTOW6TGQEGCAOWQMZYHQRTWAA"
-  replication_task_indentifier = "addresses-api-es-dms-task"
-  task_settings = templatefile("${path.module}/task_settings.json",
-    {
-      dms_replication_instance_name = "staging-dms-instance",
-      dms_instance_task_resource    = "2374SA74Z4BGD3UW4DZNUD5H2C43W4CXXQC56ZI"
-    }
-  )
-  source_endpoint_arn = module.source_db_endpoint.dms_endpoint_arn
-  target_endpoint_arn = aws_dms_endpoint.address_elasticsearch.endpoint_arn
-  task_table_mappings = file("${path.module}/selection_rules.json")
+  max_allocated_storage   = 1099
+  tags = {
+    Name         = "addresses_api-db-staging",
+    Environment  = "staging",
+    project_name = "platform apis",
+    terraform-managed = "true"
+  }
 }
