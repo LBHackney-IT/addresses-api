@@ -1,7 +1,7 @@
 service: addresses-api
 provider:
   name: aws
-  runtime: dotnetcore3.1
+  runtime: dotnet6
   vpc: ${self:custom.vpc.${opt:stage}}
   stage: ${opt:stage}
   region: eu-west-2
@@ -14,7 +14,7 @@ functions:
     handler: AddressesAPI::AddressesAPI.LambdaEntryPoint::FunctionHandlerAsync
     role: lambdaExecutionRole
     package:
-      artifact: ./AddressesAPI/bin/release/netcoreapp3.1/addresses-api.zip
+      artifact: ./AddressesAPI/bin/release/net6.0/addresses-api.zip
     environment:
       CONNECTION_STRING: Host=${ssm:/addresses-api/${self:provider.stage}/postgres-hostname};Port=${ssm:/addresses-api/${self:provider.stage}/postgres-port};Database=addresses_api;Username=${ssm:/addresses-api/${self:provider.stage}/postgres-username};Password=${ssm:/addresses-api/${self:provider.stage}/postgres-password}
       ELASTICSEARCH_DOMAIN_URL: ${ssm:/addresses-api/${self:provider.stage}/elasticsearch-domain}
@@ -33,7 +33,7 @@ functions:
     role: lambdaExecutionRole
     timeout: 60
     package:
-      artifact: ./Reindex/bin/release/netcoreapp3.1/reindex-es-alias.zip
+      artifact: ./Reindex/bin/release/net6.0/reindex-es-alias.zip
     environment:
       SQS_QUEUE_URL: ${ssm:/addresses-api/${self:provider.stage}/reindexing-queue}
       ELASTICSEARCH_DOMAIN_URL: ${ssm:/addresses-api/${self:provider.stage}/elasticsearch-domain}
@@ -56,7 +56,7 @@ functions:
     role: lambdaExecutionRole
     timeout: 30
     package:
-      artifact: ./Reindex/bin/release/netcoreapp3.1/reindex-es-alias.zip
+      artifact: ./Reindex/bin/release/net6.0/reindex-es-alias.zip
     environment:
       SQS_QUEUE_URL: ${ssm:/addresses-api/${self:provider.stage}/reindexing-queue}
       ELASTICSEARCH_DOMAIN_URL: ${ssm:/addresses-api/${self:provider.stage}/elasticsearch-domain}
