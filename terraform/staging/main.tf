@@ -33,7 +33,7 @@ terraform {
 
 data "aws_vpc" "staging_vpc" {
   tags = {
-    Name = "vpc-staging-apis-staging"
+    Name = "apis-stg"
   }
 }
 

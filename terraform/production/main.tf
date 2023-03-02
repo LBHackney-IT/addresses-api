@@ -31,7 +31,7 @@ terraform {
 
 data "aws_vpc" "production_vpc" {
   tags = {
-    Name = "vpc-production-apis-production"
+    Name = "apis-prod"
   }
 }
 
