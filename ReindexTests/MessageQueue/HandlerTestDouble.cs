@@ -22,7 +22,7 @@ namespace ReindexTests.MessageQueue
 
         public static HandlerTestDouble HandlerTestDoubleFactory()
         {
-            return (HandlerTestDouble) FormatterServices.GetUninitializedObject(typeof(HandlerTestDouble));
+            return (HandlerTestDouble)FormatterServices.GetUninitializedObject(typeof(HandlerTestDouble));
         }
 
         protected override void Log(string message)

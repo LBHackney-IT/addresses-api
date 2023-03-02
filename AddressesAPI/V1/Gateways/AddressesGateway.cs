@@ -87,7 +87,7 @@ namespace AddressesAPI.V1.Gateways
                 .Where(a => (usageSearchTerms == null || !usageSearchTerms.Any())
                             || usageSearchTerms.Contains(a.UsagePrimary))
                 .WhereAny(usageCodeSearchTerms?.Select(u =>
-                        (Expression<Func<AddressesAPI.Infrastructure.Address, bool>>) (x =>
+                        (Expression<Func<AddressesAPI.Infrastructure.Address, bool>>)(x =>
                             EF.Functions.ILike(x.UsageCode, $"%{u}%")))
                     .ToArray())
                 .Where(a => request.Gazetteer == GlobalConstants.Gazetteer.Both ||

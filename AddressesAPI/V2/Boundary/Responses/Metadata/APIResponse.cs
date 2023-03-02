@@ -23,7 +23,7 @@ namespace AddressesAPI.V2.Boundary.Responses.Metadata
 
         public APIResponse(T result)
         {
-            StatusCode = (int) HttpStatusCode.OK;
+            StatusCode = (int)HttpStatusCode.OK;
             Data = result;
         }
     }
