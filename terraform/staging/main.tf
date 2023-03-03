@@ -183,5 +183,4 @@ module "source_db_endpoint" {
   project_name            = "addresses-api"
   db_username             = data.aws_ssm_parameter.addresses_postgres_username.value
   db_password             = data.aws_ssm_parameter.addresses_postgres_db_password.value
-  db_allocated_storage    = 1099
 }
