@@ -70,7 +70,7 @@ module "postgres_db_staging" {
   db_engine            = "postgres"
   db_engine_version    = "11.16"
   db_instance_class    = "db.t3.micro"
-  db_allocated_storage = 1099
+  db_allocated_storage = 500
   maintenance_window   = "sun:10:00-sun:10:30"
   db_username          = data.aws_ssm_parameter.addresses_postgres_username.value
   db_password          = data.aws_ssm_parameter.addresses_postgres_db_password.value
@@ -98,7 +98,7 @@ module "elasticsearch_db_staging" {
   ebs_volume_size  = "20"
   region           = data.aws_region.current.name
   account_id       = data.aws_caller_identity.current.account_id
-  availability_zone_count = 3
+  zone_awareness_enabled = false
 }
 
 data "aws_ssm_parameter" "addresses_elasticsearch_domain" {
