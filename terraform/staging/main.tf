@@ -98,7 +98,7 @@ module "elasticsearch_db_staging" {
   ebs_volume_size  = "20"
   region           = data.aws_region.current.name
   account_id       = data.aws_caller_identity.current.account_id
-  availability_zone_count = 1
+  availability_zone_count = 3
 }
 
 data "aws_ssm_parameter" "addresses_elasticsearch_domain" {
