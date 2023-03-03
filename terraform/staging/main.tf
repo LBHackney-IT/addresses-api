@@ -78,6 +78,7 @@ module "postgres_db_staging" {
   multi_az             = false //only true if production deployment
   publicly_accessible  = false
   project_name         = "platform apis"
+  db_allocated_storage    = 1099
 }
 
 /*    ELASTICSEARCH SETUP    */
