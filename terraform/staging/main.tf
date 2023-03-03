@@ -183,11 +183,5 @@ module "source_db_endpoint" {
   project_name            = "addresses-api"
   db_username             = data.aws_ssm_parameter.addresses_postgres_username.value
   db_password             = data.aws_ssm_parameter.addresses_postgres_db_password.value
-  max_allocated_storage   = 1099
-  tags = {
-    Name         = "addresses_api-db-staging",
-    Environment  = "staging",
-    project_name = "platform apis",
-    terraform-managed = "true"
-  }
+  db_allocated_storage    = 1099
 }
