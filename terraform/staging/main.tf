@@ -70,7 +70,7 @@ module "postgres_db_staging" {
   db_engine            = "postgres"
   db_engine_version    = "11.16"
   db_instance_class    = "db.t3.micro"
-  db_allocated_storage = 500
+  db_allocated_storage = 1000
   maintenance_window   = "sun:10:00-sun:10:30"
   db_username          = data.aws_ssm_parameter.addresses_postgres_username.value
   db_password          = data.aws_ssm_parameter.addresses_postgres_db_password.value
