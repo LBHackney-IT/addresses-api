@@ -45,6 +45,7 @@ functions:
             fromIndex: "hackney_address"
             deleteAfterReindex: true
       - schedule:
+          enabled: false
           rate: cron(0 02 * * ? *)
           input:
             alias: "national_addresses"
