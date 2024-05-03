@@ -210,10 +210,8 @@ jobs:
 workflows:
   check-and-deploy-development:
     jobs:
-      - check-code-formatting:
-          context: api-nuget-token-context
-      - build-and-test:
-          context: api-nuget-token-context
+      - check-code-formatting
+      - build-and-test
       - assume-role-development:
           context: api-assume-role-development-context
           requires:
@@ -236,8 +234,6 @@ workflows:
   check-and-deploy-staging-and-production:
     jobs:
       - build-and-test:
-          context:
-            - api-nuget-token-context
           filters:
             branches:
               only: master
