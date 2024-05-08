@@ -54,7 +54,6 @@ namespace AddressesAPI.Tests.V2.Helper
                 PropertyStartDate = address.PropertyStartDate,
                 UsageCode = address.UsageCode,
                 UsagePrimary = address.UsagePrimary,
-                AddressChangeDate = address.AddressChangeDate,
                 OutOfBoroughAddress = address.NeverExport,
                 UPRN = address.UPRN,
                 USRN = address.USRN,
