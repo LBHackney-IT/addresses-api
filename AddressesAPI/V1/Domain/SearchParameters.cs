@@ -1,6 +1,6 @@
 namespace AddressesAPI.V1.Domain
 {
-    public class SearchParameters
+    public class  SearchParameters
     {
         public string Postcode { get; set; }
         public string BuildingNumber { get; set; }
@@ -15,5 +15,6 @@ namespace AddressesAPI.V1.Domain
         public bool? HackneyGazetteerOutOfBoroughAddress { get; set; }
         public int Page { get; set; }
         public int PageSize { get; set; }
+        public bool Hierarchy { get; set; }
     }
 }

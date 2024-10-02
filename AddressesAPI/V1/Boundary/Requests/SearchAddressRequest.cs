@@ -122,5 +122,8 @@ namespace AddressesAPI.V1.Boundary.Requests
         /// List of fields passed in as part of the request
         /// </summary>
         public List<string> RequestFields { get; set; }
+        
+        // TODO: this spike is using a simple hierarchy flag, but it may be better to include something like OutputFormat -> flat / hierarchy
+        public bool Hierarchy { get; set; }
     }
 }

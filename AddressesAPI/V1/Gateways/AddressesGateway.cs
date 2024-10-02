@@ -28,14 +28,55 @@ namespace AddressesAPI.V1.Gateways
         {
             var baseQuery = CompileBaseSearchQuery(request);
             var totalCount = baseQuery.Count();
-
-            var addresses = PageAddresses(OrderAddresses(baseQuery), request.PageSize, request.Page)
-                .Select(
+            
+            // TODO - paging does not make sense when building hierarchies - what if the 51st address is a child of an address in the first page?
+            // it should be possible to removed the upper limit for paging, but will require testing on large postcodes
+            // or just ignore any paging when working with hierarchies
+            var addresses = PageAddresses(OrderAddresses(baseQuery), request.PageSize, request.Page);
+            
+            // SimpleDomain will include parentUPRN and ChildAddress collection
+            var formattedAddresses = addresses.Select(
                     a => request.Format == GlobalConstants.Format.Simple ? a.ToSimpleDomain() : a.ToDomain()
                     )
                 .ToList();
+            
+            // TODO: this spike is using a simple hierarchy flag, but it may be better to include something like OutputFormat -> flat / hierarchy
+            if (request.Hierarchy)
+            {
+                formattedAddresses = BuildHierarchy(formattedAddresses);
+            }
 
-            return (addresses, totalCount);
+            // TODO - think about what the total count should show for hierarchies - total top level units, or include child units?
+            return (formattedAddresses, totalCount);
+        }
+
+        private static List<Address> BuildHierarchy(List<Address> addresses)
+        {
+            // find the missing parents
+            var uprns = addresses.Select(a => a.UPRN);
+            var parentUprns = addresses.Select(a => a.ParentUPRN).OfType<long>();
+            var missingParents = parentUprns.Except(uprns);
+            
+            foreach (var parent in missingParents.ToList())
+            {
+                // TODO - fetch the missing parents from the DB and add them to the addresses list
+                // this is left as an exercise to the reader. It would be good to have an example of this, but I am not sure how we find one
+            }
+            
+            var hierarchy = BuildHierarchyForParent(null, addresses);
+            
+            return hierarchy;
+        }
+        
+        private static List<Address> BuildHierarchyForParent(long? parentUprn, List<Address> addresses)
+        {
+            var results =  addresses.Where(address => address.ParentUPRN == parentUprn).Select(address =>
+            {
+                address.ChildAddresses = BuildHierarchyForParent(address.UPRN, addresses);
+                return address;
+            }).ToList();
+
+            return results;
         }
 
         private static IQueryable<AddressesAPI.Infrastructure.Address> PageAddresses(IQueryable<AddressesAPI.Infrastructure.Address> query,

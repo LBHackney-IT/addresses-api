@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using AddressesAPI.Infrastructure;
 using AddressesAPI.V1.Domain;
 using Address = AddressesAPI.V1.Domain.Address;
@@ -103,7 +104,10 @@ namespace AddressesAPI.V1.Factories
                 Line4 = addressEntity.Line4,
                 Town = addressEntity.Town,
                 UPRN = addressEntity.UPRN,
+                ParentUPRN = addressEntity.ParentUPRN,
                 Postcode = addressEntity.Postcode,
+                // TODO - we should probably only new-up the ChildAddress collection if we need to use it, so it keeps the output clean
+                ChildAddresses = new List<Address>()
             };
         }
 

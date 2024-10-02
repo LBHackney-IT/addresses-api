@@ -26,8 +26,9 @@ namespace AddressesAPI.V1.UseCase
                 .Must(format => Enum.TryParse<GlobalConstants.Format>(format, true, out _))
                 .WithMessage("Value for Format is not valid. It should be either Simple or Detailed");
 
+            //TODO - this has just been increased for this spike. See comments in AddressesGateway
             RuleFor(x => x.PageSize)
-                .LessThan(51).WithMessage("PageSize cannot exceed 50");
+                .LessThan(201).WithMessage("PageSize cannot exceed 200");
 
             RuleFor(r => r.PostCode)
                 .Matches(new Regex("^((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]))))( )?(([0-9][A-Za-z]?[A-Za-z]?)?))$"))

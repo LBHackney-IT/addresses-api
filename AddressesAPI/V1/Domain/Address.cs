@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 namespace AddressesAPI.V1.Domain
 {
     public class Address
@@ -41,5 +42,7 @@ namespace AddressesAPI.V1.Domain
         public string Town { get; set; }
         public string Postcode { get; set; }
         public long UPRN { get; set; }
+        //to hold child addresses in a hierarchy
+        public List<Address> ChildAddresses { get; set; }
     }
 }

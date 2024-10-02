@@ -24,7 +24,7 @@ namespace AddressesAPI.V1.Factories
         }
         public static AddressResponse ToResponse(this Address domain)
         {
-            return new AddressResponse
+            var response = new AddressResponse
             {
                 Line1 = domain.Line1,
                 Line2 = domain.Line2,
@@ -62,7 +62,18 @@ namespace AddressesAPI.V1.Factories
                 PropertyStartDate = domain.PropertyStartDate,
                 PropertyEndDate = domain.PropertyEndDate,
                 PropertyChangeDate = domain.PropertyChangeDate,
+                
+                // TODO - we should probably only new-up the ChildAddress collection if we need to use it, so it keeps the output clean
+                ChildAddresses = new List<AddressResponse>()
             };
+
+            // add the child addresses
+            foreach (var childAddress in domain.ChildAddresses)
+            {
+                response.ChildAddresses.Add(childAddress.ToResponse());
+            }
+            
+            return response;
         }
 
         public static List<AddressCrossReferenceResponse> ToResponse(this IEnumerable<AddressCrossReferenceDomain> domainList)
