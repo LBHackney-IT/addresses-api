@@ -28,7 +28,7 @@ namespace AddressesAPI.V1.UseCase
 
             //TODO - this has just been increased for this spike. See comments in AddressesGateway
             RuleFor(x => x.PageSize)
-                .LessThan(201).WithMessage("PageSize cannot exceed 200");
+                .LessThan(1001).WithMessage("PageSize cannot exceed 200");
 
             RuleFor(r => r.PostCode)
                 .Matches(new Regex("^((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]))))( )?(([0-9][A-Za-z]?[A-Za-z]?)?))$"))

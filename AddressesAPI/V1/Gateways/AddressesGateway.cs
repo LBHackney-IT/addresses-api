@@ -54,13 +54,15 @@ namespace AddressesAPI.V1.Gateways
         {
             // find the missing parents
             var uprns = addresses.Select(a => a.UPRN);
-            var parentUprns = addresses.Select(a => a.ParentUPRN).OfType<long>();
+            var parentUprns = addresses.Select(a => a.ParentUPRN).OfType<long>().Distinct();
             var missingParents = parentUprns.Except(uprns);
             
             foreach (var parent in missingParents.ToList())
             {
                 // TODO - fetch the missing parents from the DB and add them to the addresses list
                 // this is left as an exercise to the reader. It would be good to have an example of this, but I am not sure how we find one
+                var x = parent;
+                Console.Write(x);
             }
             
             var hierarchy = BuildHierarchyForParent(null, addresses);
