@@ -68,7 +68,7 @@ module "postgres_db_staging" {
   db_port              = 5502
   subnet_ids           = data.aws_subnet_ids.staging.ids
   db_engine            = "postgres"
-  db_engine_version    = "11.22"
+  db_engine_version    = "16.3"
   db_instance_class    = "db.t3.micro"
   db_allocated_storage = 1000
   maintenance_window   = "sun:10:00-sun:10:30"
