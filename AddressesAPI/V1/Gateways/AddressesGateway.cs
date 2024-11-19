@@ -43,28 +43,39 @@ namespace AddressesAPI.V1.Gateways
             // TODO: this spike is using a simple hierarchy flag, but it may be better to include something like OutputFormat -> flat / hierarchy
             if (request.Hierarchy)
             {
-                formattedAddresses = BuildHierarchy(formattedAddresses);
+                formattedAddresses = BuildHierarchy(formattedAddresses, request);
             }
 
             // TODO - think about what the total count should show for hierarchies - total top level units, or include child units?
             return (formattedAddresses, totalCount);
         }
 
-        private static List<Address> BuildHierarchy(List<Address> addresses)
+        private List<Address> BuildHierarchy(List<Address> addresses, SearchParameters request)
         {
+            
+            // TODO: for each parentUPRN, find all the addresses that have that UPRN and smush with the other results
+            // do this before finding missing parents
+            
+            
             // find the missing parents
             var uprns = addresses.Select(a => a.UPRN);
             var parentUprns = addresses.Select(a => a.ParentUPRN).OfType<long>().Distinct();
             var missingParents = parentUprns.Except(uprns);
+
+            request.Postcode = null;
             
-            foreach (var parent in missingParents.ToList())
+            foreach (var parentUprn in missingParents.ToList())
             {
-                // TODO - fetch the missing parents from the DB and add them to the addresses list
-                // this is left as an exercise to the reader. It would be good to have an example of this, but I am not sure how we find one
-                var x = parent;
-                Console.Write(x);
+                request.Uprn = parentUprn;
+                
+                //TODO - using the original request here is lazy and unnecessary. Just create a new one with the minimal data required. 
+                var baseQuery = CompileBaseSearchQuery(request);
+                //TODO - use the same format as the original request
+                var formattedAddresses = baseQuery.Select(a => a.ToSimpleDomain()).ToList();
+
+                addresses.AddRange(formattedAddresses);
             }
-            
+
             var hierarchy = BuildHierarchyForParent(null, addresses);
             
             return hierarchy;
