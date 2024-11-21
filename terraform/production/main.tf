@@ -58,17 +58,18 @@ data "aws_ssm_parameter" "addresses_postgres_hostname" {
 }
 
 module "postgres_db_production" {
-  source               = "github.com/LBHackney-IT/aws-hackney-common-terraform.git//modules/database/postgres"
+  source               = "./modules/database/postgres"
   environment_name     = "production"
   vpc_id               = data.aws_vpc.production_vpc.id
-  db_identifier        = "addresses-api"
+  db_identifier        = "addresses-api-db-production-emergency-temp"
   db_name              = "addresses_api"
   db_port              = 5500
   subnet_ids           = data.aws_subnet_ids.production.ids
   db_engine            = "postgres"
-  db_engine_version    = "11.22"
-  db_instance_class    = "db.t3.micro"
-  db_allocated_storage = 500
+  db_engine_version    = "16.3"
+  db_instance_class    = "db.t3.small"
+  db_allocated_storage = 750
+  db_max_allocated_storage= 850
   maintenance_window   = "sun:10:00-sun:10:30"
   db_username          = data.aws_ssm_parameter.addresses_postgres_username.value
   db_password          = data.aws_ssm_parameter.addresses_postgres_db_password.value
@@ -76,12 +77,17 @@ module "postgres_db_production" {
   multi_az             = true //only true if production deployment
   publicly_accessible  = false
   project_name         = "platform apis"
+  deletion_protection  = true
+  copy_tags_to_snapshot= true
+  additional_tags      = {
+    BackupPolicy  = "Prod"
+  }
 }
 
 /*    ELASTICSEARCH SETUP    */
 
 module "elasticsearch_db_production" {
-  source           = "github.com/LBHackney-IT/aws-hackney-common-terraform.git//modules/database/elasticsearch"
+  source           = "./modules/database/elasticsearch"
   vpc_id           = data.aws_vpc.production_vpc.id
   environment_name = "production"
   port             = 443
