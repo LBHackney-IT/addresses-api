@@ -192,6 +192,13 @@ jobs:
     steps:
       - terraform-init-then-apply:
           environment: "development"
+  # Infrastructure changes preview:
+  preview-terraform-staging-changes:
+    executor: docker-terraform
+    steps:
+      - terraform-init-then-preview:
+          environment: "staging"
+  # Infrastructure deployment:
   terraform-init-and-apply-to-staging:
     executor: docker-terraform
     steps:
@@ -203,7 +210,7 @@ jobs:
     steps:
       - terraform-init-then-preview:
           environment: "production"
-    # Infrastructure deployment:
+  # Infrastructure deployment:
   terraform-init-and-apply-to-production:
     executor: docker-terraform
     steps:
@@ -272,9 +279,19 @@ workflows:
           filters:
             branches:
               only: master
+      - preview-terraform-staging-changes:
+        requires:
+          - assume-role-staging
+        filters:
+          branches:
+            only: master
+      - continue-with-staging-terraform-release:
+            type: approval
+            requires:
+              - preview-terraform-staging-changes
       - terraform-init-and-apply-to-staging:
           requires:
-            - assume-role-staging
+            - continue-with-staging-terraform-release
           filters:
             branches:
               only: master
