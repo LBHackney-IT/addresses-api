@@ -280,15 +280,15 @@ workflows:
             branches:
               only: master
       - preview-terraform-staging-changes:
-        requires:
-          - assume-role-staging
-        filters:
-          branches:
-            only: master
+          requires:
+            - assume-role-staging
+          filters:
+            branches:
+              only: master
       - continue-with-staging-terraform-release:
-            type: approval
-            requires:
-              - preview-terraform-staging-changes
+          type: approval
+          requires:
+            - preview-terraform-staging-changes
       - terraform-init-and-apply-to-staging:
           requires:
             - continue-with-staging-terraform-release
