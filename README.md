@@ -72,6 +72,17 @@ make remove-es-data
 ```
 to remove the docker container and volume. Then next time you start and seed the `dev-elasticsearch` container it will have the new data loaded.
 
+#### Setting up Kibana
+
+If you want to query the elasticsearch database you can use the provided Kibana container.
+
+To start Kibana, run:
+```sh
+docker-compose up -d kibana
+```
+
+Kibana UI will be available on http://localhost:5601/app/dev_tools#/console
+
 ### Running the tests
 
 You can run the tests in a container:
