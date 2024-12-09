@@ -85,6 +85,15 @@ services:
         aliases:
           - test-elasticsearch
           - elastic
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.9.3
+    container_name: kibana
+    ports:
+      - 5601:5601
+    environment:
+      ELASTICSEARCH_HOSTS: http://test-elasticsearch:9200
+    networks:
+      - elastic
 volumes:
   esdata-test:
     driver: local
