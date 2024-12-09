@@ -29,7 +29,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=mypassword
       - POSTGRES_DB=devdb
-    image: postgres:12
+    image: postgres:16
     container_name: dev-database
     ports:
       - 5433:5432
@@ -55,7 +55,7 @@ services:
       - elastic
       - postgres
   test-database:
-    image: postgres:12
+    image: postgres:16
     container_name: test-database
     ports:
       - 5432:5432

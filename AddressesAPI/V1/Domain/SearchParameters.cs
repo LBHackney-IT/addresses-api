@@ -15,5 +15,8 @@ namespace AddressesAPI.V1.Domain
         public bool? HackneyGazetteerOutOfBoroughAddress { get; set; }
         public int Page { get; set; }
         public int PageSize { get; set; }
+
+        public GlobalConstants.Structure Structure { get; set; }
+        public long? ParentUprn { get; set; }
     }
 }

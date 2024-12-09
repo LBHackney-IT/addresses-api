@@ -1,9 +1,9 @@
-using System.Collections.Generic;
 using AddressesAPI.V1;
 using AddressesAPI.V1.Boundary.Requests;
 using AddressesAPI.V1.UseCase;
 using FluentValidation.TestHelper;
 using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace AddressesAPI.Tests.V1.UseCase
 {
@@ -348,6 +348,12 @@ namespace AddressesAPI.Tests.V1.UseCase
             _classUnderTest.TestValidate(request).ShouldHaveError().WithErrorMessage("You must provide at least one of (uprn, usrn, postcode), when gazetteer is 'both'.");
         }
 
+        [Test]
+        public void GivenArequestWithInvalidStructureValue_ItReturnsAnError()
+        {
+            var request = new SearchAddressRequest() { PostCode = "A2", Structure = "InvalidValue" };
+            _classUnderTest.TestValidate(request).ShouldHaveError().WithErrorMessage("Value for Structure is not valid.It should be either Flat or Hierarchy.");
+        }
         #endregion
 
         #region Enum validation

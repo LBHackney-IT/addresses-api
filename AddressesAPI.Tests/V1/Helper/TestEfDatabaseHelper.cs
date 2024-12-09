@@ -21,6 +21,7 @@ namespace AddressesAPI.Tests.V1.Helper
             if (request?.Street != null) randomAddressRecord.Street = request.Street;
             if (request?.UPRN != null) randomAddressRecord.UPRN = request.UPRN;
             if (request?.USRN != null) randomAddressRecord.USRN = request.USRN;
+            randomAddressRecord.ParentUPRN = request?.ParentUPRN; //we want to be able to pass null ParentUPRN in some cases and override the fixture value
             if (request?.UsagePrimary != null) randomAddressRecord.UsagePrimary = request.UsagePrimary;
             if (request?.UsageCode != null) randomAddressRecord.UsageCode = request.UsageCode;
             if (request?.Gazetteer != null) randomAddressRecord.Gazetteer = request.Gazetteer;

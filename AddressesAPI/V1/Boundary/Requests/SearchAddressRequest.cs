@@ -122,5 +122,11 @@ namespace AddressesAPI.V1.Boundary.Requests
         /// List of fields passed in as part of the request
         /// </summary>
         public List<string> RequestFields { get; set; }
+
+        /// <summary>
+        /// Allows a switch between flat and hierarchical results structure. 
+        /// Hierarchical structure is based on parent UPRN and UPRN relationships
+        /// </summary>
+        public string Structure { get; set; } = GlobalConstants.Structure.Flat.ToString();
     }
 }

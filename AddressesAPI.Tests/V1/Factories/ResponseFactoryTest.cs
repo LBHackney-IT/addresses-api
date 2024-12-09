@@ -1,10 +1,11 @@
-using AddressesAPI.Tests.V1.Helper;
-using AddressCrossReferenceResponse = AddressesAPI.V1.Boundary.Responses.Data.AddressCrossReferenceResponse;
+using AddressesAPI.V1.Boundary.Responses.Data;
 using AddressesAPI.V1.Domain;
 using AddressesAPI.V1.Factories;
 using AutoFixture;
 using FluentAssertions;
 using NUnit.Framework;
+using System.Collections.Generic;
+using AddressCrossReferenceResponse = AddressesAPI.V1.Boundary.Responses.Data.AddressCrossReferenceResponse;
 
 namespace AddressesAPI.Tests.V1.Factories
 {
@@ -14,9 +15,15 @@ namespace AddressesAPI.Tests.V1.Factories
         [Test]
         public void MapsAnAddressDomainDirectlyToAnAddressResponse()
         {
-            var domain = _fixture.Create<Address>();
-            var response = domain.ToResponse();
-            response.ShouldBeEquivalentToExpectedObjectWithExceptions(domain);
+            var domain = _fixture.Build<Address>().Without(a => a.ChildAddresses).Create();
+
+            var childAddress = _fixture.Build<Address>().Without(a => a.ChildAddresses).Create();
+            domain.ChildAddresses = new List<Address>() { childAddress };
+
+            var result = domain.ToResponse();
+
+            result.Should().BeEquivalentTo(domain);
+            result.Should().BeOfType<AddressResponse>();
         }
 
         [Test]

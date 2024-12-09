@@ -1,14 +1,15 @@
-using System;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
 using AddressesAPI.Infrastructure;
 using AddressesAPI.Tests.V1.Helper;
 using AddressesAPI.V1.Boundary.Responses.Metadata;
 using AutoFixture;
 using Bogus;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using NUnit.Framework;
+using System;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace AddressesAPI.Tests.V1.E2ETests
 {
@@ -167,6 +168,81 @@ namespace AddressesAPI.Tests.V1.E2ETests
             errors.Error.ValidationErrors.Should().ContainEquivalentOf(
                 new ValidationError { Message = message, FieldName = fieldName }
             );
+        }
+
+        [Test]
+        public async Task SettingStructureToHierarchyReturnsResultsInUPRNHierarchyFormat()
+        {
+            var parentUPRN = 11111111;
+            var postcode = "A1 2B";
+
+            var parentAddress = new NationalAddress
+            {
+                UPRN = parentUPRN,
+                Postcode = postcode,
+            };
+
+            var childAddress = new NationalAddress
+            {
+                ParentUPRN = parentUPRN,
+                Postcode = postcode,
+                UPRN = 22222222
+            };
+
+            TestEfDataHelper.InsertAddress(DatabaseContext, request: parentAddress);
+            TestEfDataHelper.InsertAddress(DatabaseContext, request: childAddress);
+
+            var querystring = $"Postcode={postcode}&Structure=Hierarchy";
+
+            var response = await CallEndpointWithQueryParameters(querystring).ConfigureAwait(true);
+
+            response.StatusCode.Should().Be(StatusCodes.Status200OK);
+
+            var returnedAddresses = await response.ConvertToSearchAddressResponseObject().ConfigureAwait(true);
+
+            returnedAddresses.Data.Addresses.Count.Should().Be(1);
+            returnedAddresses.Data.TotalCount.Should().Be(2);
+            returnedAddresses.Data.Addresses.First().UPRN.Should().Be(parentUPRN);
+            returnedAddresses.Data.Addresses.First().ChildAddresses.Count.Should().Be(1);
+            returnedAddresses.Data.Addresses.First().ChildAddresses.First().UPRN.Should().Be(childAddress.UPRN);
+        }
+
+        [TestCase("")]
+        [TestCase("Flat")]
+        public async Task SettingStructureToFlatOrNotProvidingItReturnsResultsInFlatFormat(string structure)
+        {
+            var parentUPRN = 11111111;
+            var postcode = "A1 2B";
+
+            var parentAddress = new NationalAddress
+            {
+                UPRN = parentUPRN,
+                Postcode = postcode,
+            };
+
+            var childAddress = new NationalAddress
+            {
+                ParentUPRN = parentUPRN,
+                Postcode = postcode,
+                UPRN = 22222222,
+            };
+
+            TestEfDataHelper.InsertAddress(DatabaseContext, request: parentAddress);
+            TestEfDataHelper.InsertAddress(DatabaseContext, request: childAddress);
+
+            var structureParam = string.IsNullOrEmpty(structure) ? "" : $"Structure={structure}";
+
+            var querystring = $"Postcode={postcode}&{structureParam}";
+
+            var response = await CallEndpointWithQueryParameters(querystring).ConfigureAwait(true);
+
+            response.StatusCode.Should().Be(StatusCodes.Status200OK);
+
+            var returnedAddresses = await response.ConvertToSearchAddressResponseObject().ConfigureAwait(true);
+
+            returnedAddresses.Data.Addresses.Count.Should().Be(2);
+            returnedAddresses.Data.TotalCount.Should().Be(2);
+            returnedAddresses.Data.Addresses.All(x => x.ChildAddresses == null);
         }
 
         private void AddSomeRandomAddressToTheDatabase(int? count = null, string gazetteer = "Local")

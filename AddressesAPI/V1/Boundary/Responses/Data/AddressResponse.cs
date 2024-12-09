@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace AddressesAPI.V1.Boundary.Responses.Data
 {
@@ -131,5 +132,7 @@ namespace AddressesAPI.V1.Boundary.Responses.Data
         /// Only included if format query parameter is set to detailed.
         /// </summary>
         public int? PropertyChangeDate { get; set; }
+
+        public List<AddressResponse> ChildAddresses { get; set; }
     }
 }
