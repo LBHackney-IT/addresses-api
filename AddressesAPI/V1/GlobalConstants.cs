@@ -20,5 +20,11 @@ namespace AddressesAPI.V1
             Local,
             Both
         };
+
+        public enum Structure
+        {
+            Flat,
+            Hierarchy
+        }
     }
 }

@@ -1,4 +1,3 @@
-using System;
 using AddressesAPI.V1.Boundary.Requests;
 using AddressesAPI.V1.Boundary.Responses;
 using AddressesAPI.V1.Boundary.Responses.Metadata;
@@ -7,6 +6,7 @@ using AddressesAPI.V1.Factories;
 using AddressesAPI.V1.Gateways;
 using AddressesAPI.V1.HelperMethods;
 using AddressesAPI.V1.UseCase.Interfaces;
+using System;
 
 namespace AddressesAPI.V1.UseCase
 {
@@ -59,7 +59,8 @@ namespace AddressesAPI.V1.UseCase
                 PageSize = request.PageSize,
                 UsageCode = request.usageCode,
                 UsagePrimary = request.usagePrimary,
-                HackneyGazetteerOutOfBoroughAddress = request.HackneyGazetteerOutOfBoroughAddress
+                HackneyGazetteerOutOfBoroughAddress = request.HackneyGazetteerOutOfBoroughAddress,
+                Structure = Enum.Parse<GlobalConstants.Structure>(request.Structure, true)
             };
         }
     }
