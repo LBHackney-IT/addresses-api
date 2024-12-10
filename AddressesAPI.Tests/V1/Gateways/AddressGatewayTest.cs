@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using AddressesAPI.Infrastructure;
 using AddressesAPI.Tests.V1.Helper;
 using AddressesAPI.V1;
@@ -10,6 +7,9 @@ using AddressesAPI.V1.Gateways;
 using Bogus;
 using FluentAssertions;
 using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Address = AddressesAPI.V1.Domain.Address;
 
 namespace AddressesAPI.Tests.V1.Gateways
@@ -246,13 +246,37 @@ namespace AddressesAPI.Tests.V1.Gateways
         }
 
         [Test]
+        public void WillSearchParentUprndsForAMatch()
+        {
+            var matchingAddress = TestEfDataHelper.InsertAddress(DatabaseContext,
+                request: new NationalAddress { ParentUPRN = 11111111 }
+            );
+
+            var otherAddress = TestEfDataHelper.InsertAddress(DatabaseContext,
+               request: new NationalAddress { ParentUPRN = 22222222 }
+           );
+
+            var request = new SearchParameters
+            {
+                Page = 1,
+                PageSize = 50,
+                Format = GlobalConstants.Format.Detailed,
+                Gazetteer = GlobalConstants.Gazetteer.Both,
+                ParentUprn = matchingAddress.ParentUPRN
+            };
+
+            var (addresses, _) = _classUnderTest.SearchAddresses(request);
+            addresses.Count.Should().Be(1);
+            addresses.First().Should().BeEquivalentTo(matchingAddress.ToDomain());
+        }
+
+        [Test]
         public void WillSearchUsrnsForAMatch()
         {
             var uprn = _faker.Random.Number(10000000, 99999999);
             var savedAddress = TestEfDataHelper.InsertAddress(DatabaseContext,
                 request: new NationalAddress { USRN = uprn }
             );
-            TestEfDataHelper.InsertAddress(DatabaseContext);
             var request = new SearchParameters
             {
                 Page = 1,
@@ -826,6 +850,577 @@ namespace AddressesAPI.Tests.V1.Gateways
             _classUnderTest.GetSingleAddress(addressKey).Should().BeNull();
         }
 
+        #endregion
+
+        #region PropertyHierarchy
+        [Test]
+        public void ItWillReturnPropertyHierarchyWhenBuildHierarchyFlagIsTrue()
+        {
+            var parentUprn = _faker.Random.Number(10000000, 99999999);
+
+            var parentAddress = new NationalAddress()
+            {
+                UPRN = parentUprn,
+                ParentUPRN = null
+            };
+
+            var childAddressOne = new NationalAddress()
+            {
+                ParentUPRN = parentAddress.UPRN
+            };
+
+            var childAddressTwo = new NationalAddress()
+            {
+                ParentUPRN = parentAddress.UPRN
+            };
+
+            TestEfDataHelper.InsertAddress(DatabaseContext, request: parentAddress);
+            TestEfDataHelper.InsertAddress(DatabaseContext, request: childAddressOne);
+            TestEfDataHelper.InsertAddress(DatabaseContext, request: childAddressTwo);
+
+            var request = new SearchParameters()
+            {
+                Gazetteer = GlobalConstants.Gazetteer.Both,
+                Structure = GlobalConstants.Structure.Hierarchy
+            };
+
+            var (addresses, totalCount) = _classUnderTest.SearchAddresses(request);
+
+            addresses.Count.Should().Be(1);
+            totalCount.Should().Be(3);
+            addresses.First().UPRN.Should().Be(parentAddress.UPRN);
+            addresses.First().ParentUPRN.Should().BeNull();
+            addresses.First().ChildAddresses.Count.Should().Be(2);
+            _ = addresses.First().ChildAddresses.All(x => x.ChildAddresses == null);
+            _ = addresses.First().ChildAddresses.All(x => x.ParentUPRN == parentAddress.UPRN);
+        }
+        //TODO: test multiple levels
+
+        [Test]
+        public void ItWillIncludeParentRecordsToTheHierarchyEvenIfTheyAreNotIncludedInTheOriginalResultsSet()
+        {
+            //Missing parents when searching by postcode
+            //for some addresses the parent address may not have a postcode specified,
+            //leading to a situation where an address has a parentUPRN attribute that points to a UPRN that is not is the result set.
+            //To build the hierarchy these missing parents must be identified and added to the result set by making additional database calls to fetch them by UPRN.
+            var parentUprn = _faker.Random.Number(10000000, 99999999);
+            var postCode = "E8 4TT";
+
+            var parentAddressOutsideResultSet = new NationalAddress()
+            {
+                UPRN = parentUprn,
+                ParentUPRN = null,
+                Postcode = null
+            };
+
+            var childAddressOne = new NationalAddress()
+            {
+                ParentUPRN = parentAddressOutsideResultSet.UPRN,
+                UPRN = _faker.Random.Number(10000000, 99999999),
+                Postcode = postCode
+            };
+
+            var childAddressTwo = new NationalAddress()
+            {
+                ParentUPRN = parentAddressOutsideResultSet.UPRN,
+                UPRN = _faker.Random.Number(10000000, 99999999),
+                Postcode = postCode
+            };
+
+            TestEfDataHelper.InsertAddress(DatabaseContext, request: parentAddressOutsideResultSet);
+            TestEfDataHelper.InsertAddress(DatabaseContext, request: childAddressOne);
+            TestEfDataHelper.InsertAddress(DatabaseContext, request: childAddressTwo);
+
+            var request = new SearchParameters()
+            {
+                Page = 1,
+                PageSize = 50,
+                Gazetteer = GlobalConstants.Gazetteer.Both,
+                Structure = GlobalConstants.Structure.Hierarchy,
+                Postcode = postCode
+            };
+
+            var (addresses, totalCount) = _classUnderTest.SearchAddresses(request);
+
+            addresses.Count.Should().Be(1);
+            totalCount.Should().Be(3);
+            addresses.First().UPRN.Should().Be(parentAddressOutsideResultSet.UPRN);
+            addresses.First().ParentUPRN.Should().BeNull();
+            addresses.First().ChildAddresses.Count.Should().Be(2);
+            _ = addresses.First().ChildAddresses.All(x => x.ChildAddresses == null);
+            _ = addresses.First().ChildAddresses.All(x => x.ParentUPRN == parentAddressOutsideResultSet.UPRN);
+        }
+
+        //Parents with children in another postcode.
+        //Sometimes the children of a parent can be split across 2 postcodes.
+        //In order to get all the children for the parent an additional search must be made
+        // to find all the addresses that have a parentUPRN matching any of the parentUPRNs in the original search
+        // and combining the results before building the hierarchy.
+        [Test]
+        public void ItWillIncludeChildRecordsToTheHierarchyEvenIfTheyAreNotIncludedInTheOriginalResultsSet()
+        {
+            var parentUprn = _faker.Random.Number(10000000, 99999999);
+            var matchingPostcode = "E8 4TT";
+            var nonMatchingPostCode = "A1 B23";
+
+            var parentAddress = new NationalAddress()
+            {
+                UPRN = parentUprn,
+                ParentUPRN = null,
+                Postcode = matchingPostcode
+            };
+
+            var childAddressWithMatchingPostcode = new NationalAddress()
+            {
+                UPRN = _faker.Random.Number(10000000, 99999999),
+                ParentUPRN = parentUprn,
+                Postcode = matchingPostcode
+            };
+
+            var childAddressWithoutMatchingPostCode = new NationalAddress()
+            {
+                UPRN = _faker.Random.Number(10000000, 99999999),
+                ParentUPRN = parentUprn,
+                Postcode = nonMatchingPostCode
+            };
+
+            TestEfDataHelper.InsertAddress(DatabaseContext, request: parentAddress);
+            TestEfDataHelper.InsertAddress(DatabaseContext, request: childAddressWithMatchingPostcode);
+            TestEfDataHelper.InsertAddress(DatabaseContext, request: childAddressWithoutMatchingPostCode);
+
+            var request = new SearchParameters()
+            {
+                Page = 1,
+                PageSize = 50,
+                Gazetteer = GlobalConstants.Gazetteer.Both,
+                Structure = GlobalConstants.Structure.Hierarchy,
+                Postcode = matchingPostcode
+            };
+
+            var (addresses, totalCount) = _classUnderTest.SearchAddresses(request);
+
+            addresses.Count.Should().Be(1);
+            totalCount.Should().Be(3);
+            addresses.First().UPRN.Should().Be(parentAddress.UPRN);
+            addresses.First().ParentUPRN.Should().BeNull();
+            addresses.First().ChildAddresses.Count.Should().Be(2);
+            _ = addresses.First().ChildAddresses.All(x => x.ChildAddresses == null);
+            _ = addresses.First().ChildAddresses.All(x => x.ParentUPRN == parentAddress.UPRN);
+        }
+
+        [Test]
+        public void ItWillKeepTheCorrectOrderOfParentRecordsWithinTheHierarchy()
+        {
+            var parentUprnOne = _faker.Random.Number(10000000, 99999999);
+            var parentUprnTwo = _faker.Random.Number(10000000, 99999999);
+
+            var town = "Test town";
+
+            //non matching postcode ensures this gets addedd to the results set as a missing parent after initial ordering
+            //adding records later will break the order in most cases and not handling it would make the final order of parents unpredictable
+            var parentAddressOne = new NationalAddress()
+            {
+                UPRN = parentUprnOne,
+                ParentUPRN = null,
+                Postcode = "AB 1CD",
+                Town = town,
+            };
+
+            var childAddressOne = new NationalAddress()
+            {
+                UPRN = _faker.Random.Number(10000000, 99999999),
+                ParentUPRN = parentUprnOne,
+                Postcode = "E8 4TX9",
+                Town = town,
+            };
+
+            var parentAddressTwo = new NationalAddress()
+            {
+                UPRN = parentUprnTwo,
+                ParentUPRN = null,
+                Postcode = "E8 4TX3",
+                Town = town,
+            };
+
+            var childAddressTwo = new NationalAddress()
+            {
+                UPRN = _faker.Random.Number(10000000, 99999999),
+                ParentUPRN = parentUprnTwo,
+                Postcode = "E8 4TX3",
+                Town = town,
+            };
+
+            TestEfDataHelper.InsertAddress(DatabaseContext, request: parentAddressOne);
+            TestEfDataHelper.InsertAddress(DatabaseContext, request: parentAddressTwo);
+            TestEfDataHelper.InsertAddress(DatabaseContext, request: childAddressOne);
+            TestEfDataHelper.InsertAddress(DatabaseContext, request: childAddressTwo);
+
+            var request = new SearchParameters()
+            {
+                Page = 1,
+                PageSize = 50,
+                Gazetteer = GlobalConstants.Gazetteer.Both,
+                Structure = GlobalConstants.Structure.Hierarchy,
+                Postcode = "E8 4T"
+            };
+
+            var (addresses, totalCount) = _classUnderTest.SearchAddresses(request);
+
+            addresses.Count.Should().Be(2);
+            totalCount.Should().Be(4);
+            _ = addresses.
+                First().Postcode.Should().Be(parentAddressOne.Postcode);
+            _ = addresses.
+                Last().Postcode.Should().Be(parentAddressTwo.Postcode);
+        }
+
+        [Test]
+        public void ItWillKeepTheCorrectOrderOfChildRecordsWithinTheHierarchy()
+        {
+            var parentUprn = _faker.Random.Number(10000000, 99999999);
+
+            var town = "Test town";
+
+            var parentAddress = new NationalAddress()
+            {
+                UPRN = parentUprn,
+                ParentUPRN = null,
+                Postcode = "E8 4TX9",
+                Town = town,
+            };
+
+            var childAddressOne = new NationalAddress()
+            {
+                UPRN = _faker.Random.Number(10000000, 99999999),
+                ParentUPRN = parentAddress.UPRN,
+                Postcode = parentAddress.Postcode,
+                Town = town,
+            };
+
+            //child address with the same parent uprn, but with different postode.
+            //This ensures this child gets added to the result set after initial sorting 
+            //post code difference to other child record is not realistic, but highlights ordering issues if not handled
+            var childAddressTwo = new NationalAddress()
+            {
+                UPRN = _faker.Random.Number(10000000, 99999999),
+                ParentUPRN = parentAddress.UPRN,
+                Postcode = "AB 1CD",
+                Town = town,
+            };
+
+            TestEfDataHelper.InsertAddress(DatabaseContext, request: parentAddress);
+            TestEfDataHelper.InsertAddress(DatabaseContext, request: childAddressOne);
+            TestEfDataHelper.InsertAddress(DatabaseContext, request: childAddressTwo);
+
+            var request = new SearchParameters()
+            {
+                Page = 1,
+                PageSize = 50,
+                Gazetteer = GlobalConstants.Gazetteer.Both,
+                Structure = GlobalConstants.Structure.Hierarchy,
+                Postcode = "E8 4TX"
+            };
+
+            var (addresses, totalCount) = _classUnderTest.SearchAddresses(request);
+
+            addresses.Count.Should().Be(1);
+            totalCount.Should().Be(3);
+            _ = addresses.
+                First().ChildAddresses.First().Postcode.Should().Be(childAddressTwo.Postcode);
+        }
+
+        [Test]
+        public void ItWillReturnAsManylayersOfHierarchyAsRequiredByTheDataStructure()
+        {
+            var levelOneParent = new NationalAddress()
+            {
+                UPRN = 1,
+                ParentUPRN = null,
+                Postcode = "E8 4TA"
+            };
+
+            var levelOneChild = new NationalAddress()
+            {
+                UPRN = 2,
+                ParentUPRN = levelOneParent.UPRN,
+                Postcode = "E8 4TA"
+            };
+
+            var levelTwoParent = new NationalAddress()
+            {
+                UPRN = 3,
+                ParentUPRN = levelOneChild.UPRN,
+                Postcode = "E8 4TB"
+            };
+
+            var levelTwoChild = new NationalAddress()
+            {
+                UPRN = 4,
+                ParentUPRN = levelTwoParent.UPRN,
+                Postcode = "E8 4TB"
+            };
+
+            TestEfDataHelper.InsertAddress(DatabaseContext, request: levelOneParent);
+            TestEfDataHelper.InsertAddress(DatabaseContext, request: levelOneChild);
+            TestEfDataHelper.InsertAddress(DatabaseContext, request: levelTwoParent);
+            TestEfDataHelper.InsertAddress(DatabaseContext, request: levelTwoChild);
+
+            var request = new SearchParameters()
+            {
+                Page = 1,
+                PageSize = 50,
+                Gazetteer = GlobalConstants.Gazetteer.Both,
+                Structure = GlobalConstants.Structure.Hierarchy,
+                Postcode = "E8 4T"
+            };
+
+            var (addresses, totalCount) = _classUnderTest.SearchAddresses(request);
+
+            addresses.Count.Should().Be(1);
+            addresses.First().ChildAddresses.Count.Should().Be(1);
+            addresses.First().ChildAddresses.First().ChildAddresses.Count.Should().Be(1);
+        }
+
+        [Test]
+        public void ItWillReturnRecordsWithoutParentUPRNWhenHierarchyIsRequestedButMatchingRecordsDontHaveAnyChildren()
+        {
+            var postcode = "E8 4TB";
+
+            // this could be standalone unit or a parent
+            var parentOne = new NationalAddress()
+            {
+                UPRN = 3,
+                ParentUPRN = null,
+                Postcode = postcode
+            };
+
+            var parentTwo = new NationalAddress()
+            {
+                UPRN = 4,
+                ParentUPRN = null,
+                Postcode = postcode
+            };
+
+            TestEfDataHelper.InsertAddress(DatabaseContext, request: parentOne);
+            TestEfDataHelper.InsertAddress(DatabaseContext, request: parentTwo);
+
+            var request = new SearchParameters()
+            {
+                Page = 1,
+                PageSize = 50,
+                Gazetteer = GlobalConstants.Gazetteer.Both,
+                Structure = GlobalConstants.Structure.Hierarchy,
+                Postcode = postcode
+            };
+
+            var (addresses, totalCount) = (_classUnderTest.SearchAddresses(request));
+            totalCount.Should().Be(2);
+            addresses.Any(x => x.ChildAddresses == null).Should().BeTrue();
+        }
+
+        #region OrderDomainAddresses
+
+        [Test]
+        public void OrderDomainAddressesWillFirstlyOrderByTown()
+        {
+            var addressOne = new Address() { Town = "town c" };
+            var addressTwo = new Address() { Town = "town b" };
+            var addressThree = new Address() { Town = "town a" };
+
+            var addresses = new List<Address>()
+            {
+                addressOne,
+                addressTwo,
+                addressThree
+            };
+
+            var results = _classUnderTest.OrderDomainAddresses(addresses);
+            results.ElementAt(0).Should().Be(addressThree);
+            results.ElementAt(1).Should().Be(addressTwo);
+            results.ElementAt(2).Should().Be(addressOne);
+
+        }
+
+        [Test]
+        public void OrderDomainAddressesWillSecondlyOrderByPostCodePresense()
+        {
+            var addressOne = new Address() { Town = "town a" };
+            var addressTwo = new Address() { Town = "town a", Postcode = "A1 2B" };
+            var addressThree = new Address() { Town = "town a" };
+
+            var addresses = new List<Address>()
+            {
+                addressOne,
+                addressTwo,
+                addressThree
+            };
+
+            var results = _classUnderTest.OrderDomainAddresses(addresses);
+            results.ElementAt(0).Should().Be(addressTwo);
+            results.ElementAt(1).Should().Be(addressOne);
+            results.ElementAt(2).Should().Be(addressThree);
+        }
+
+        [Test]
+        public void OrderDomainAddressesWillThirdlyOrderBypostcode()
+        {
+            var addressOne = new Address() { Town = "town a", Street = "street a", Postcode = "C3 1A" };
+            var addressTwo = new Address() { Town = "town a", Street = "street a", Postcode = "B2 3C" };
+            var addressThree = new Address() { Town = "town a", Street = "street a", Postcode = "A1 2B" };
+
+            var addresses = new List<Address>()
+            {
+                addressOne,
+                addressTwo,
+                addressThree
+            };
+
+            var results = _classUnderTest.OrderDomainAddresses(addresses);
+            results.ElementAt(0).Should().Be(addressThree);
+            results.ElementAt(1).Should().Be(addressTwo);
+            results.ElementAt(2).Should().Be(addressOne);
+        }
+
+        [Test]
+        public void OrderDomainAddressesWillFourthlyOrderByStreet()
+        {
+            var addressOne = new Address() { Town = "town a", Street = "street c" };
+            var addressTwo = new Address() { Town = "town a", Street = "street b" };
+            var addressThree = new Address() { Town = "town a", Street = "street a" };
+
+            var addresses = new List<Address>()
+            {
+                addressOne,
+                addressTwo,
+                addressThree
+            };
+
+            var results = _classUnderTest.OrderDomainAddresses(addresses);
+            results.ElementAt(0).Should().Be(addressThree);
+            results.ElementAt(1).Should().Be(addressTwo);
+            results.ElementAt(2).Should().Be(addressOne);
+        }
+
+        [Test]
+        public void OrderDomainAddressesWillFifthlyOrderByPresenceOfBuildingNumber()
+        {
+            var addressOne = new Address() { Town = "town a", Postcode = "A1", Street = "street a", BuildingNumber = "1" };
+            var addressTwo = new Address() { Town = "town a", Postcode = "A1", Street = "street a", };
+            var addressThree = new Address() { Town = "town a", Postcode = "A1", Street = "street a", BuildingNumber = "2" };
+
+            var addresses = new List<Address>()
+            {
+                addressOne,
+                addressTwo,
+                addressThree
+            };
+
+            var results = _classUnderTest.OrderDomainAddresses(addresses);
+            results.ElementAt(0).Should().Be(addressOne);
+            results.ElementAt(1).Should().Be(addressThree);
+            results.ElementAt(2).Should().Be(addressTwo);
+        }
+
+        [Test]
+        public void OrderDomainAddressesWillSixthlyOrderByBuildingNumber()
+        {
+            var addressOne = new Address() { Town = "town a", Street = "street a", BuildingNumber = "2" };
+            var addressTwo = new Address() { Town = "town a", Street = "street a", BuildingNumber = "3" };
+            var addressThree = new Address() { Town = "town a", Street = "street a", BuildingNumber = "1" };
+
+            var addresses = new List<Address>()
+            {
+                addressOne,
+                addressTwo,
+                addressThree
+            };
+
+            var results = _classUnderTest.OrderDomainAddresses(addresses);
+            results.ElementAt(0).Should().Be(addressThree);
+            results.ElementAt(1).Should().Be(addressOne);
+            results.ElementAt(2).Should().Be(addressTwo);
+        }
+
+        [Test]
+        public void OrderDomainAddressesWillSeventhlyOrderByZeroUnitNumber()
+        {
+            var addressOne = new Address() { Town = "town a", Street = "street a", UnitNumber = "0" };
+            var addressTwo = new Address() { Town = "town a", Street = "street a", UnitNumber = "3" };
+            var addressThree = new Address() { Town = "town a", Street = "street a", UnitNumber = "1" };
+
+            var addresses = new List<Address>()
+            {
+                addressOne,
+                addressTwo,
+                addressThree
+            };
+
+            var results = _classUnderTest.OrderDomainAddresses(addresses);
+            results.ElementAt(0).Should().Be(addressThree);
+            results.ElementAt(1).Should().Be(addressTwo);
+            results.ElementAt(2).Should().Be(addressOne);
+        }
+
+        [Test]
+        public void OrderDomainAddressesWillEightlyOrderByUnitNumber()
+        {
+            var addressOne = new Address() { Town = "town a", Street = "street a", UnitNumber = "0" };
+            var addressTwo = new Address() { Town = "town a", Street = "street a", UnitNumber = "3" };
+            var addressThree = new Address() { Town = "town a", Street = "street a", UnitNumber = "1" };
+
+            var addresses = new List<Address>()
+            {
+                addressOne,
+                addressTwo,
+                addressThree
+            };
+
+            var results = _classUnderTest.OrderDomainAddresses(addresses);
+            results.ElementAt(0).Should().Be(addressThree);
+            results.ElementAt(1).Should().Be(addressTwo);
+            results.ElementAt(2).Should().Be(addressOne);
+        }
+
+        [Test]
+        public void OrderDomainAddressesWillNinthlyOrderByPresenseOfUnitName()
+        {
+            var addressOne = new Address() { Town = "town a", Street = "street a", };
+            var addressTwo = new Address() { Town = "town a", Street = "street a", UnitName = "name a" };
+            var addressThree = new Address() { Town = "town a", Street = "street a", UnitName = "name a" };
+
+            var addresses = new List<Address>()
+            {
+                addressOne,
+                addressTwo,
+                addressThree
+            };
+
+            var results = _classUnderTest.OrderDomainAddresses(addresses);
+            results.ElementAt(0).Should().Be(addressTwo);
+            results.ElementAt(1).Should().Be(addressThree);
+            results.ElementAt(2).Should().Be(addressOne);
+        }
+
+        [Test]
+        public void OrderDomainAddressesWillTenthlylyOrderByUnitName()
+        {
+            var addressOne = new Address() { Town = "town a", Street = "street a", };
+            var addressTwo = new Address() { Town = "town a", Street = "street a", UnitName = "name b" };
+            var addressThree = new Address() { Town = "town a", Street = "street a", UnitName = "name a" };
+
+            var addresses = new List<Address>()
+            {
+                addressOne,
+                addressTwo,
+                addressThree
+            };
+
+            var results = _classUnderTest.OrderDomainAddresses(addresses);
+            results.ElementAt(0).Should().Be(addressThree);
+            results.ElementAt(1).Should().Be(addressTwo);
+            results.ElementAt(2).Should().Be(addressOne);
+        }
+        #endregion
         #endregion
     }
 }

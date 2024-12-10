@@ -104,6 +104,7 @@ namespace AddressesAPI.V1.Factories
                 Town = addressEntity.Town,
                 UPRN = addressEntity.UPRN,
                 Postcode = addressEntity.Postcode,
+                ParentUPRN = addressEntity.ParentUPRN,
             };
         }
 

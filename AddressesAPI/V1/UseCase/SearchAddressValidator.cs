@@ -1,10 +1,10 @@
+using AddressesAPI.V1.Boundary.Requests;
+using AddressesAPI.V1.UseCase.Interfaces;
+using FluentValidation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using AddressesAPI.V1.Boundary.Requests;
-using AddressesAPI.V1.UseCase.Interfaces;
-using FluentValidation;
 
 namespace AddressesAPI.V1.UseCase
 {
@@ -44,6 +44,10 @@ namespace AddressesAPI.V1.UseCase
             RuleFor(r => r.RequestFields)
                 .Must(CheckForInvalidProperties)
                 .WithMessage("Invalid properties have been provided.");
+
+            RuleFor(r => r.Structure)
+                .Must(structure => Enum.TryParse<GlobalConstants.Structure>(structure, true, out _))
+                .WithMessage("Value for Structure is not valid.It should be either Flat or Hierarchy.");
         }
 
         private static bool CheckForInvalidProperties(List<string> requestFields)

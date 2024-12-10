@@ -1,10 +1,9 @@
-using System.Collections.Generic;
-using System.Linq;
-using AddressesAPI.V1.Boundary.Responses;
 using AddressesAPI.V1.Boundary.Responses.Data;
 using AddressesAPI.V1.Domain;
-using AddressCrossReferenceResponse = AddressesAPI.V1.Boundary.Responses.Data.AddressCrossReferenceResponse;
+using System.Collections.Generic;
+using System.Linq;
 using AddressCrossReferenceDomain = AddressesAPI.V1.Domain.AddressCrossReference;
+using AddressCrossReferenceResponse = AddressesAPI.V1.Boundary.Responses.Data.AddressCrossReferenceResponse;
 
 namespace AddressesAPI.V1.Factories
 {
@@ -62,6 +61,7 @@ namespace AddressesAPI.V1.Factories
                 PropertyStartDate = domain.PropertyStartDate,
                 PropertyEndDate = domain.PropertyEndDate,
                 PropertyChangeDate = domain.PropertyChangeDate,
+                ChildAddresses = domain.ChildAddresses?.ToResponse()
             };
         }
 
