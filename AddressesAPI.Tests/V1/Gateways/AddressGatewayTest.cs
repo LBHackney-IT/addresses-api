@@ -1181,6 +1181,43 @@ namespace AddressesAPI.Tests.V1.Gateways
             addresses.First().ChildAddresses.First().ChildAddresses.Count.Should().Be(1);
         }
 
+        [Test]
+        public void ItWillReturnRecordsWithoutParentUPRNWhenHierarchyIsRequestedButMatchingRecordsDontHaveAnyChildren()
+        {
+            var postcode = "E8 4TB";
+
+            // this could be standalone unit or a parent
+            var parentOne = new NationalAddress()
+            {
+                UPRN = 3,
+                ParentUPRN = null,
+                Postcode = postcode
+            };
+
+            var parentTwo = new NationalAddress()
+            {
+                UPRN = 4,
+                ParentUPRN = null,
+                Postcode = postcode
+            };
+
+            TestEfDataHelper.InsertAddress(DatabaseContext, request: parentOne);
+            TestEfDataHelper.InsertAddress(DatabaseContext, request: parentTwo);
+
+            var request = new SearchParameters()
+            {
+                Page = 1,
+                PageSize = 50,
+                Gazetteer = GlobalConstants.Gazetteer.Both,
+                Structure = GlobalConstants.Structure.Hierarchy,
+                Postcode = postcode
+            };
+
+            var (addresses, totalCount) = (_classUnderTest.SearchAddresses(request));
+            totalCount.Should().Be(2);
+            addresses.Any(x => x.ChildAddresses == null).Should().BeTrue();
+        }
+
         #region OrderDomainAddresses
 
         [Test]

@@ -91,7 +91,8 @@ namespace AddressesAPI.V1.Gateways
 
             foreach (var parent in distinctParents)
             {
-                var originalChildCount = parent.ChildAddresses.Count;
+                var originalChildCount = parent.ChildAddresses?.Count;
+
 
                 var getAllChildrenByParentUPRNQuery = new SearchParameters()
                 {
@@ -107,13 +108,16 @@ namespace AddressesAPI.V1.Gateways
                     ? a.ToSimpleDomain() : a.ToDomain())
                     .ToList();
 
-                parent.ChildAddresses
-                    .AddRange(formattedChildAddress
-                        .Where(child => !parent.ChildAddresses
-                            .Any(x => x.UPRN == child.UPRN)));
+                if (formattedChildAddress.Count > 0)
+                {
+                    parent.ChildAddresses
+                        .AddRange(formattedChildAddress
+                            .Where(child => !parent.ChildAddresses
+                                .Any(x => x.UPRN == child.UPRN)));
 
-                //increase total count by new child accounts count
-                totalCount += parent.ChildAddresses.Count - originalChildCount;
+                    //increase total count by new child accounts count
+                    totalCount += (int)(parent.ChildAddresses.Count - originalChildCount);
+                }
             }
 
             //order parents again to ensure parents added to the initial result set appear in the correct position
@@ -122,7 +126,10 @@ namespace AddressesAPI.V1.Gateways
             //order child records to ensure they are in the correct order within the parent
             foreach (var parentAddress in hierarchyWithAllParents)
             {
-                parentAddress.ChildAddresses = OrderDomainAddresses(parentAddress.ChildAddresses);
+                if (parentAddress.ChildAddresses != null)
+                {
+                    parentAddress.ChildAddresses = OrderDomainAddresses(parentAddress.ChildAddresses);
+                }
             }
 
             return (orderedByparentsHierarchy, totalCount);
