@@ -78,6 +78,9 @@ module "postgres_db_staging" {
   multi_az             = false //only true if production deployment
   publicly_accessible  = false
   project_name         = "platform apis"
+  additional_tags      = {
+    BackupPolicy = "Prod"
+  }
 }
 
 /*    ELASTICSEARCH SETUP    */
