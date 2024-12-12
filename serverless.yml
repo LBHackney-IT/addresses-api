@@ -13,6 +13,8 @@ functions:
     name: ${self:service}-${self:provider.stage}
     handler: AddressesAPI::AddressesAPI.LambdaEntryPoint::FunctionHandlerAsync
     role: lambdaExecutionRole
+    timeout: 300
+    memorySize: 2048
     package:
       artifact: ./AddressesAPI/bin/release/net6.0/addresses-api.zip
     environment:
