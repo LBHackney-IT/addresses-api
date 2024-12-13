@@ -83,42 +83,44 @@ namespace AddressesAPI.V1.Gateways
             //build initial hierarchy based on parents
             var hierarchyWithAllParents = BuildHierarchyForParent(null, addresses);
 
+            //// DISABLED UNTIL WE HAVE OPTIMISED THE TABLES FOR PARENT UPRN QUERIES ////
             //ensure we are not missing children from the results set
             //this is typically when a child address is outside the parent's post code
-            var distinctParents = hierarchyWithAllParents
-                .Where(x => x.ParentUPRN == null)
-                .Select(a => a).Distinct();
 
-            foreach (var parent in distinctParents)
-            {
-                var originalChildCount = parent.ChildAddresses?.Count;
+            //var distinctParents = hierarchyWithAllParents
+            //    .Where(x => x.ParentUPRN == null)
+            //    .Select(a => a).Distinct();
+
+            //foreach (var parent in distinctParents)
+            //{
+            //    var originalChildCount = parent.ChildAddresses?.Count;
 
 
-                var getAllChildrenByParentUPRNQuery = new SearchParameters()
-                {
-                    Format = originalRequest.Format,
-                    Gazetteer = originalRequest.Gazetteer,
-                    ParentUprn = parent.UPRN,
-                };
+            //    var getAllChildrenByParentUPRNQuery = new SearchParameters()
+            //    {
+            //        Format = originalRequest.Format,
+            //        Gazetteer = originalRequest.Gazetteer,
+            //        ParentUprn = parent.UPRN,
+            //    };
 
-                var baseQuery = CompileBaseSearchQuery(getAllChildrenByParentUPRNQuery);
+            //    var baseQuery = CompileBaseSearchQuery(getAllChildrenByParentUPRNQuery).ToList();
 
-                var formattedChildAddress = baseQuery.Select(
-                    a => getAllChildrenByParentUPRNQuery.Format == GlobalConstants.Format.Simple
-                    ? a.ToSimpleDomain() : a.ToDomain())
-                    .ToList();
+            //    var formattedChildAddress = baseQuery.Select(
+            //        a => getAllChildrenByParentUPRNQuery.Format == GlobalConstants.Format.Simple
+            //        ? a.ToSimpleDomain() : a.ToDomain())
+            //        .ToList();
 
-                if (formattedChildAddress.Count > 0)
-                {
-                    parent.ChildAddresses
-                        .AddRange(formattedChildAddress
-                            .Where(child => !parent.ChildAddresses
-                                .Any(x => x.UPRN == child.UPRN)));
+            //    if (formattedChildAddress.Count > 0)
+            //    {
+            //        parent.ChildAddresses
+            //            .AddRange(formattedChildAddress
+            //                .Where(child => !parent.ChildAddresses
+            //                    .Any(x => x.UPRN == child.UPRN)));
 
-                    //increase total count by new child accounts count
-                    totalCount += (int)(parent.ChildAddresses.Count - originalChildCount);
-                }
-            }
+            //        //increase total count by new child accounts count
+            //        totalCount += (int)(parent.ChildAddresses.Count - originalChildCount);
+            //    }
+            //}
 
             //order parents again to ensure parents added to the initial result set appear in the correct position
             var orderedByparentsHierarchy = OrderDomainAddresses(hierarchyWithAllParents);
@@ -210,7 +212,8 @@ namespace AddressesAPI.V1.Gateways
                             EF.Functions.ILike(a.Street.Replace(" ", ""), streetSearchTerm))
                 .Where(a => addressStatusSearchTerms == null || addressStatusSearchTerms.Contains(a.AddressStatus.ToLower()))
                 .Where(a => request.Uprn == null || a.UPRN == request.Uprn)
-                .Where(a => request.ParentUprn == null || a.ParentUPRN == request.ParentUprn)
+                //// DISABLED UNTIL WE HAVE OPTIMISED THE TABLES FOR PARENT UPRN QUERIES ////
+                //.Where(a => request.ParentUprn == null || a.ParentUPRN == request.ParentUprn)
                 .Where(a => request.Usrn == null
                             || a.USRN == request.Usrn)
                 .Where(a => (usageSearchTerms == null || !usageSearchTerms.Any())
