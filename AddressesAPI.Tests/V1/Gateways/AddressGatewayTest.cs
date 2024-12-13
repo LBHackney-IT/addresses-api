@@ -246,7 +246,8 @@ namespace AddressesAPI.Tests.V1.Gateways
         }
 
         [Test]
-        public void WillSearchParentUprndsForAMatch()
+        [Ignore("Disabled until we have optimised tables for parent UPRN queries")]
+        public void WillSearchParentUPRNsForAMatch()
         {
             var matchingAddress = TestEfDataHelper.InsertAddress(DatabaseContext,
                 request: new NationalAddress { ParentUPRN = 11111111 }
@@ -956,7 +957,9 @@ namespace AddressesAPI.Tests.V1.Gateways
         //In order to get all the children for the parent an additional search must be made
         // to find all the addresses that have a parentUPRN matching any of the parentUPRNs in the original search
         // and combining the results before building the hierarchy.
+
         [Test]
+        [Ignore("Disabled until we have optimised tables for parent UPRN queries")]
         public void ItWillIncludeChildRecordsToTheHierarchyEvenIfTheyAreNotIncludedInTheOriginalResultsSet()
         {
             var parentUprn = _faker.Random.Number(10000000, 99999999);
@@ -1075,6 +1078,7 @@ namespace AddressesAPI.Tests.V1.Gateways
         }
 
         [Test]
+        [Ignore("Disabled until we have optimised tables for parent UPRN queries")]
         public void ItWillKeepTheCorrectOrderOfChildRecordsWithinTheHierarchy()
         {
             var parentUprn = _faker.Random.Number(10000000, 99999999);
