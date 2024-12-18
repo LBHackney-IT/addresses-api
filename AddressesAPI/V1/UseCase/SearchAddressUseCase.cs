@@ -33,11 +33,12 @@ namespace AddressesAPI.V1.UseCase
 
             if (results == null)
                 return new SearchAddressResponse();
+
             var useCaseResponse = new SearchAddressResponse
             {
                 Addresses = results.ToResponse(),
                 TotalCount = totalCount,
-                PageCount = totalCount.CalculatePageCount(request.PageSize)
+                PageCount = searchParameters.Structure == GlobalConstants.Structure.Hierarchy ? 1 : totalCount.CalculatePageCount(request.PageSize)
             };
 
             return useCaseResponse;

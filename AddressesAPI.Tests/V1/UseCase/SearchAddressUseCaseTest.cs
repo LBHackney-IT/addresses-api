@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using AddressesAPI.Tests.V1.Helper;
 using AddressesAPI.V1;
 using AddressesAPI.V1.Boundary.Requests;
@@ -14,6 +12,8 @@ using FluentAssertions;
 using FluentValidation.Results;
 using Moq;
 using NUnit.Framework;
+using System;
+using System.Collections.Generic;
 
 namespace AddressesAPI.Tests.V1.UseCase
 {
@@ -195,6 +195,26 @@ namespace AddressesAPI.Tests.V1.UseCase
             result.Setup(x => x.IsValid).Returns(valid);
             _fakeValidator.Setup(x => x.Validate(It.IsAny<SearchAddressRequest>()))
                 .Returns(result.Object);
+        }
+
+        [Test]
+        public void GivenHierarchyAsStructure_WhenExecuteAsync_ReturnsPageCountOneRegardlessOfTotalCount()
+        {
+            SetupValidatorToReturnValid();
+
+            var request = new SearchAddressRequest
+            {
+                Structure = GlobalConstants.Structure.Hierarchy.ToString()
+            };
+
+            var addresses = new List<Address> { };
+
+            //total count set to 1000 which normally results in 20 pages by default
+            _fakeGateway.Setup(s => s.SearchAddresses(It.IsAny<SearchParameters>())).Returns((addresses, 1000));
+
+            var response = _classUnderTest.ExecuteAsync(request);
+
+            response.PageCount.Should().Be(1);
         }
     }
 }
