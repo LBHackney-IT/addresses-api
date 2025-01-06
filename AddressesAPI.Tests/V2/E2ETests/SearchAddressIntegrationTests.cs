@@ -1,7 +1,3 @@
-using System;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
 using AddressesAPI.Infrastructure;
 using AddressesAPI.Tests.V2.Helper;
 using AddressesAPI.V2.Boundary.Responses.Data;
@@ -10,6 +6,10 @@ using AutoFixture;
 using Bogus;
 using FluentAssertions;
 using NUnit.Framework;
+using System;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace AddressesAPI.Tests.V2.E2ETests
 {
@@ -77,13 +77,13 @@ namespace AddressesAPI.Tests.V2.E2ETests
             var queryParameters = new NationalAddress
             {
                 USRN = _faker.Random.Int(),
-                AddressStatus = "Historical"
+                AddressStatus = "Historic"
             };
             await TestDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, addressKey, queryParameters)
                 .ConfigureAwait(true);
             await AddSomeRandomAddressToTheDatabase().ConfigureAwait(true);
 
-            var queryString = $"USRN={queryParameters.USRN}&address_status=Historical&Format=Detailed&address_scope=national";
+            var queryString = $"USRN={queryParameters.USRN}&address_status=Historic&Format=Detailed&address_scope=national";
 
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);
@@ -165,12 +165,12 @@ namespace AddressesAPI.Tests.V2.E2ETests
                 Line4 = _faker.Address.Country(),
                 Town = _faker.Address.City(),
                 Postcode = "E41JJ",
-                AddressStatus = "Historical"
+                AddressStatus = "Historic"
             };
             await TestDataHelper.InsertAddressInDbAndEs(DatabaseContext, ElasticsearchClient, addressKey, addressDetails)
                 .ConfigureAwait(true);
             await AddSomeRandomAddressToTheDatabase().ConfigureAwait(true);
-            var queryString = $"uprn={addressDetails.UPRN}&address_status=Historical&format=Simple&address_scope=national";
+            var queryString = $"uprn={addressDetails.UPRN}&address_status=Historic&format=Simple&address_scope=national";
 
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);

@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AddressesAPI.V2;
 using AddressesAPI.V2.Boundary.Requests;
 using AddressesAPI.V2.Boundary.Responses;
@@ -16,6 +12,10 @@ using Bogus;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using ValidationResult = FluentValidation.Results.ValidationResult;
 
 namespace AddressesAPI.Tests.V2.UseCase
@@ -109,7 +109,7 @@ namespace AddressesAPI.Tests.V2.UseCase
             _addressGateway.Verify();
         }
 
-        [TestCase("approved,historical", new[] { "approved", "historical" })]
+        [TestCase("approved,historic", new[] { "approved", "historic" })]
         [TestCase("provisional", new[] { "provisional" })]
         public void ExecuteAsync_CorrectlyConvertsAddressStatusIntoAList(string addressQuery, IEnumerable<string> expectedList)
         {

@@ -93,7 +93,7 @@ namespace AddressesAPI.V1.Boundary.Requests
         /// Allows switch between address statuses:
         /// Alternative,
         /// Approved Preferred (Default),
-        /// Historical,
+        /// Historic,
         /// Provisional
         /// </summary>
         public string AddressStatus { get; set; }

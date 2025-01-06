@@ -1,4 +1,3 @@
-using System;
 using AddressesAPI.Tests.V2.Helper;
 using AddressesAPI.V2.Boundary.Requests;
 using AddressesAPI.V2.Boundary.Responses;
@@ -11,6 +10,7 @@ using FluentAssertions;
 using FluentValidation.Results;
 using Moq;
 using NUnit.Framework;
+using System;
 
 namespace AddressesAPI.Tests.V2.UseCase
 {
@@ -82,7 +82,7 @@ namespace AddressesAPI.Tests.V2.UseCase
                 UPRN = 10024389298,
                 USRN = 21320239,
                 ParentUPRN = 10024389282,
-                AddressStatus = "Historical",
+                AddressStatus = "Historic",
                 UnitName = "FLAT 16",
                 UnitNumber = "",
                 BuildingName = "HAZELNUT COURT",

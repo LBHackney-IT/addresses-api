@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 namespace AddressesAPI.V2.Boundary.Requests
 {
@@ -83,7 +83,7 @@ namespace AddressesAPI.V2.Boundary.Requests
         /// Allows switch between address statuses:
         /// Alternative,
         /// Approved (Default),
-        /// Historical,
+        /// Historic,
         /// Provisional
         /// </summary>
         [FromQuery(Name = "address_status")]

@@ -76,12 +76,12 @@ namespace AddressesAPI.Tests.V1.E2ETests
             var queryParameters = new NationalAddress
             {
                 USRN = _faker.Random.Int(),
-                AddressStatus = "Historical"
+                AddressStatus = "Historic"
             };
             TestEfDataHelper.InsertAddress(DatabaseContext, addressKey, queryParameters);
             AddSomeRandomAddressToTheDatabase();
 
-            var queryString = $"USRN={queryParameters.USRN}&AddressStatus=Historical&Format=Detailed";
+            var queryString = $"USRN={queryParameters.USRN}&AddressStatus=Historic&Format=Detailed";
 
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);
@@ -104,11 +104,11 @@ namespace AddressesAPI.Tests.V1.E2ETests
                 Line4 = _faker.Address.Country(),
                 Town = _faker.Address.City(),
                 Postcode = "E41JJ",
-                AddressStatus = "Historical"
+                AddressStatus = "Historic"
             };
             TestEfDataHelper.InsertAddress(DatabaseContext, addressKey, addressDetails);
             AddSomeRandomAddressToTheDatabase();
-            var queryString = $"UPRN={addressDetails.UPRN}&AddressStatus=Historical&Format=Simple";
+            var queryString = $"UPRN={addressDetails.UPRN}&AddressStatus=Historic&Format=Simple";
 
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
             response.StatusCode.Should().Be(200);

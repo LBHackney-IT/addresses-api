@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AddressesAPI.Infrastructure;
 using AddressesAPI.Tests.V2.Helper;
 using AddressesAPI.V2;
@@ -9,8 +5,11 @@ using AddressesAPI.V2.Domain;
 using AddressesAPI.V2.Gateways;
 using Bogus;
 using FluentAssertions;
-using Nest;
 using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace AddressesAPI.Tests.V2.Gateways
 {
@@ -284,13 +283,13 @@ namespace AddressesAPI.Tests.V2.Gateways
         [TestCase("Alternative", new[] { "Alternative" })]
         [TestCase("Approved", new[] { "Approved" })]
         [TestCase("Approved Preferred", new[] { "Approved" })]
-        [TestCase("Historical", new[] { "Historical" })]
+        [TestCase("Historic", new[] { "Historic" })]
         [TestCase("Provisional", new[] { "Provisional" })]
         [TestCase("Alternative", new[] { "Alternative", "Approved" })]
         [TestCase("alternative", new[] { "Alternative", "Approved" })]
-        [TestCase("Historical", new[] { "Alternative", "Approved", "Historical" })]
-        [TestCase("Provisional", new[] { "Historical", "Provisional" })]
-        [TestCase("Provisional", new[] { "Historical", "provisional" })]
+        [TestCase("Historic", new[] { "Alternative", "Approved", "Historic" })]
+        [TestCase("Provisional", new[] { "Historic", "Provisional" })]
+        [TestCase("Provisional", new[] { "Historic", "provisional" })]
         public async Task WillSearchForAddressesWithStatus(string savedStatus, IEnumerable<string> statusSearchTerm)
         {
             var savedAddress = await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
@@ -320,7 +319,7 @@ namespace AddressesAPI.Tests.V2.Gateways
             var savedAddress = await TestDataHelper.InsertAddressInEs(ElasticsearchClient).ConfigureAwait(true);
 
             await TestDataHelper.InsertAddressInEs(ElasticsearchClient,
-                addressConfig: new QueryableAddress { AddressStatus = "Historical" }).ConfigureAwait(true);
+                addressConfig: new QueryableAddress { AddressStatus = "Historic" }).ConfigureAwait(true);
             var request = new SearchParameters
             {
                 Page = 1,
