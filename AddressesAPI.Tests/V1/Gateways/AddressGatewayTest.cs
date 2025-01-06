@@ -894,7 +894,6 @@ namespace AddressesAPI.Tests.V1.Gateways
             _ = addresses.First().ChildAddresses.All(x => x.ChildAddresses == null);
             _ = addresses.First().ChildAddresses.All(x => x.ParentUPRN == parentAddress.UPRN);
         }
-        //TODO: test multiple levels
 
         [Test]
         public void ItWillIncludeParentRecordsToTheHierarchyEvenIfTheyAreNotIncludedInTheOriginalResultsSet()
@@ -1015,7 +1014,8 @@ namespace AddressesAPI.Tests.V1.Gateways
             var parentUprnOne = _faker.Random.Number(10000000, 99999999);
             var parentUprnTwo = _faker.Random.Number(10000000, 99999999);
 
-            var town = "Test town";
+            var townOne = "Test town a";
+            var townTwo = "Test town b";
 
             //non matching postcode ensures this gets addedd to the results set as a missing parent after initial ordering
             //adding records later will break the order in most cases and not handling it would make the final order of parents unpredictable
@@ -1024,7 +1024,7 @@ namespace AddressesAPI.Tests.V1.Gateways
                 UPRN = parentUprnOne,
                 ParentUPRN = null,
                 Postcode = "AB 1CD",
-                Town = town,
+                Town = townOne,
             };
 
             var childAddressOne = new NationalAddress()
@@ -1032,7 +1032,7 @@ namespace AddressesAPI.Tests.V1.Gateways
                 UPRN = _faker.Random.Number(10000000, 99999999),
                 ParentUPRN = parentUprnOne,
                 Postcode = "E8 4TX9",
-                Town = town,
+                Town = townOne,
             };
 
             var parentAddressTwo = new NationalAddress()
@@ -1040,7 +1040,7 @@ namespace AddressesAPI.Tests.V1.Gateways
                 UPRN = parentUprnTwo,
                 ParentUPRN = null,
                 Postcode = "E8 4TX3",
-                Town = town,
+                Town = townTwo,
             };
 
             var childAddressTwo = new NationalAddress()
@@ -1048,7 +1048,7 @@ namespace AddressesAPI.Tests.V1.Gateways
                 UPRN = _faker.Random.Number(10000000, 99999999),
                 ParentUPRN = parentUprnTwo,
                 Postcode = "E8 4TX3",
-                Town = town,
+                Town = townTwo,
             };
 
             TestEfDataHelper.InsertAddress(DatabaseContext, request: parentAddressOne);
@@ -1087,7 +1087,7 @@ namespace AddressesAPI.Tests.V1.Gateways
                 UPRN = parentUprn,
                 ParentUPRN = null,
                 Postcode = "E8 4TX9",
-                Town = town,
+                Town = town
             };
 
             var childAddressOne = new NationalAddress()
@@ -1096,6 +1096,7 @@ namespace AddressesAPI.Tests.V1.Gateways
                 ParentUPRN = parentAddress.UPRN,
                 Postcode = parentAddress.Postcode,
                 Town = town,
+                Line1 = "Child address B"
             };
 
             //child address with the same parent uprn, but with different postode.
@@ -1107,6 +1108,7 @@ namespace AddressesAPI.Tests.V1.Gateways
                 ParentUPRN = parentAddress.UPRN,
                 Postcode = "AB 1CD",
                 Town = town,
+                Line1 = "Child address A"
             };
 
             TestEfDataHelper.InsertAddress(DatabaseContext, request: parentAddress);
@@ -1235,7 +1237,7 @@ namespace AddressesAPI.Tests.V1.Gateways
                 addressThree
             };
 
-            var results = _classUnderTest.OrderDomainAddresses(addresses);
+            var results = _classUnderTest.OrderDomainAddressesForHierarchy(addresses);
             results.ElementAt(0).Should().Be(addressThree);
             results.ElementAt(1).Should().Be(addressTwo);
             results.ElementAt(2).Should().Be(addressOne);
@@ -1243,184 +1245,31 @@ namespace AddressesAPI.Tests.V1.Gateways
         }
 
         [Test]
-        public void OrderDomainAddressesWillSecondlyOrderByPostCodePresense()
+        public void OrderDomainAddressesWillSecondlyOrderByLine1()
         {
-            var addressOne = new Address() { Town = "town a" };
-            var addressTwo = new Address() { Town = "town a", Postcode = "A1 2B" };
-            var addressThree = new Address() { Town = "town a" };
+            var addressOne = new Address() { Town = "towan a", Line1 = "Flat 19", UnitNumber = "19" };
+            var addressTwo = new Address() { Town = "towan a", Line1 = "Flat 2", UnitNumber = "2" };
+            var addressThree = new Address() { Town = "towan a", Line1 = "Flat 20", UnitNumber = "20" };
+            var addressFour = new Address() { Town = "towan a", Line1 = "Flat 2b", UnitNumber = "2b" };
+            var addressFive = new Address() { Town = "towan a", Line1 = "Flat 2a", UnitNumber = "2a" };
 
             var addresses = new List<Address>()
             {
                 addressOne,
                 addressTwo,
-                addressThree
+                addressThree,
+                addressFour,
+                addressFive
             };
 
-            var results = _classUnderTest.OrderDomainAddresses(addresses);
+            var results = _classUnderTest.OrderDomainAddressesForHierarchy(addresses);
             results.ElementAt(0).Should().Be(addressTwo);
-            results.ElementAt(1).Should().Be(addressOne);
-            results.ElementAt(2).Should().Be(addressThree);
+            results.ElementAt(1).Should().Be(addressFive);
+            results.ElementAt(2).Should().Be(addressFour);
+            results.ElementAt(3).Should().Be(addressOne);
+            results.ElementAt(4).Should().Be(addressThree);
         }
 
-        [Test]
-        public void OrderDomainAddressesWillThirdlyOrderBypostcode()
-        {
-            var addressOne = new Address() { Town = "town a", Street = "street a", Postcode = "C3 1A" };
-            var addressTwo = new Address() { Town = "town a", Street = "street a", Postcode = "B2 3C" };
-            var addressThree = new Address() { Town = "town a", Street = "street a", Postcode = "A1 2B" };
-
-            var addresses = new List<Address>()
-            {
-                addressOne,
-                addressTwo,
-                addressThree
-            };
-
-            var results = _classUnderTest.OrderDomainAddresses(addresses);
-            results.ElementAt(0).Should().Be(addressThree);
-            results.ElementAt(1).Should().Be(addressTwo);
-            results.ElementAt(2).Should().Be(addressOne);
-        }
-
-        [Test]
-        public void OrderDomainAddressesWillFourthlyOrderByStreet()
-        {
-            var addressOne = new Address() { Town = "town a", Street = "street c" };
-            var addressTwo = new Address() { Town = "town a", Street = "street b" };
-            var addressThree = new Address() { Town = "town a", Street = "street a" };
-
-            var addresses = new List<Address>()
-            {
-                addressOne,
-                addressTwo,
-                addressThree
-            };
-
-            var results = _classUnderTest.OrderDomainAddresses(addresses);
-            results.ElementAt(0).Should().Be(addressThree);
-            results.ElementAt(1).Should().Be(addressTwo);
-            results.ElementAt(2).Should().Be(addressOne);
-        }
-
-        [Test]
-        public void OrderDomainAddressesWillFifthlyOrderByPresenceOfBuildingNumber()
-        {
-            var addressOne = new Address() { Town = "town a", Postcode = "A1", Street = "street a", BuildingNumber = "1" };
-            var addressTwo = new Address() { Town = "town a", Postcode = "A1", Street = "street a", };
-            var addressThree = new Address() { Town = "town a", Postcode = "A1", Street = "street a", BuildingNumber = "2" };
-
-            var addresses = new List<Address>()
-            {
-                addressOne,
-                addressTwo,
-                addressThree
-            };
-
-            var results = _classUnderTest.OrderDomainAddresses(addresses);
-            results.ElementAt(0).Should().Be(addressOne);
-            results.ElementAt(1).Should().Be(addressThree);
-            results.ElementAt(2).Should().Be(addressTwo);
-        }
-
-        [Test]
-        public void OrderDomainAddressesWillSixthlyOrderByBuildingNumber()
-        {
-            var addressOne = new Address() { Town = "town a", Street = "street a", BuildingNumber = "2" };
-            var addressTwo = new Address() { Town = "town a", Street = "street a", BuildingNumber = "3" };
-            var addressThree = new Address() { Town = "town a", Street = "street a", BuildingNumber = "1" };
-
-            var addresses = new List<Address>()
-            {
-                addressOne,
-                addressTwo,
-                addressThree
-            };
-
-            var results = _classUnderTest.OrderDomainAddresses(addresses);
-            results.ElementAt(0).Should().Be(addressThree);
-            results.ElementAt(1).Should().Be(addressOne);
-            results.ElementAt(2).Should().Be(addressTwo);
-        }
-
-        [Test]
-        public void OrderDomainAddressesWillSeventhlyOrderByZeroUnitNumber()
-        {
-            var addressOne = new Address() { Town = "town a", Street = "street a", UnitNumber = "0" };
-            var addressTwo = new Address() { Town = "town a", Street = "street a", UnitNumber = "3" };
-            var addressThree = new Address() { Town = "town a", Street = "street a", UnitNumber = "1" };
-
-            var addresses = new List<Address>()
-            {
-                addressOne,
-                addressTwo,
-                addressThree
-            };
-
-            var results = _classUnderTest.OrderDomainAddresses(addresses);
-            results.ElementAt(0).Should().Be(addressThree);
-            results.ElementAt(1).Should().Be(addressTwo);
-            results.ElementAt(2).Should().Be(addressOne);
-        }
-
-        [Test]
-        public void OrderDomainAddressesWillEightlyOrderByUnitNumber()
-        {
-            var addressOne = new Address() { Town = "town a", Street = "street a", UnitNumber = "0" };
-            var addressTwo = new Address() { Town = "town a", Street = "street a", UnitNumber = "3" };
-            var addressThree = new Address() { Town = "town a", Street = "street a", UnitNumber = "1" };
-
-            var addresses = new List<Address>()
-            {
-                addressOne,
-                addressTwo,
-                addressThree
-            };
-
-            var results = _classUnderTest.OrderDomainAddresses(addresses);
-            results.ElementAt(0).Should().Be(addressThree);
-            results.ElementAt(1).Should().Be(addressTwo);
-            results.ElementAt(2).Should().Be(addressOne);
-        }
-
-        [Test]
-        public void OrderDomainAddressesWillNinthlyOrderByPresenseOfUnitName()
-        {
-            var addressOne = new Address() { Town = "town a", Street = "street a", };
-            var addressTwo = new Address() { Town = "town a", Street = "street a", UnitName = "name a" };
-            var addressThree = new Address() { Town = "town a", Street = "street a", UnitName = "name a" };
-
-            var addresses = new List<Address>()
-            {
-                addressOne,
-                addressTwo,
-                addressThree
-            };
-
-            var results = _classUnderTest.OrderDomainAddresses(addresses);
-            results.ElementAt(0).Should().Be(addressTwo);
-            results.ElementAt(1).Should().Be(addressThree);
-            results.ElementAt(2).Should().Be(addressOne);
-        }
-
-        [Test]
-        public void OrderDomainAddressesWillTenthlylyOrderByUnitName()
-        {
-            var addressOne = new Address() { Town = "town a", Street = "street a", };
-            var addressTwo = new Address() { Town = "town a", Street = "street a", UnitName = "name b" };
-            var addressThree = new Address() { Town = "town a", Street = "street a", UnitName = "name a" };
-
-            var addresses = new List<Address>()
-            {
-                addressOne,
-                addressTwo,
-                addressThree
-            };
-
-            var results = _classUnderTest.OrderDomainAddresses(addresses);
-            results.ElementAt(0).Should().Be(addressThree);
-            results.ElementAt(1).Should().Be(addressTwo);
-            results.ElementAt(2).Should().Be(addressOne);
-        }
         #endregion
         #endregion
     }
