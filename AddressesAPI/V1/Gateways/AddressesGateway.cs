@@ -2,6 +2,7 @@ using AddressesAPI.Infrastructure;
 using AddressesAPI.V1.Domain;
 using AddressesAPI.V1.Factories;
 using Microsoft.EntityFrameworkCore;
+using NaturalSort.Extension;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -85,7 +86,6 @@ namespace AddressesAPI.V1.Gateways
 
             //ensure we are not missing children from the results set
             //this is typically when a child address is outside the parent's post code
-
             var distinctParents = hierarchyWithAllParents
                 .Where(x => x.ParentUPRN == null)
                 .Select(a => a).Distinct();
@@ -93,7 +93,6 @@ namespace AddressesAPI.V1.Gateways
             foreach (var parent in distinctParents)
             {
                 var originalChildCount = parent.ChildAddresses?.Count;
-
 
                 var getAllChildrenByParentUPRNQuery = new SearchParameters()
                 {
@@ -121,16 +120,13 @@ namespace AddressesAPI.V1.Gateways
                 }
             }
 
-            //order parents again to ensure parents added to the initial result set appear in the correct position
-            var orderedByparentsHierarchy = OrderDomainAddresses(hierarchyWithAllParents);
+            //order parents
+            var orderedByparentsHierarchy = OrderDomainAddressesForHierarchy(hierarchyWithAllParents);
 
             //order child records to ensure they are in the correct order within the parent
-            foreach (var parentAddress in hierarchyWithAllParents)
+            foreach (var parentAddress in hierarchyWithAllParents.Where(parentAddress => parentAddress.ChildAddresses != null))
             {
-                if (parentAddress.ChildAddresses != null)
-                {
-                    parentAddress.ChildAddresses = OrderDomainAddresses(parentAddress.ChildAddresses);
-                }
+                parentAddress.ChildAddresses = OrderDomainAddressesForHierarchy(parentAddress.ChildAddresses);
             }
 
             return (orderedByparentsHierarchy, totalCount);
@@ -176,20 +172,11 @@ namespace AddressesAPI.V1.Gateways
                 .ThenBy(a => a.UnitName);
         }
 
-        //infrastructure properties not availabe in domain object removed
-        public List<Address> OrderDomainAddresses(List<Address> addresses)
+        public List<Address> OrderDomainAddressesForHierarchy(List<Address> addresses)
         {
             return addresses
                 .OrderBy(a => a.Town)
-                .ThenBy(a => a.Postcode == null)
-                .ThenBy(a => a.Postcode)
-                .ThenBy(a => a.Street)
-                .ThenBy(a => a.BuildingNumber == null)
-                .ThenBy(a => a.BuildingNumber)
-                .ThenBy(a => a.UnitNumber == "0")
-                .ThenBy(a => a.UnitNumber)
-                .ThenBy(a => a.UnitName == null)
-                .ThenBy(a => a.UnitName)
+                    .ThenBy(a => a.Line1, StringComparison.OrdinalIgnoreCase.WithNaturalSort())
                 .ToList();
         }
 
