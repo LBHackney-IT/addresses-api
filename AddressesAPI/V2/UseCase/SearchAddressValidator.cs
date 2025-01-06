@@ -1,11 +1,11 @@
+using AddressesAPI.V2.Boundary.Requests;
+using AddressesAPI.V2.UseCase.Interfaces;
+using FluentValidation;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
-using AddressesAPI.V2.Boundary.Requests;
-using AddressesAPI.V2.UseCase.Interfaces;
-using FluentValidation;
 
 namespace AddressesAPI.V2.UseCase
 {
@@ -116,7 +116,7 @@ namespace AddressesAPI.V2.UseCase
 
         private static bool CanBeAnyCombinationOfAllowedAddressStatuses(string addressStatus)
         {
-            var allowedValues = new List<string> { "historical", "alternative", "approved", "provisional" };
+            var allowedValues = new List<string> { "historic", "alternative", "approved", "provisional" };
             if (string.IsNullOrEmpty(addressStatus))
             {
                 return false;

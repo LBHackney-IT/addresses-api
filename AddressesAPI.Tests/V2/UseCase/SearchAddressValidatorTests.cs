@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using AddressesAPI.V2;
 using AddressesAPI.V2.Boundary.Requests;
 using AddressesAPI.V2.UseCase;
@@ -6,6 +5,7 @@ using Bogus;
 using FluentAssertions;
 using FluentValidation.TestHelper;
 using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace AddressesAPI.Tests.V2.UseCase
 {
@@ -36,8 +36,8 @@ namespace AddressesAPI.Tests.V2.UseCase
         }
 
         [TestCase("alternative")]
-        [TestCase("historical")]
-        [TestCase("approved,historical")]
+        [TestCase("historic")]
+        [TestCase("approved,historic")]
         public void GivenAnAllowedAddressStatusValue_WhenCallingValidation_ItReturnsNoErrors(string addressStatusVal)
         {
             var request = new SearchAddressRequest { AddressStatus = addressStatusVal };
