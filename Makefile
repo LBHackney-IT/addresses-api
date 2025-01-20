@@ -1,22 +1,22 @@
 .PHONY: setup
 setup:
-	docker-compose build
+	docker compose build
 
 .PHONY: build
 build:
-	docker-compose build addresses-api
+	docker compose build addresses-api
 
 .PHONY: serve
 serve:
-	docker-compose build addresses-api && docker-compose up addresses-api
+	docker compose build addresses-api && docker compose up addresses-api
 
 .PHONY: shell
 shell:
-	docker-compose run addresses-api bash
+	docker compose run addresses-api bash
 
 .PHONY: test
 test:
-	docker-compose build addresses-api-test && docker-compose up -d test-elasticsearch && docker-compose up addresses-api-test
+	docker compose build addresses-api-test && docker compose up -d test-elasticsearch && docker compose up addresses-api-test
 
 .PHONY: migrate-dev-database
 migrate-dev-database:
@@ -43,7 +43,7 @@ restart-db:
 	docker stop $$(docker ps -q --filter name=test-database -a)
 	-docker rm $$(docker ps -q --filter name=test-database -a)
 	docker rmi test-database
-	docker-compose up -d test-database
+	docker compose up -d test-database
 
 .PHONY: remove-es-data
 remove-es-data:

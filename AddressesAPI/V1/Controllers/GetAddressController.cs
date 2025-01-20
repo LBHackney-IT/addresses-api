@@ -41,9 +41,9 @@ namespace AddressesAPI.V1.Controllers
         [HttpOptions]
         public IActionResult Options()
         {
-            Response.Headers.Add("Access-Control-Allow-Methods", "GET,OPTIONS");
-            Response.Headers.Add("Access-Control-Origin", "*");
-            Response.Headers.Add("Access-Control-Allow-Headers", "*");
+            Response.Headers.AccessControlAllowMethods = "GET,OPTIONS";
+            Response.Headers.AccessControlAllowOrigin = "*";
+            Response.Headers.AccessControlAllowHeaders = "*";
             return HandleResponse("OK");
         }
     }
