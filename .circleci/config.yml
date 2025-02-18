@@ -255,6 +255,7 @@ workflows:
           requires:
             - assume-role-development
       - deploy-to-development:
+          context: "Serverless Framework"
           requires:
             - assume-role-development
   check-and-deploy-staging-and-production:
@@ -294,6 +295,7 @@ workflows:
       #       branches:
       #         only: master
       - deploy-to-staging:
+          context: "Serverless Framework"
           requires:
             - assume-role-staging
           filters:
@@ -341,6 +343,7 @@ workflows:
             branches:
               only: master
       - deploy-to-production:
+          context: "Serverless Framework"
           requires:
             - permit-production-release
             - assume-role-production
