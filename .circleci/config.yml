@@ -8,7 +8,7 @@ orbs:
 executors:
   docker-python:
     docker:
-      - image: circleci/python:3.7
+      - image: cimg/python:3.7
   docker-terraform:
     docker:
       - image: "hashicorp/terraform:light"
@@ -90,7 +90,7 @@ commands:
       - run:
           name: Install Node.js
           command: |
-            curl -sL https://deb.nodesource.com/setup_14.x | bash -
+            curl -sL https://deb.nodesource.com/setup_20.x | bash -
             apt-get update && apt-get install -y nodejs
       - run:
           name: Install serverless CLI
@@ -217,7 +217,7 @@ jobs:
       - terraform-init-then-apply:
           environment: "production"
   deploy-to-development:
-    executor: docker-python
+    executor: docker-dotnet
     steps:
       - deploy-lambda:
           stage: "development"
