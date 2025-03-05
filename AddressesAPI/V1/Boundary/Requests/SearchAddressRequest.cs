@@ -60,6 +60,11 @@ namespace AddressesAPI.V1.Boundary.Requests
         public long? UPRN { get; set; }
 
         /// <summary>
+        /// Filter by parent UPRN
+        /// </summary>
+        public long? ParentUPRN { get; set; }
+
+        /// <summary>
         /// Filter by USRN (unique street reference number - uniquely identifies streets)
         /// </summary>
         public int? USRN { get; set; }

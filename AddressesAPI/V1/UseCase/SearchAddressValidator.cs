@@ -35,11 +35,11 @@ namespace AddressesAPI.V1.UseCase
 
             RuleFor(r => r)
                 .Must(CheckForAtLeastOneMandatoryFilterPropertyWithGazetteerLocal)
-                .WithMessage("You must provide at least one of (uprn, usrn, postcode, street, usagePrimary, usageCode), when gazeteer is 'local'.");
+                .WithMessage("You must provide at least one of (uprn, parentUprn, usrn, postcode, street, usagePrimary, usageCode), when gazeteer is 'local'.");
 
             RuleFor(r => r)
                 .Must(CheckForAtLeastOneMandatoryFilterPropertyWithGazetteerBoth)
-                .WithMessage("You must provide at least one of (uprn, usrn, postcode), when gazetteer is 'both'.");
+                .WithMessage("You must provide at least one of (uprn, parentUprn, usrn, postcode), when gazetteer is 'both'.");
 
             RuleFor(r => r.RequestFields)
                 .Must(CheckForInvalidProperties)
@@ -68,6 +68,7 @@ namespace AddressesAPI.V1.UseCase
         {
             return request.Gazetteer == GlobalConstants.Gazetteer.Both.ToString()
                    || request.UPRN != null
+                   || request.ParentUPRN != null
                    || request.USRN != null
                    || request.PostCode != null
                    || request.Street != null
@@ -79,6 +80,7 @@ namespace AddressesAPI.V1.UseCase
         {
             return request.Gazetteer != GlobalConstants.Gazetteer.Both.ToString()
                    || request.UPRN != null
+                   || request.ParentUPRN != null
                    || request.USRN != null
                    || request.PostCode != null;
         }

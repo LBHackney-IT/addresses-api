@@ -265,6 +265,21 @@ namespace AddressesAPI.Tests.V1.UseCase
         }
 
         [TestCase(12345)]
+        public void GivenARequestWithOnlyParentUPRN_IfGazetteerIsLocal_WhenCallingValidation_ItReturnsNoError(int uprn)
+        {
+            var request = new SearchAddressRequest() { ParentUPRN = uprn, Gazetteer = _localGazetteer };
+            _classUnderTest.TestValidate(request).ShouldNotHaveError();
+        }
+
+
+        [TestCase(12345)]
+        public void GivenARequestWithOnlyParentUPRN_IfGazetteerIsBoth_WhenCallingValidation_ItReturnsNoError(int uprn)
+        {
+            var request = new SearchAddressRequest() { ParentUPRN = uprn };
+            _classUnderTest.TestValidate(request).ShouldNotHaveError();
+        }
+
+        [TestCase(12345)]
         public void GivenARequestWithOnlyUSRN_IfGazetteerIsLocal_WhenCallingValidation_ItReturnsNoError(int usrn)
         {
             var request = new SearchAddressRequest() { USRN = usrn, Gazetteer = _localGazetteer };
