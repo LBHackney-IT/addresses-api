@@ -317,7 +317,7 @@ namespace AddressesAPI.Tests.V1.UseCase
         public void GivenARequestWithOnlyAStreet_IfGazetteerIsBoth_WhenCallingValidation_ItReturnsAnError(string street)
         {
             var request = new SearchAddressRequest() { Street = street };
-            _classUnderTest.TestValidate(request).ShouldHaveError().WithErrorMessage("You must provide at least one of (uprn, usrn, postcode), when gazetteer is 'both'.");
+            _classUnderTest.TestValidate(request).ShouldHaveError().WithErrorMessage("You must provide at least one of (uprn, parentUprn, usrn, postcode), when gazetteer is 'both'.");
         }
 
         [TestCase("someValue")]
@@ -331,7 +331,7 @@ namespace AddressesAPI.Tests.V1.UseCase
         public void GivenARequestWithOnlyUsagePrimary_IfGazetteerIsBoth_WhenCallingValidation_ItReturnsAnError(string usagePrimary)
         {
             var request = new SearchAddressRequest() { usagePrimary = usagePrimary };
-            _classUnderTest.TestValidate(request).ShouldHaveError().WithErrorMessage("You must provide at least one of (uprn, usrn, postcode), when gazetteer is 'both'.");
+            _classUnderTest.TestValidate(request).ShouldHaveError().WithErrorMessage("You must provide at least one of (uprn, parentUprn, usrn, postcode), when gazetteer is 'both'.");
         }
 
         [TestCase("otherValue")]
@@ -345,21 +345,21 @@ namespace AddressesAPI.Tests.V1.UseCase
         public void GivenARequestWithOnlyUsageCode_IfGazetteerIsBoth_WhenCallingValidation_ItReturnsAnError(string usageCode)
         {
             var request = new SearchAddressRequest() { usageCode = usageCode };
-            _classUnderTest.TestValidate(request).ShouldHaveError().WithErrorMessage("You must provide at least one of (uprn, usrn, postcode), when gazetteer is 'both'.");
+            _classUnderTest.TestValidate(request).ShouldHaveError().WithErrorMessage("You must provide at least one of (uprn, parentUprn, usrn, postcode), when gazetteer is 'both'.");
         }
 
         [TestCase("12345")]
         public void GivenARequestWithNoMandatoryFields_IfGazetteerIsLocal_WhenCallingValidation_ItReturnsAnError(string buildingNumber)
         {
             var request = new SearchAddressRequest() { BuildingNumber = buildingNumber, Gazetteer = _localGazetteer };
-            _classUnderTest.TestValidate(request).ShouldHaveError().WithErrorMessage("You must provide at least one of (uprn, usrn, postcode, street, usagePrimary, usageCode), when gazeteer is 'local'.");
+            _classUnderTest.TestValidate(request).ShouldHaveError().WithErrorMessage("You must provide at least one of (uprn, parentUprn, usrn, postcode, street, usagePrimary, usageCode), when gazeteer is 'local'.");
         }
 
         [TestCase("12345")]
         public void GivenARequestWithNoMandatoryFields_IfGazetteerIsBoth_WhenCallingValidation_ItReturnsAnError(string buildingNumber)
         {
             var request = new SearchAddressRequest() { BuildingNumber = buildingNumber };
-            _classUnderTest.TestValidate(request).ShouldHaveError().WithErrorMessage("You must provide at least one of (uprn, usrn, postcode), when gazetteer is 'both'.");
+            _classUnderTest.TestValidate(request).ShouldHaveError().WithErrorMessage("You must provide at least one of (uprn, parentUprn, usrn, postcode), when gazetteer is 'both'.");
         }
 
         [Test]
