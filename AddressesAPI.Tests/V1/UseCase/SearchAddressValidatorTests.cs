@@ -271,7 +271,6 @@ namespace AddressesAPI.Tests.V1.UseCase
             _classUnderTest.TestValidate(request).ShouldNotHaveError();
         }
 
-
         [TestCase(12345)]
         public void GivenARequestWithOnlyParentUPRN_IfGazetteerIsBoth_WhenCallingValidation_ItReturnsNoError(int uprn)
         {
