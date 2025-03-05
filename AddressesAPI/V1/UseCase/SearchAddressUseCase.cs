@@ -54,6 +54,7 @@ namespace AddressesAPI.V1.UseCase
                 Postcode = request.PostCode,
                 Street = request.Street,
                 Uprn = request.UPRN,
+                ParentUprn = request.ParentUPRN,
                 Usrn = request.USRN,
                 AddressStatus = request.AddressStatus,
                 BuildingNumber = request.BuildingNumber,
