@@ -157,8 +157,8 @@ namespace AddressesAPI.Tests.V1.E2ETests
 
         [TestCase("PageSize=100", "PageSize", "PageSize cannot exceed 50")]
         [TestCase("PostCode=12376", "PostCode", "Must provide at least the first part of the postcode.")]
-        [TestCase("Gazetteer=Both&street=hackneyroad", "", "You must provide at least one of (uprn, usrn, postcode), when gazetteer is 'both'.")]
-        [TestCase("Gazetteer=Local", "", "You must provide at least one of (uprn, usrn, postcode, street, usagePrimary, usageCode), when gazeteer is 'local'.")]
+        [TestCase("Gazetteer=Both&street=hackneyroad", "", "You must provide at least one of (uprn, parentUprn, usrn, postcode), when gazetteer is 'both'.")]
+        [TestCase("Gazetteer=Local", "", "You must provide at least one of (uprn, parentUprn, usrn, postcode, street, usagePrimary, usageCode), when gazeteer is 'local'.")]
         public async Task ValidationErrors(string queryString, string fieldName, string message)
         {
             var response = await CallEndpointWithQueryParameters(queryString).ConfigureAwait(true);
