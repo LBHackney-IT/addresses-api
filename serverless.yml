@@ -25,7 +25,7 @@ functions:
           private: true
           cors: true
           authorizer:
-            arn: ${ssm:/platform-apis-lambda-authorizer-arn}
+            arn: ${self:custom.authorizerArns.${opt:stage}}
             type: request
   reindexElasticsearchAlias:
     name: ${self:service}-reindex-es-alias-${self:provider.stage}
@@ -135,6 +135,10 @@ resources:
       Properties:
         QueueName: sqs-addresses-api-reindex-${self:provider.stage}
 custom:
+  authorizerArns:
+    development: arn:aws:lambda:eu-west-2:859159924354:function:api-auth-verify-token-development-apiauthverifytoken
+    staging:     arn:aws:lambda:eu-west-2:715003523189:function:api-auth-verify-token-new-staging-apiauthverifytokennew
+    production:  arn:aws:lambda:eu-west-2:153306643385:function:api-auth-verify-token-production-apiauthverifytoken
   vpc:
     development:
       subnetIds:
