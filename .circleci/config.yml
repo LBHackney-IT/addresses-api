@@ -260,22 +260,6 @@ workflows:
           filters:
             branches:
               only: master
-      - preview-terraform-staging-changes:
-          requires:
-            - assume-role-staging
-          filters:
-            branches:
-              only: master
-      - continue-with-staging-terraform-release:
-          type: approval
-          requires:
-            - preview-terraform-staging-changes
-      - terraform-init-and-apply-to-staging:
-          requires:
-            - continue-with-staging-terraform-release
-          filters:
-            branches:
-              only: master
       # - migrate-database-staging:
       #     requires:
       #       - terraform-init-and-apply-to-staging
@@ -290,14 +274,86 @@ workflows:
           filters:
             branches:
               only: master
-      - permit-production-terraform-release:
+      - permit-production-deployment-workflow:
           type: approval
           requires:
             - deploy-to-staging
+          filters:
+            branches:
+              only: master
       - assume-role-production:
           context: api-assume-role-production-context
           requires:
-              - permit-production-terraform-release
+              - permit-production-deployment-workflow
+          filters:
+             branches:
+               only: master
+      # - migrate-database-production:
+      #     requires:
+      #       - terraform-init-and-apply-to-production
+      #       - assume-role-production
+      #     filters:
+      #       branches:
+      #         only: master
+      - permit-production-release:
+          type: approval
+          requires:
+            - assume-role-production
+          filters:
+            branches:
+              only: master
+      - deploy-to-production:
+          context: "Serverless Framework"
+          requires:
+            - permit-production-release
+          filters:
+            branches:
+              only: master
+
+  deploy-staging-and-production-terraform:
+    jobs:
+      - permit-staging-and-production-terraform-workflow:
+          type: approval
+          filters:
+            branches:
+              only: master
+      - assume-role-staging:
+          context: api-assume-role-staging-context
+          requires:
+            - permit-staging-and-production-terraform-workflow
+          filters:
+            branches:
+              only: master
+      - preview-terraform-staging-changes:
+          requires:
+            - assume-role-staging
+          filters:
+            branches:
+              only: master
+      - continue-with-staging-terraform-release:
+          type: approval
+          requires:
+            - preview-terraform-staging-changes
+          filters:
+            branches:
+              only: master
+      - terraform-init-and-apply-to-staging:
+          requires:
+            - continue-with-staging-terraform-release
+          filters:
+            branches:
+              only: master      
+      - permit-production-terraform-workflow:
+          type: approval
+          requires:
+            - terraform-init-and-apply-to-staging
+          filters:
+            branches:
+              only: master
+      - assume-role-production:
+          context: api-assume-role-production-context
+          requires:
+              - permit-production-terraform-workflow
           filters:
              branches:
                only: master
@@ -311,31 +367,12 @@ workflows:
             type: approval
             requires:
               - preview-terraform-production-changes
+            filters:
+              branches:
+                only: master
       - terraform-init-and-apply-to-production:
           requires:
             - continue-with-production-terraform-release
-          filters:
-            branches:
-              only: master
-      # - migrate-database-production:
-      #     requires:
-      #       - terraform-init-and-apply-to-production
-      #       - assume-role-production
-      #     filters:
-      #       branches:
-      #         only: master
-      - permit-production-release:
-          type: approval
-          requires:
-            - deploy-to-staging
-          filters:
-            branches:
-              only: master
-      - deploy-to-production:
-          context: "Serverless Framework"
-          requires:
-            - permit-production-release
-            - assume-role-production
           filters:
             branches:
               only: master
