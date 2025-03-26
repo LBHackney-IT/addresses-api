@@ -22,7 +22,7 @@ functions:
       - http:
           path: /{proxy+}
           method: ANY
-          private: true
+          private: false
           cors: true
           authorizer:
             arn: ${self:custom.authorizerArns.${opt:stage}}
