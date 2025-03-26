@@ -29,6 +29,7 @@ functions:
             type: request
             resultTtlInSeconds: 0
             identitySource: method.request.header.Authorization
+            managedExternally: true
   reindexElasticsearchAlias:
     name: ${self:service}-reindex-es-alias-${self:provider.stage}
     handler: Reindex::Reindex.Handler::ReindexAlias
