@@ -295,17 +295,10 @@ workflows:
       #     filters:
       #       branches:
       #         only: master
-      - permit-production-release:
-          type: approval
-          requires:
-            - assume-role-production
-          filters:
-            branches:
-              only: master
       - deploy-to-production:
           context: "Serverless Framework"
           requires:
-            - permit-production-release
+            - assume-role-production
           filters:
             branches:
               only: master
