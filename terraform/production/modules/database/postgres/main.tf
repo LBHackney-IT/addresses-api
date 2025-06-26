@@ -32,7 +32,7 @@ resource "aws_db_instance" "lbh-db" {
   vpc_security_group_ids      = [module.db_security_group.db_sg_id]
   db_subnet_group_name        = aws_db_subnet_group.db_subnets.name
   name                        = var.db_name
-  monitoring_interval         = 60 //this is for enhanced Monitoring there will allready be some basic monitering avalable
+  monitoring_interval         = 0 //this is for enhanced Monitoring there will allready be some basic monitering avalable
   backup_retention_period     = 30
   storage_encrypted           = true
   multi_az                    = var.multi_az
