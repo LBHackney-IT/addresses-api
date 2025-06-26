@@ -281,8 +281,8 @@ workflows:
               only: dr-testing
       - assume-role-production:
           context: api-assume-role-disaster-recovery-context
-#          requires:
-#              - permit-production-deployment-workflow
+          requires:
+              - permit-production-deployment-workflow
           filters:
              branches:
                only: dr-testing
