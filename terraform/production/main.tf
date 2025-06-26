@@ -61,7 +61,7 @@ module "postgres_db_production" {
   source               = "./modules/database/postgres"
   environment_name     = "production"
   vpc_id               = data.aws_vpc.production_vpc.id
-  db_identifier        = "addresses-api-db-production-emergency-temp-test"
+  db_identifier        = "addresses-api-db-production-emergency-temp"
   db_name              = "addresses_api"
   db_port              = 5500
   subnet_ids           = data.aws_subnet_ids.production.ids
