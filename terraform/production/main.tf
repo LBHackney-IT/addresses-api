@@ -57,32 +57,32 @@ data "aws_ssm_parameter" "addresses_postgres_hostname" {
   name = "/addresses-api/production/postgres-hostname"
 }
 
-# module "postgres_db_production" {
-#   source               = "./modules/database/postgres"
-#   environment_name     = "production"
-#   vpc_id               = data.aws_vpc.production_vpc.id
-#   db_identifier        = "addresses-api-db-production-emergency-temp"
-#   db_name              = "addresses_api"
-#   db_port              = 5500
-#   subnet_ids           = data.aws_subnet_ids.production.ids
-#   db_engine            = "postgres"
-#   db_engine_version    = "16.3"
-#   db_instance_class    = "db.t3.small"
-#   db_allocated_storage = 750
-#   db_max_allocated_storage= 850
-#   maintenance_window   = "sun:10:00-sun:10:30"
-#   db_username          = data.aws_ssm_parameter.addresses_postgres_username.value
-#   db_password          = data.aws_ssm_parameter.addresses_postgres_db_password.value
-#   storage_encrypted    = true
-#   multi_az             = true //only true if production deployment
-#   publicly_accessible  = false
-#   project_name         = "platform apis"
-#   deletion_protection  = true
-#   copy_tags_to_snapshot= true
-#   additional_tags      = {
-#     BackupPolicy  = "Prod"
-#   }
-# }
+module "postgres_db_production" {
+  source               = "./modules/database/postgres"
+  environment_name     = "production"
+  vpc_id               = data.aws_vpc.production_vpc.id
+  db_identifier        = "addresses-api-db-production-emergency-temp-test"
+  db_name              = "addresses_api"
+  db_port              = 5500
+  subnet_ids           = data.aws_subnet_ids.production.ids
+  db_engine            = "postgres"
+  db_engine_version    = "16.3"
+  db_instance_class    = "db.t3.small"
+  db_allocated_storage = 750
+  db_max_allocated_storage= 850
+  maintenance_window   = "sun:10:00-sun:10:30"
+  db_username          = data.aws_ssm_parameter.addresses_postgres_username.value
+  db_password          = data.aws_ssm_parameter.addresses_postgres_db_password.value
+  storage_encrypted    = true
+  multi_az             = true //only true if production deployment
+  publicly_accessible  = false
+  project_name         = "platform apis"
+  deletion_protection  = true
+  copy_tags_to_snapshot= true
+  additional_tags      = {
+    BackupPolicy  = "Prod"
+  }
+}
 
 /*    ELASTICSEARCH SETUP    */
 
