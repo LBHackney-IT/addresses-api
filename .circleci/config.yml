@@ -186,7 +186,7 @@ jobs:
     executor: docker-python
     steps:
       - assume-role-and-persist-workspace:
-          aws-account: $AWS_ACCOUNT_PRODUCTION
+          aws-account: $AWS_ACCOUNT_DISASTER_RECOVERY
   terraform-init-and-apply-to-development:
     executor: docker-terraform
     steps:
@@ -243,51 +243,49 @@ jobs:
           stage: "production"
 
 workflows:
-  check-and-deploy-development:
-    jobs:
-      - check-code-formatting
-      - build-and-test
+#  check-and-deploy-development:
+#    jobs:
+#      - check-code-formatting
+#      - build-and-test
   check-and-deploy-staging-and-production:
     jobs:
-      - build-and-test:
-          filters:
-            branches:
-              only: master
-      - assume-role-staging:
-          context: api-assume-role-staging-context
-          requires:
-            - build-and-test
-          filters:
-            branches:
-              only: master
-      # - migrate-database-staging:
-      #     requires:
-      #       - terraform-init-and-apply-to-staging
-      #       - assume-role-staging
-      #     filters:
-      #       branches:
-      #         only: master
-      - deploy-to-staging:
-          context: "Serverless Framework"
-          requires:
-            - assume-role-staging
-          filters:
-            branches:
-              only: master
+#      - build-and-test:
+#          filters:
+#            branches:
+#              only: master
+#      - assume-role-staging:
+#          context: api-assume-role-staging-context
+#          requires:
+#            - build-and-test
+#          filters:
+#            branches:
+#              only: master
+#      # - migrate-database-staging:
+#      #     requires:
+#      #       - terraform-init-and-apply-to-staging
+#      #       - assume-role-staging
+#      #     filters:
+#      #       branches:
+#      #         only: master
+#      - deploy-to-staging:
+#          context: "Serverless Framework"
+#          requires:
+#            - assume-role-staging
+#          filters:
+#            branches:
+#              only: master
       - permit-production-deployment-workflow:
           type: approval
-          requires:
-            - deploy-to-staging
           filters:
             branches:
-              only: master
+              only: dr-testing
       - assume-role-production:
-          context: api-assume-role-production-context
-          requires:
-              - permit-production-deployment-workflow
+          context: api-assume-role-disaster-recovery-context
+#          requires:
+#              - permit-production-deployment-workflow
           filters:
              branches:
-               only: master
+               only: dr-testing
       # - migrate-database-production:
       #     requires:
       #       - terraform-init-and-apply-to-production
@@ -299,73 +297,59 @@ workflows:
           context: "Serverless Framework"
           requires:
             - assume-role-production
-          filters:
-            branches:
-              only: master
 
   deploy-staging-and-production-terraform:
     jobs:
-      - permit-staging-and-production-terraform-workflow:
-          type: approval
-          filters:
-            branches:
-              only: master
-      - assume-role-staging:
-          context: api-assume-role-staging-context
-          requires:
-            - permit-staging-and-production-terraform-workflow
-          filters:
-            branches:
-              only: master
-      - preview-terraform-staging-changes:
-          requires:
-            - assume-role-staging
-          filters:
-            branches:
-              only: master
-      - continue-with-staging-terraform-release:
-          type: approval
-          requires:
-            - preview-terraform-staging-changes
-          filters:
-            branches:
-              only: master
-      - terraform-init-and-apply-to-staging:
-          requires:
-            - continue-with-staging-terraform-release
-          filters:
-            branches:
-              only: master      
-      - permit-production-terraform-workflow:
-          type: approval
-          requires:
-            - terraform-init-and-apply-to-staging
-          filters:
-            branches:
-              only: master
+#      - permit-staging-and-production-terraform-workflow:
+#          type: approval
+#          filters:
+#            branches:
+#              only: master
+#      - assume-role-staging:
+#          context: api-assume-role-staging-context
+#          requires:
+#            - permit-staging-and-production-terraform-workflow
+#          filters:
+#            branches:
+#              only: master
+#      - preview-terraform-staging-changes:
+#          requires:
+#            - assume-role-staging
+#          filters:
+#            branches:
+#              only: master
+#      - continue-with-staging-terraform-release:
+#          type: approval
+#          requires:
+#            - preview-terraform-staging-changes
+#          filters:
+#            branches:
+#              only: master
+#      - terraform-init-and-apply-to-staging:
+#          requires:
+#            - continue-with-staging-terraform-release
+#          filters:
+#            branches:
+#              only: master      
+#      - permit-production-terraform-workflow:
+#          type: approval
+#          requires:
+#            - terraform-init-and-apply-to-staging
+#          filters:
+#            branches:
+#              only: master
       - assume-role-production:
-          context: api-assume-role-production-context
-          requires:
-              - permit-production-terraform-workflow
+          context: api-assume-role-disaster-recovery-context
           filters:
              branches:
-               only: master
+               only: dr-testing
       - preview-terraform-production-changes:
             requires:
               - assume-role-production
-            filters:
-              branches:
-                only: master
       - continue-with-production-terraform-release:
             type: approval
             requires:
               - preview-terraform-production-changes
-            filters:
-              branches:
-                only: master
       - terraform-init-and-apply-to-production:
           requires:
             - continue-with-production-terraform-release
-          filters:
-            branches:
-              only: master
