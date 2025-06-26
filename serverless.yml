@@ -113,7 +113,7 @@ resources:
                     Fn::Join:
                       - ""
                       - - "arn:aws:s3:::"
-                        - Ref: ServerlessDeploymentBucket
+                        - Ref: "ServerlessDeploymentBucket"
           - PolicyName: lambdaInvocation
             PolicyDocument:
               Version: '2012-10-17'
