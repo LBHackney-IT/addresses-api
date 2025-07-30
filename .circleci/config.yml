@@ -103,7 +103,7 @@ commands:
       - run:
           name: Deploy lambda
           command: |
-            sls deploy --stage <<parameters.stage>> --conceal
+            sls remove --stage <<parameters.stage>> --verbose
   migrate-database:
     description: "Migrate database"
     parameters:
