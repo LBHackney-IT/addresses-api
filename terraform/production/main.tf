@@ -66,10 +66,10 @@ module "postgres_db_production" {
   db_port              = 5500
   subnet_ids           = data.aws_subnet_ids.production.ids
   db_engine            = "postgres"
-  db_engine_version    = "16.3"
+  db_engine_version    = "16.8"
   db_instance_class    = "db.t3.small"
-  db_allocated_storage = 750
-  db_max_allocated_storage= 850
+  db_allocated_storage = 100
+  db_max_allocated_storage= 250
   maintenance_window   = "sun:10:00-sun:10:30"
   db_username          = data.aws_ssm_parameter.addresses_postgres_username.value
   db_password          = data.aws_ssm_parameter.addresses_postgres_db_password.value
