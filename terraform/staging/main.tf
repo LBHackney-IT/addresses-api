@@ -156,6 +156,16 @@ resource "aws_iam_role_policy_attachment" "attach_policy" {
   policy_arn = aws_iam_policy.es_policy.arn
 }
 
+module "dms_replication_instance_staging" {
+  source = "./modules/dms"
+  environment_name = "staging"
+  project_name = "addresses-api"
+  replication_instance_identifier = "staging-dms-instance"
+  replication_instance_class = "dms.t3.small"
+  vpc_id = data.aws_vpc.staging_vpc.id
+  subnet_ids = data.aws_subnet_ids.staging.ids
+  maintenance_window = "Sun:08:00-Sun:08:30"
+}
 resource "aws_dms_endpoint" "address_elasticsearch" {
   endpoint_id   = "target-addresses-es"
   endpoint_type = "target"
