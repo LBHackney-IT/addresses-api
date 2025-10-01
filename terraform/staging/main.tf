@@ -226,7 +226,7 @@ module "address-es-dms-local-addresses" {
   task_settings = templatefile("${path.module}/task_settings.json",
     {
       dms_replication_instance_name = "staging-dms-instance",
-      dms_instance_task_resource    = "" // Will be updated once the task has been deployed
+      dms_instance_task_resource    = "to-be-updated-local" // Will be updated once the task has been deployed
     }
   )
   source_endpoint_arn = module.source_db_endpoint.dms_endpoint_arn
@@ -244,7 +244,7 @@ module "address-es-dms-national-addresses" {
   task_settings = templatefile("${path.module}/task_settings.json",
     {
       dms_replication_instance_name = "staging-dms-instance",
-      dms_instance_task_resource    = "" // Will be updated once the task has been deployed
+      dms_instance_task_resource    = "to-be-updated-national" // Will be updated once the task has been deployed
     }
   )
   source_endpoint_arn = module.source_db_endpoint.dms_endpoint_arn
