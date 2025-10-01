@@ -110,6 +110,12 @@ data "aws_ssm_parameter" "addresses_elasticsearch_domain" {
 }
 
 /*    DMS SETUP    */
+resource "aws_ssm_parameter" "dms_rep_instance_arn" {
+  name  = "/addresses-api/staging/dms-rep-instance-arn"
+  type  = "String"
+  value = module.dms_replication_instance_staging.dms_rep_instance_arn
+}
+
 data "aws_iam_policy_document" "dms-assume-role-policy" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -208,4 +214,40 @@ module "source_db_endpoint" {
   project_name            = "addresses-api"
   db_username             = data.aws_ssm_parameter.addresses_postgres_username.value
   db_password             = data.aws_ssm_parameter.addresses_postgres_db_password.value
+}
+
+module "address-es-dms-local-addresses" {
+  source                       = "github.com/LBHackney-IT/aws-dms-terraform.git?ref=b15e5a9374faed9ce5105ef35aceebfdad6fbf68//dms_replication_task"
+  environment_name             = "stg"
+  project_name                 = "addresses-api"
+  migration_type               = "full-load"
+  replication_instance_arn     = aws_ssm_parameter.dms_rep_instance_arn.value
+  replication_task_indentifier = "addresses-api-es-dms-task-local-addresses"
+  task_settings = templatefile("${path.module}/task_settings.json",
+    {
+      dms_replication_instance_name = "staging-dms-instance",
+      dms_instance_task_resource    = "" // Will be updated once the task has been deployed
+    }
+  )
+  source_endpoint_arn = module.source_db_endpoint.dms_endpoint_arn
+  target_endpoint_arn = aws_dms_endpoint.address_elasticsearch.endpoint_arn
+  task_table_mappings = file("${path.module}/selection_rules_local.json")
+}
+
+module "address-es-dms-national-addresses" {
+  source                       = "github.com/LBHackney-IT/aws-dms-terraform.git?ref=b15e5a9374faed9ce5105ef35aceebfdad6fbf68//dms_replication_task"
+  environment_name             = "stg"
+  project_name                 = "addresses-api"
+  migration_type               = "full-load-and-cdc"
+  replication_instance_arn     = aws_ssm_parameter.dms_rep_instance_arn.value
+  replication_task_indentifier = "addresses-api-es-dms-task-national-addresses"
+  task_settings = templatefile("${path.module}/task_settings.json",
+    {
+      dms_replication_instance_name = "staging-dms-instance",
+      dms_instance_task_resource    = "" // Will be updated once the task has been deployed
+    }
+  )
+  source_endpoint_arn = module.source_db_endpoint.dms_endpoint_arn
+  target_endpoint_arn = aws_dms_endpoint.address_elasticsearch.endpoint_arn
+  task_table_mappings = file("${path.module}/selection_rules_national.json")
 }
