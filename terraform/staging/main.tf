@@ -110,8 +110,10 @@ data "aws_ssm_parameter" "addresses_elasticsearch_domain" {
 }
 
 /*    DMS SETUP    */
-data "aws_ssm_parameter" "dms_rep_instance_id" {
-  name = "/addresses-api/staging/dms-rep-instance-id"
+resource "aws_ssm_parameter" "dms_rep_instance_arn" {
+  name  = "/addresses-api/staging/dms-rep-instance-arn"
+  type  = "String"
+  value = module.dms_replication_instance_staging.dms_rep_instance_arn
 }
 
 data "aws_iam_policy_document" "dms-assume-role-policy" {
@@ -215,11 +217,11 @@ module "source_db_endpoint" {
 }
 
 module "address-es-dms-local-addresses" {
-  source                       = "github.com/LBHackney-IT/aws-dms-terraform.git//dms_replication_task"
-  environment_name             = "staging"
+  source                       = "github.com/LBHackney-IT/aws-dms-terraform.git?ref=b15e5a9374faed9ce5105ef35aceebfdad6fbf68//dms_replication_task"
+  environment_name             = "stg"
   project_name                 = "addresses-api"
   migration_type               = "full-load"
-  replication_instance_arn     = "arn:aws:dms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rep:${data.aws_ssm_parameter.dms_rep_instance_id.value}"
+  replication_instance_arn     = aws_ssm_parameter.dms_rep_instance_arn.value
   replication_task_indentifier = "addresses-api-es-dms-task-local-addresses"
   task_settings = templatefile("${path.module}/task_settings.json",
     {
@@ -233,11 +235,11 @@ module "address-es-dms-local-addresses" {
 }
 
 module "address-es-dms-national-addresses" {
-  source                       = "github.com/LBHackney-IT/aws-dms-terraform.git//dms_replication_task"
-  environment_name             = "staging"
+  source                       = "github.com/LBHackney-IT/aws-dms-terraform.git?ref=b15e5a9374faed9ce5105ef35aceebfdad6fbf68//dms_replication_task"
+  environment_name             = "stg"
   project_name                 = "addresses-api"
   migration_type               = "full-load-and-cdc"
-  replication_instance_arn     = "arn:aws:dms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rep:${data.aws_ssm_parameter.dms_rep_instance_id.value}"
+  replication_instance_arn     = aws_ssm_parameter.dms_rep_instance_arn.value
   replication_task_indentifier = "addresses-api-es-dms-task-national-addresses"
   task_settings = templatefile("${path.module}/task_settings.json",
     {
