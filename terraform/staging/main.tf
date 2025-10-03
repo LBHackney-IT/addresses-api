@@ -96,10 +96,10 @@ module "elasticsearch_db_staging" {
   project_name     = "addresses-api"
   es_version       = "7.8"
   encrypt_at_rest  = "false"
-  instance_type    = "t2.medium.elasticsearch"
-  instance_count   = "1"
+  instance_type    = "t3.medium.elasticsearch"
+  instance_count   = "3"
   ebs_enabled      = "true"
-  ebs_volume_size  = "20"
+  ebs_volume_size  = "30"
   region           = data.aws_region.current.name
   account_id       = data.aws_caller_identity.current.account_id
   zone_awareness_enabled = false
