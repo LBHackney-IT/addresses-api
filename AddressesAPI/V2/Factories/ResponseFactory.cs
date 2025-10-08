@@ -3,23 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using AddressesAPI.V2.Boundary.Responses.Data;
 using AddressesAPI.V2.Domain;
-using AddressCrossReferenceDomain = AddressesAPI.V2.Domain.AddressCrossReference;
 namespace AddressesAPI.V2.Factories
 {
     public static class ResponseFactory
     {
-        public static AddressCrossReferenceResponse ToResponse(this AddressCrossReferenceDomain domain)
-        {
-            return new AddressCrossReferenceResponse
-            {
-                Code = domain.Code,
-                Name = domain.Name,
-                Value = domain.Value,
-                EndDate = domain.EndDate,
-                CrossRefKey = domain.CrossRefKey,
-                UPRN = domain.UPRN
-            };
-        }
         public static AddressResponse ToResponse(this Address domain)
         {
             return new AddressResponse
@@ -69,11 +56,6 @@ namespace AddressesAPI.V2.Factories
             return domainStatus.Equals("Approved Preferred", StringComparison.InvariantCultureIgnoreCase)
                 ? "Approved"
                 : domainStatus;
-        }
-
-        public static List<AddressCrossReferenceResponse> ToResponse(this IEnumerable<AddressCrossReferenceDomain> domainList)
-        {
-            return domainList.Select(domain => domain.ToResponse()).ToList();
         }
 
         public static List<AddressResponse> ToResponse(this IEnumerable<Address> domainList)

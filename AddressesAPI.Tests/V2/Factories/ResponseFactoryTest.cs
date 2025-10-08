@@ -45,13 +45,5 @@ namespace AddressesAPI.Tests.V2.Factories
             var response = domain.ToResponse();
             response.AddressStatus.Should().Be("Approved");
         }
-
-        [Test]
-        public void MapsAnAddressCrossReferenceDomainDirectlyToAResponse()
-        {
-            var domain = _fixture.Create<AddressCrossReference>();
-            domain.ToResponse().Should().BeEquivalentTo(domain);
-            domain.ToResponse().Should().BeOfType<AddressCrossReferenceResponse>();
-        }
     }
 }
