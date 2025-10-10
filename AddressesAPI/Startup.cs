@@ -153,7 +153,6 @@ namespace AddressesAPI
         private static void RegisterV2Gateways(IServiceCollection services)
         {
             services.AddScoped<V2.Gateways.IAddressesGateway, V2.Gateways.AddressesGateway>();
-            services.AddScoped<V2.Gateways.ICrossReferencesGateway, V2.Gateways.CrossReferencesGateway>();
             services.AddScoped<V2.Gateways.ISearchAddressesGateway, V2.Gateways.ElasticGateway>();
         }
 
@@ -172,9 +171,7 @@ namespace AddressesAPI
             services.AddScoped<V2.UseCase.Interfaces.ISearchAddressValidator, V2.UseCase.SearchAddressValidator>();
             services.AddScoped<V2.UseCase.Interfaces.ISearchAddressUseCase, V2.UseCase.SearchAddressUseCase>();
             services.AddScoped<V2.UseCase.Interfaces.IGetAddressRequestValidator, V2.UseCase.GetAddressRequestValidator>();
-            services.AddScoped<V2.UseCase.Interfaces.IGetCrossReferenceRequestValidator, V2.UseCase.GetCrossReferenceRequestValidator>();
             services.AddScoped<V2.UseCase.Interfaces.IGetSingleAddressUseCase, V2.UseCase.GetSingleAddressUseCase>();
-            services.AddScoped<V2.UseCase.Interfaces.IGetPropertiesCrossReferenceUseCase, V2.UseCase.GetPropertiesCrossReferenceUseCase>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
