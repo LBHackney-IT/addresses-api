@@ -1,8 +1,6 @@
 version: 2.1
 
 orbs:
-  aws-ecr: circleci/aws-ecr@3.0.0
-  aws-cli: circleci/aws-cli@0.1.9
   aws_assume_role: lbh-hackit/aws_assume_role@0.1.0
 
 executors:
@@ -284,10 +282,10 @@ workflows:
       - assume-role-production:
           context: api-assume-role-production-context
           requires:
-              - permit-production-deployment-workflow
+            - permit-production-deployment-workflow
           filters:
-             branches:
-               only: master
+            branches:
+              only: master
       # - migrate-database-production:
       #     requires:
       #       - terraform-init-and-apply-to-production
@@ -335,7 +333,7 @@ workflows:
             - continue-with-staging-terraform-release
           filters:
             branches:
-              only: master      
+              only: master
       - permit-production-terraform-workflow:
           type: approval
           requires:
@@ -346,23 +344,23 @@ workflows:
       - assume-role-production:
           context: api-assume-role-production-context
           requires:
-              - permit-production-terraform-workflow
+            - permit-production-terraform-workflow
           filters:
-             branches:
-               only: master
+            branches:
+              only: master
       - preview-terraform-production-changes:
-            requires:
-              - assume-role-production
-            filters:
-              branches:
-                only: master
+          requires:
+            - assume-role-production
+          filters:
+            branches:
+              only: master
       - continue-with-production-terraform-release:
-            type: approval
-            requires:
-              - preview-terraform-production-changes
-            filters:
-              branches:
-                only: master
+          type: approval
+          requires:
+            - preview-terraform-production-changes
+          filters:
+            branches:
+              only: master
       - terraform-init-and-apply-to-production:
           requires:
             - continue-with-production-terraform-release
