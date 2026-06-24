@@ -183,16 +183,16 @@ jobs:
     steps:
       - terraform-preview:
           environment: "staging"
-  terraform-init-and-apply-to-staging:
-    executor: docker-terraform
-    steps:
-      - terraform-init-then-apply:
-          environment: "staging"
   preview-terraform-production-changes:
     executor: docker-terraform
     steps:
       - terraform-preview:
           environment: "production"
+  terraform-init-and-apply-to-staging:
+    executor: docker-terraform
+    steps:
+      - terraform-init-then-apply:
+          environment: "staging"
   terraform-init-and-apply-to-production:
     executor: docker-terraform
     steps:
@@ -212,16 +212,6 @@ jobs:
     executor: docker-dotnet
     steps:
       - deploy-lambda:
-          stage: "production"
-  migrate-database-staging:
-    executor: docker-dotnet
-    steps:
-      - migrate-database:
-          stage: "staging"
-  migrate-database-production:
-    executor: docker-dotnet
-    steps:
-      - migrate-database:
           stage: "production"
 
 workflows:
