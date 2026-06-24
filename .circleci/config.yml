@@ -36,9 +36,8 @@ commands:
           root: *workspace_root
           paths:
             - .aws
-  # Preview terraform before applying
   terraform-preview:
-    description: "Initializes and applies terraform configuration"
+    description: "Previews terraform configuration changes"
     parameters:
       environment:
         type: string
@@ -56,7 +55,6 @@ commands:
           command: |
             cd ./terraform/<<parameters.environment>>/
             terraform plan
-  # Apply terraform
   terraform-init-then-apply:
     description: "Initializes and applies terraform configuration"
     parameters:
@@ -170,11 +168,6 @@ jobs:
           command: |
             docker-compose up -d test-elasticsearch
             docker-compose run addresses-api-test
-  assume-role-development:
-    executor: docker-python
-    steps:
-      - assume-role-and-persist-workspace:
-          aws-account: $AWS_ACCOUNT_DEVELOPMENT
   assume-role-staging:
     executor: docker-python
     steps:
@@ -185,30 +178,21 @@ jobs:
     steps:
       - assume-role-and-persist-workspace:
           aws-account: $AWS_ACCOUNT_PRODUCTION
-  terraform-init-and-apply-to-development:
-    executor: docker-terraform
-    steps:
-      - terraform-init-then-apply:
-          environment: "development"
-  # Infrastructure changes preview:
   preview-terraform-staging-changes:
     executor: docker-terraform
     steps:
       - terraform-preview:
           environment: "staging"
-  # Infrastructure deployment:
   terraform-init-and-apply-to-staging:
     executor: docker-terraform
     steps:
       - terraform-init-then-apply:
           environment: "staging"
-  # Infrastructure changes preview:
   preview-terraform-production-changes:
     executor: docker-terraform
     steps:
       - terraform-preview:
           environment: "production"
-  # Infrastructure deployment:
   terraform-init-and-apply-to-production:
     executor: docker-terraform
     steps:
@@ -258,13 +242,6 @@ workflows:
           filters:
             branches:
               only: master
-      # - migrate-database-staging:
-      #     requires:
-      #       - terraform-init-and-apply-to-staging
-      #       - assume-role-staging
-      #     filters:
-      #       branches:
-      #         only: master
       - deploy-to-staging:
           context: "Serverless Framework"
           requires:
@@ -286,13 +263,6 @@ workflows:
           filters:
             branches:
               only: master
-      # - migrate-database-production:
-      #     requires:
-      #       - terraform-init-and-apply-to-production
-      #       - assume-role-production
-      #     filters:
-      #       branches:
-      #         only: master
       - deploy-to-production:
           context: "Serverless Framework"
           requires:
