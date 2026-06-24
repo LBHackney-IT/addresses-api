@@ -37,7 +37,7 @@ commands:
           paths:
             - .aws
   # Preview terraform before applying
-  terraform-init-then-preview:
+  terraform-preview:
     description: "Initializes and applies terraform configuration"
     parameters:
       environment:
@@ -194,7 +194,7 @@ jobs:
   preview-terraform-staging-changes:
     executor: docker-terraform
     steps:
-      - terraform-init-then-preview:
+      - terraform-preview:
           environment: "staging"
   # Infrastructure deployment:
   terraform-init-and-apply-to-staging:
@@ -206,7 +206,7 @@ jobs:
   preview-terraform-production-changes:
     executor: docker-terraform
     steps:
-      - terraform-init-then-preview:
+      - terraform-preview:
           environment: "production"
   # Infrastructure deployment:
   terraform-init-and-apply-to-production:
