@@ -140,22 +140,22 @@ jobs:
     steps:
       - assume-role-and-persist-workspace:
           aws-account: $AWS_ACCOUNT_PRODUCTION
-  preview-terraform-staging-changes:
+  preview-staging-terraform:
     executor: docker-terraform
     steps:
       - terraform-preview:
           environment: "staging"
-  preview-terraform-production-changes:
+  preview-production-terraform:
     executor: docker-terraform
     steps:
       - terraform-preview:
           environment: "production"
-  terraform-init-and-apply-to-staging:
+  release-staging-terraform:
     executor: docker-terraform
     steps:
       - terraform-apply-changes:
           environment: "staging"
-  terraform-init-and-apply-to-production:
+  release-production-terraform:
     executor: docker-terraform
     steps:
       - terraform-apply-changes:
@@ -172,10 +172,27 @@ jobs:
           stage: "production"
 
 workflows:
-  check-and-deploy-development:
+  feature:
     jobs:
       - check-code-formatting
       - build-and-test
+      - assume-role-staging:
+          context: api-assume-role-staging-context
+          filters:
+            branches:
+              ignore: master
+      - preview-staging-terraform:
+          requires:
+            - assume-role-staging
+      - assume-role-production:
+          context: api-assume-role-production-context
+          filters:
+            branches:
+              ignore: master
+      - preview-production-terraform:
+          requires:
+            - assume-role-production
+
   check-and-deploy-staging-and-production:
     jobs:
       - build-and-test:
@@ -245,7 +262,7 @@ workflows:
           filters:
             branches:
               only: master
-      - terraform-init-and-apply-to-staging:
+      - release-staging-terraform:
           requires:
             - continue-with-staging-terraform-release
           filters:
@@ -254,7 +271,7 @@ workflows:
       - permit-production-terraform-workflow:
           type: approval
           requires:
-            - terraform-init-and-apply-to-staging
+            - release-staging-terraform
           filters:
             branches:
               only: master
@@ -278,7 +295,7 @@ workflows:
           filters:
             branches:
               only: master
-      - terraform-init-and-apply-to-production:
+      - release-production-terraform:
           requires:
             - continue-with-production-terraform-release
           filters:
