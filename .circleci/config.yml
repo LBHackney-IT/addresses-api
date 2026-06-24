@@ -67,7 +67,7 @@ commands:
             cd ./terraform/<<parameters.environment>>/
             terraform plan
 
-  terraform-init-then-apply:
+  terraform-apply-changes:
     description: "Initializes and applies terraform configuration"
     parameters:
       environment:
@@ -153,18 +153,13 @@ jobs:
   terraform-init-and-apply-to-staging:
     executor: docker-terraform
     steps:
-      - terraform-init-then-apply:
+      - terraform-apply-changes:
           environment: "staging"
   terraform-init-and-apply-to-production:
     executor: docker-terraform
     steps:
-      - terraform-init-then-apply:
+      - terraform-apply-changes:
           environment: "production"
-  deploy-to-development:
-    executor: docker-dotnet
-    steps:
-      - deploy-lambda:
-          stage: "development"
   deploy-to-staging:
     executor: docker-dotnet
     steps:
