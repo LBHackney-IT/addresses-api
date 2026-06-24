@@ -36,6 +36,20 @@ commands:
           root: *workspace_root
           paths:
             - .aws
+
+  terraform-init:
+    description: "Initializes Terraform configuration for a specific environment"
+    parameters:
+      environment:
+        type: string
+    steps:
+      - run:
+          name: get and init
+          command: |
+            cd ./terraform/<<parameters.environment>>/
+            terraform get -update=true
+            terraform init
+
   terraform-preview:
     description: "Previews terraform configuration changes"
     parameters:
@@ -44,12 +58,8 @@ commands:
     steps:
       - *attach_workspace
       - checkout
-      - run:
-          command: |
-            cd ./terraform/<<parameters.environment>>/
-            terraform get -update=true
-            terraform init
-          name: get and init
+      - terraform-init:
+          environment: <<parameters.environment>>
       - run:
           name: preview
           command: |
@@ -63,12 +73,8 @@ commands:
     steps:
       - *attach_workspace
       - checkout
-      - run:
-          command: |
-            cd ./terraform/<<parameters.environment>>/
-            terraform get -update=true
-            terraform init
-          name: get and init
+      - terraform-init:
+          environment: <<parameters.environment>>
       - run:
           name: apply
           command: |
