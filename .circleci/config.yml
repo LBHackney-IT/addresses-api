@@ -51,21 +51,21 @@ commands:
             terraform get -update=true
             terraform init
 
-  terraform-preview:
-    description: "Previews terraform configuration changes"
-    parameters:
-      environment:
-        type: string
-    steps:
-      - *attach_workspace
-      - checkout
-      - terraform-init:
-          environment: <<parameters.environment>>
-      - run:
-          name: preview
-          command: |
-            cd ./terraform/<<parameters.environment>>/
-            terraform plan
+  # terraform-preview:
+  #   description: "Previews terraform configuration changes"
+  #   parameters:
+  #     environment:
+  #       type: string
+  #   steps:
+  #     - *attach_workspace
+  #     - checkout
+  #     - terraform-init:
+  #         environment: <<parameters.environment>>
+  #     - run:
+  #         name: preview
+  #         command: |
+  #           cd ./terraform/<<parameters.environment>>/
+  #           terraform plan
 
   terraform-apply-changes:
     description: "Initializes and applies terraform configuration"
@@ -107,6 +107,7 @@ commands:
             sls deploy --stage <<parameters.stage>> --conceal
 
 jobs:
+  # TODO: replace the legacy linter with 'dotnet format'
   check-code-formatting:
     executor: docker-dotnet
     steps:
@@ -117,6 +118,7 @@ jobs:
       - run:
           name: Run formatter check
           command: ./dotnet-format-local/dotnet-format --check
+  # replace the docker-compose with 'docker compose' (space)
   build-and-test:
     executor: docker-python
     steps:
@@ -140,16 +142,34 @@ jobs:
     steps:
       - assume-role-and-persist-workspace:
           aws-account: $AWS_ACCOUNT_PRODUCTION
-  preview-staging-terraform:
+
+  preview-terraform:
     executor: docker-terraform
+    parameters:
+      environment:
+        type: string
     steps:
-      - terraform-preview:
-          environment: "staging"
-  preview-production-terraform:
-    executor: docker-terraform
-    steps:
-      - terraform-preview:
-          environment: "production"
+      - *attach_workspace
+      - checkout
+      - terraform-init:
+          environment: <<parameters.environment>>
+      - run:
+          name: Terraform Plan (Preview)
+          command: |
+            cd ./terraform/<<parameters.environment>>/
+            terraform plan
+
+  # preview-staging-terraform:
+  #   executor: docker-terraform
+  #   steps:
+  #     - terraform-preview:
+  #         environment: "staging"
+  # preview-production-terraform:
+  #   executor: docker-terraform
+  #   steps:
+  #     - terraform-preview:
+  #         environment: "production"
+
   release-staging-terraform:
     executor: docker-terraform
     steps:
@@ -181,7 +201,9 @@ workflows:
           filters:
             branches:
               ignore: master
-      - preview-staging-terraform:
+      - preview-terraform:
+          name: preview-staging-terraform
+          environment: "staging"
           requires:
             - assume-role-staging
       - assume-role-production:
@@ -189,7 +211,9 @@ workflows:
           filters:
             branches:
               ignore: master
-      - preview-production-terraform:
+      - preview-terraform:
+          name: preview-production-terraform
+          environment: "production"
           requires:
             - assume-role-production
 
