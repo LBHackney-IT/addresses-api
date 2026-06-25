@@ -34,28 +34,6 @@ commands:
             cd ./terraform/<<parameters.environment>>/
             terraform get -update=true
             terraform init
-  deploy-lambda:
-    description: "Deploys API via Serverless"
-    parameters:
-      stage:
-        type: string
-    steps:
-      - *attach_workspace
-      - checkout
-      - setup_remote_docker
-      - node/install
-      - run:
-          name: Install serverless CLI
-          command: npm i -g serverless
-      - run:
-          name: Build lambda
-          command: |
-            chmod +x ./build.sh
-            ./build.sh
-      - run:
-          name: Deploy lambda
-          command: |
-            sls deploy --stage <<parameters.stage>> --conceal
 
 jobs:
   check-code-formatting:
@@ -123,16 +101,28 @@ jobs:
           command: |
             cd ./terraform/<<parameters.environment>>/
             terraform apply -auto-approve
-  deploy-to-staging:
+  deploy-lambda:
     executor: docker-dotnet
+    parameters:
+      stage:
+        type: string
     steps:
-      - deploy-lambda:
-          stage: "staging"
-  deploy-to-production:
-    executor: docker-dotnet
-    steps:
-      - deploy-lambda:
-          stage: "production"
+      - *attach_workspace
+      - checkout
+      - setup_remote_docker
+      - node/install
+      - run:
+          name: Install serverless CLI
+          command: npm i -g serverless
+      - run:
+          name: Build lambda
+          command: |
+            chmod +x ./build.sh
+            ./build.sh
+      - run:
+          name: Deploy lambda
+          command: |
+            sls deploy --stage <<parameters.stage>> --conceal
 
 workflows:
   feature:
@@ -173,7 +163,9 @@ workflows:
           context: api-assume-role-staging-context
           aws-account: $AWS_ACCOUNT_STAGING
           requires: [build-and-test]
-      - deploy-to-staging:
+      - deploy-lambda:
+          name: deploy-to-staging
+          stage: "staging"
           context: "Serverless Framework"
           requires: [assume-role-staging]
       - permit-production-deployment:
@@ -184,7 +176,9 @@ workflows:
           context: api-assume-role-production-context
           aws-account: $AWS_ACCOUNT_PRODUCTION
           requires: [permit-production-deployment]
-      - deploy-to-production:
+      - deploy-lambda:
+          name: deploy-to-production
+          stage: "production"
           context: "Serverless Framework"
           requires: [assume-role-production]
 
