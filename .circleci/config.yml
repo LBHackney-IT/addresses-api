@@ -258,12 +258,11 @@ workflows:
           filters:
             branches:
               only: master
-      - preview-terraform-staging-changes:
+      - preview-terraform:
+          name: preview-staging-terraform
+          environment: "staging"
           requires:
             - assume-role-staging
-          filters:
-            branches:
-              only: master
       - continue-with-staging-terraform-release:
           type: approval
           requires:
@@ -291,12 +290,11 @@ workflows:
           filters:
             branches:
               only: master
-      - preview-terraform-production-changes:
+      - preview-terraform:
+          name: preview-production-terraform
+          environment: "production"
           requires:
             - assume-role-production
-          filters:
-            branches:
-              only: master
       - continue-with-production-terraform-release:
           type: approval
           requires:
