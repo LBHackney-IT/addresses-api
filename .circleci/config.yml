@@ -107,17 +107,13 @@ commands:
             sls deploy --stage <<parameters.stage>> --conceal
 
 jobs:
-  # TODO: replace the legacy linter with 'dotnet format'
   check-code-formatting:
     executor: docker-dotnet
     steps:
       - checkout
       - run:
-          name: Install dotnet format
-          command: dotnet tool install dotnet-format --tool-path ./dotnet-format-local/
-      - run:
           name: Run formatter check
-          command: ./dotnet-format-local/dotnet-format --check
+          command: dotnet format --verify-no-changes
   # replace the docker-compose with 'docker compose' (space)
   build-and-test:
     executor: docker-python
