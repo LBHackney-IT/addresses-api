@@ -114,7 +114,6 @@ jobs:
       - run:
           name: Run formatter check
           command: dotnet format --verify-no-changes
-  # replace the docker-compose with 'docker compose' (space)
   build-and-test:
     executor: docker-python
     steps:
@@ -122,12 +121,12 @@ jobs:
       - setup_remote_docker
       - run:
           name: build
-          command: docker-compose build addresses-api-test
+          command: docker compose build addresses-api-test
       - run:
           name: Run tests
           command: |
-            docker-compose up -d test-elasticsearch
-            docker-compose run addresses-api-test
+            docker compose up -d test-elasticsearch
+            docker compose run addresses-api-test
   assume-role-staging:
     executor: docker-python
     steps:
