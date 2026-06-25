@@ -1,17 +1,16 @@
 version: 2.1
 
 orbs:
-  aws-ecr: circleci/aws-ecr@3.0.0
-  aws-cli: circleci/aws-cli@0.1.9
-  aws_assume_role: lbh-hackit/aws_assume_role@0.1.0
+  node: circleci/node@7.2.1
+  aws_assume_role: lbh-hackit/aws_assume_role@0.1.1
 
 executors:
   docker-python:
     docker:
-      - image: cimg/python:3.7
+      - image: cimg/python:3.14
   docker-terraform:
     docker:
-      - image: "hashicorp/terraform:light"
+      - image: "hashicorp/terraform:latest"
   docker-dotnet:
     docker:
       - image: mcr.microsoft.com/dotnet/sdk:8.0
@@ -21,10 +20,36 @@ references:
   attach_workspace: &attach_workspace
     attach_workspace:
       at: *workspace_root
+  master_only: &master_only
+    branches:
+      only: master
+  ignore_master: &ignore_master
+    branches:
+      ignore: master
 
-commands:
-  assume-role-and-persist-workspace:
-    description: "Assumes deployment role and persists credentials across jobs"
+jobs:
+  check-code-formatting:
+    executor: docker-dotnet
+    steps:
+      - checkout
+      - run:
+          name: Run formatter check
+          command: dotnet format --verify-no-changes --severity warn
+  build-and-test:
+    executor: docker-python
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: build
+          command: docker compose build addresses-api-test
+      - run:
+          name: Run tests
+          command: |
+            docker compose up -d test-elasticsearch
+            docker compose run addresses-api-test
+  assume-role:
+    executor: docker-python
     parameters:
       aws-account:
         type: string
@@ -38,48 +63,36 @@ commands:
           root: *workspace_root
           paths:
             - .aws
-  # Preview terraform before applying
-  terraform-init-then-preview:
-    description: "Initializes and applies terraform configuration"
+  execute-terraform:
+    executor: docker-terraform
     parameters:
       environment:
-        type: string
+        type: enum
+        enum: ["staging", "production"]
+      action:
+        type: enum
+        enum: ["preview", "deploy"]
     steps:
       - *attach_workspace
       - checkout
       - run:
+          name: Terraform Init
           command: |
             cd ./terraform/<<parameters.environment>>/
             terraform get -update=true
             terraform init
-          name: get and init
       - run:
-          name: preview
+          name: Terraform <<parameters.action>>
           command: |
             cd ./terraform/<<parameters.environment>>/
-            terraform plan
-  # Apply terraform
-  terraform-init-then-apply:
-    description: "Initializes and applies terraform configuration"
-    parameters:
-      environment:
-        type: string
-    steps:
-      - *attach_workspace
-      - checkout
-      - run:
-          command: |
-            cd ./terraform/<<parameters.environment>>/
-            terraform get -update=true
-            terraform init
-          name: get and init
-      - run:
-          name: apply
-          command: |
-            cd ./terraform/<<parameters.environment>>/
-            terraform apply -auto-approve
+
+            if [ "<<parameters.action>>" = "preview" ]; then
+              terraform plan
+            elif [ "<<parameters.action>>" = "deploy" ]; then
+              terraform apply -auto-approve
+            fi
   deploy-lambda:
-    description: "Deploys API via Serverless"
+    executor: docker-dotnet
     parameters:
       stage:
         type: string
@@ -87,11 +100,7 @@ commands:
       - *attach_workspace
       - checkout
       - setup_remote_docker
-      - run:
-          name: Install Node.js
-          command: |
-            curl -sL https://deb.nodesource.com/setup_20.x | bash -
-            apt-get update && apt-get install -y nodejs
+      - node/install
       - run:
           name: Install serverless CLI
           command: npm i -g serverless
@@ -104,268 +113,102 @@ commands:
           name: Deploy lambda
           command: |
             sls deploy --stage <<parameters.stage>> --conceal
-  migrate-database:
-    description: "Migrate database"
-    parameters:
-      stage:
-        type: string
-    steps:
-      - *attach_workspace
-      - checkout
-      - setup_remote_docker
-      - run:
-          name: Install SSH client
-          command: apt-get update && apt-get install -y openssh-client
-      - run:
-          name: Install Unzip
-          command: apt-get update && apt-get install unzip
-      - run:
-          name: Install AWS CLI
-          command: |
-            curl -L -o awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
-            unzip awscliv2.zip
-            ./aws/install
-      - run:
-          name: Install Session Manager plugin
-          command: |
-            curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb"
-            dpkg -i session-manager-plugin.deb
-      - run:
-          name: Install dotnet ef core
-          command: dotnet tool install dotnet-ef --version 6.0.6 --tool-path ./dotnet-ef-local/
-      - run:
-          name: SSH into RDS and migrate database
-          command: |
-            aws ssm get-parameter --name "/platform-apis-jump-box-pem-key" --output text --query Parameter.Value > ./private-key.pem
-            chmod 400 ./private-key.pem
-            HOST=$(aws ssm get-parameter --name /addresses-api/<<parameters.stage>>/postgres-hostname --query Parameter.Value)
-            PORT=$(aws ssm get-parameter --name /addresses-api/<<parameters.stage>>/postgres-port --query Parameter.Value)
-            INSTANCE_NAME=$(aws ssm get-parameter --name /platform-apis-jump-box-instance-name --query Parameter.Value)
-            ssh -4 -i ./private-key.pem -Nf -M -L 5432:${HOST//\"}:${PORT//\"} -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" -o ProxyCommand="aws ssm start-session --target %h --document AWS-StartSSHSession --parameters portNumber=%p --region=eu-west-2" ec2-user@${INSTANCE_NAME//\"}
-            PASSWORD=$(aws ssm get-parameter --name /addresses-api/<<parameters.stage>>/postgres-password --query Parameter.Value)
-            USERNAME=$(aws ssm get-parameter --name /addresses-api/<<parameters.stage>>/postgres-username --query Parameter.Value)
-            CONN_STR="Host=localhost;Password=${PASSWORD};Port=5432;Username=${USERNAME};Database=addresses_api;CommandTimeout=120;"
-            cd ./AddressesAPI/
-            CONNECTION_STRING=${CONN_STR} ./../dotnet-ef-local/dotnet-ef database update
-
-jobs:
-  check-code-formatting:
-    executor: docker-dotnet
-    steps:
-      - checkout
-      - run:
-          name: Install dotnet format
-          command: dotnet tool install dotnet-format --tool-path ./dotnet-format-local/
-      - run:
-          name: Run formatter check
-          command: ./dotnet-format-local/dotnet-format --check
-  build-and-test:
-    executor: docker-python
-    steps:
-      - checkout
-      - setup_remote_docker
-      - run:
-          name: build
-          command: docker-compose build addresses-api-test
-      - run:
-          name: Run tests
-          command: |
-            docker-compose up -d test-elasticsearch
-            docker-compose run addresses-api-test
-  assume-role-development:
-    executor: docker-python
-    steps:
-      - assume-role-and-persist-workspace:
-          aws-account: $AWS_ACCOUNT_DEVELOPMENT
-  assume-role-staging:
-    executor: docker-python
-    steps:
-      - assume-role-and-persist-workspace:
-          aws-account: $AWS_ACCOUNT_STAGING
-  assume-role-production:
-    executor: docker-python
-    steps:
-      - assume-role-and-persist-workspace:
-          aws-account: $AWS_ACCOUNT_PRODUCTION
-  terraform-init-and-apply-to-development:
-    executor: docker-terraform
-    steps:
-      - terraform-init-then-apply:
-          environment: "development"
-  # Infrastructure changes preview:
-  preview-terraform-staging-changes:
-    executor: docker-terraform
-    steps:
-      - terraform-init-then-preview:
-          environment: "staging"
-  # Infrastructure deployment:
-  terraform-init-and-apply-to-staging:
-    executor: docker-terraform
-    steps:
-      - terraform-init-then-apply:
-          environment: "staging"
-  # Infrastructure changes preview:
-  preview-terraform-production-changes:
-    executor: docker-terraform
-    steps:
-      - terraform-init-then-preview:
-          environment: "production"
-  # Infrastructure deployment:
-  terraform-init-and-apply-to-production:
-    executor: docker-terraform
-    steps:
-      - terraform-init-then-apply:
-          environment: "production"
-  deploy-to-development:
-    executor: docker-dotnet
-    steps:
-      - deploy-lambda:
-          stage: "development"
-  deploy-to-staging:
-    executor: docker-dotnet
-    steps:
-      - deploy-lambda:
-          stage: "staging"
-  deploy-to-production:
-    executor: docker-dotnet
-    steps:
-      - deploy-lambda:
-          stage: "production"
-  migrate-database-staging:
-    executor: docker-dotnet
-    steps:
-      - migrate-database:
-          stage: "staging"
-  migrate-database-production:
-    executor: docker-dotnet
-    steps:
-      - migrate-database:
-          stage: "production"
 
 workflows:
-  check-and-deploy-development:
+  feature:
     jobs:
       - check-code-formatting
       - build-and-test
-  check-and-deploy-staging-and-production:
+      - assume-role:
+          name: assume-role-staging
+          context: api-assume-role-staging-context
+          aws-account: $AWS_ACCOUNT_STAGING
+          filters: *ignore_master
+      - execute-terraform:
+          name: preview-staging-terraform
+          environment: "staging"
+          action: "preview"
+          requires: [assume-role-staging]
+      - assume-role:
+          name: assume-role-production
+          context: api-assume-role-production-context
+          aws-account: $AWS_ACCOUNT_PRODUCTION
+          filters: *ignore_master
+      - execute-terraform:
+          name: preview-production-terraform
+          environment: "production"
+          action: "preview"
+          requires: [assume-role-production]
+
+  deploy-api-code-stg-and-prod:
     jobs:
       - build-and-test:
-          filters:
-            branches:
-              only: master
-      - assume-role-staging:
+          filters: *master_only
+      - assume-role:
+          name: assume-role-staging
           context: api-assume-role-staging-context
-          requires:
-            - build-and-test
-          filters:
-            branches:
-              only: master
-      # - migrate-database-staging:
-      #     requires:
-      #       - terraform-init-and-apply-to-staging
-      #       - assume-role-staging
-      #     filters:
-      #       branches:
-      #         only: master
-      - deploy-to-staging:
+          aws-account: $AWS_ACCOUNT_STAGING
+          requires: [build-and-test]
+      - deploy-lambda:
+          name: deploy-to-staging
+          stage: "staging"
           context: "Serverless Framework"
-          requires:
-            - assume-role-staging
-          filters:
-            branches:
-              only: master
-      - permit-production-deployment-workflow:
+          requires: [assume-role-staging]
+      - permit-production-deployment:
           type: approval
-          requires:
-            - deploy-to-staging
-          filters:
-            branches:
-              only: master
-      - assume-role-production:
+          requires: [deploy-to-staging]
+      - assume-role:
+          name: assume-role-production
           context: api-assume-role-production-context
-          requires:
-              - permit-production-deployment-workflow
-          filters:
-             branches:
-               only: master
-      # - migrate-database-production:
-      #     requires:
-      #       - terraform-init-and-apply-to-production
-      #       - assume-role-production
-      #     filters:
-      #       branches:
-      #         only: master
-      - deploy-to-production:
+          aws-account: $AWS_ACCOUNT_PRODUCTION
+          requires: [permit-production-deployment]
+      - deploy-lambda:
+          name: deploy-to-production
+          stage: "production"
           context: "Serverless Framework"
-          requires:
-            - assume-role-production
-          filters:
-            branches:
-              only: master
+          requires: [assume-role-production]
 
   deploy-staging-and-production-terraform:
     jobs:
-      - permit-staging-and-production-terraform-workflow:
+      - start-staging-terraform-release:
           type: approval
-          filters:
-            branches:
-              only: master
-      - assume-role-staging:
+          filters: *master_only
+      - assume-role:
+          name: assume-role-staging
           context: api-assume-role-staging-context
-          requires:
-            - permit-staging-and-production-terraform-workflow
-          filters:
-            branches:
-              only: master
-      - preview-terraform-staging-changes:
-          requires:
-            - assume-role-staging
-          filters:
-            branches:
-              only: master
-      - continue-with-staging-terraform-release:
+          aws-account: $AWS_ACCOUNT_STAGING
+          requires: [start-staging-terraform-release]
+      - execute-terraform:
+          name: preview-staging-terraform
+          environment: "staging"
+          action: "preview"
+          requires: [assume-role-staging]
+      - permit-staging-terraform-release:
           type: approval
-          requires:
-            - preview-terraform-staging-changes
-          filters:
-            branches:
-              only: master
-      - terraform-init-and-apply-to-staging:
-          requires:
-            - continue-with-staging-terraform-release
-          filters:
-            branches:
-              only: master      
-      - permit-production-terraform-workflow:
+          requires: [preview-staging-terraform]
+      - execute-terraform:
+          name: release-staging-terraform
+          environment: "staging"
+          action: "deploy"
+          requires: [permit-staging-terraform-release]
+      - start-production-terraform-release:
           type: approval
-          requires:
-            - terraform-init-and-apply-to-staging
-          filters:
-            branches:
-              only: master
-      - assume-role-production:
+          filters: *master_only
+      - assume-role:
+          name: assume-role-production
           context: api-assume-role-production-context
-          requires:
-              - permit-production-terraform-workflow
-          filters:
-             branches:
-               only: master
-      - preview-terraform-production-changes:
-            requires:
-              - assume-role-production
-            filters:
-              branches:
-                only: master
-      - continue-with-production-terraform-release:
-            type: approval
-            requires:
-              - preview-terraform-production-changes
-            filters:
-              branches:
-                only: master
-      - terraform-init-and-apply-to-production:
-          requires:
-            - continue-with-production-terraform-release
-          filters:
-            branches:
-              only: master
+          aws-account: $AWS_ACCOUNT_PRODUCTION
+          requires: [start-production-terraform-release]
+      - execute-terraform:
+          name: preview-production-terraform
+          environment: "production"
+          action: "preview"
+          requires: [assume-role-production]
+      - permit-production-terraform-release:
+          type: approval
+          requires: [preview-production-terraform]
+      - execute-terraform:
+          name: release-production-terraform
+          environment: "production"
+          action: "deploy"
+          requires: [permit-production-terraform-release]

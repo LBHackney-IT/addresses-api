@@ -8,7 +8,7 @@ resource "aws_security_group" "dms_sg" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    self = true
+    self        = true
   }
 
   egress {

@@ -21,7 +21,7 @@ Hackney Addresses API user documentation is available for more information about
 4. Rename the initial template.
 5. Open it in your IDE.
 
-Note: Additional setup and troubleshooting information can be found in the *docs* file.
+Note: Additional setup and troubleshooting information can be found in the _docs_ file.
 
 ### Development
 
@@ -62,14 +62,17 @@ This will run migrations on the development database and then seed it with data.
 #### Setting up the development elasticsearch instance
 
 In your terminal run:
+
 ```sh
 make seed-es-data
 ```
 
 If you changed the elasticsearch seed files, then you can run
+
 ```sh
 make remove-es-data
 ```
+
 to remove the docker container and volume. Then next time you start and seed the `dev-elasticsearch` container it will have the new data loaded.
 
 #### Setting up Kibana
@@ -77,8 +80,9 @@ to remove the docker container and volume. Then next time you start and seed the
 If you want to query the elasticsearch database you can use the provided Kibana container.
 
 To start Kibana, run:
+
 ```sh
-docker-compose up -d kibana
+docker compose up -d kibana
 ```
 
 Kibana UI will be available on http://localhost:5601/app/dev_tools#/console
@@ -100,8 +104,8 @@ dotnet test
 If not using make, or to debug the tests in visual studio, start the test databases in their docker containers before starting the tests
 
 ```sh
-docker-compose up -d test-database
-docker-compose up -d test-elasticsearch
+docker compose up -d test-database
+docker compose up -d test-elasticsearch
 ```
 
 NOTE - if you have a local version of postgres installed (and it is running on the default port 5432), you will need to stop it else the unit tests will fail - the docker postgres also runs on port 5432 and there will be a clash.
@@ -109,14 +113,14 @@ NOTE - if you have a local version of postgres installed (and it is running on t
 In windows, go to services and stop the postgres server service.
 
 On a Mac, you can check which ports are in use by running
+
 ```sh
 sudo lsof -PiTCP -sTCP:LISTEN
 ```
+
 If postgres is running, you can either uninstall it using the uninstaller or kill the process.
 
-
 The migrations for the test database are run as part of the initial test setup.
-
 
 ### Release process
 
@@ -133,7 +137,7 @@ Then we have an automated six step deployment process, which runs in CircleCI.
 5. We manually confirm a production deployment in the CircleCI workflow once we're happy with our changes in staging.
 6. The application is deployed to production.
 
-Our staging and production environments are hosted by AWS. We would deploy to production per each feature/config merged into  `master`  branch.
+Our staging and production environments are hosted by AWS. We would deploy to production per each feature/config merged into `master` branch.
 
 ### Creating A PR
 
@@ -159,7 +163,7 @@ CONNECTION_STRING="Host=127.0.0.1;Database=testdb;Username=postgres;Password=myp
 ```
 
 - Or you can delete the migration files and then revert the changes to `AddressesContextModelSnapshot.cs`.
-After which make the necessary changes to the context, then create the migration files again.
+  After which make the necessary changes to the context, then create the migration files again.
 
 > Note: You must not commit any changes to any DbSet that is listed in `AddressesContext` without creating a migration file for the change. If not the change won't be reflected in the database and will cause errors.
 
@@ -169,19 +173,18 @@ After which make the necessary changes to the context, then create the migration
 
 FxCop runs code analysis when the Solution is built.
 
-
 Both the API and Test projects have been set up to **treat all warnings from the code analysis as errors** and therefore, fail the build.
 
 However, we can select which errors to suppress by setting the severity of the responsible rule to none, e.g `dotnet_analyzer_diagnostic.<Category-or-RuleId>.severity = none`, within the `.editorconfig` file.
 Documentation on how to do this can be found [here](https://docs.microsoft.com/en-us/visualstudio/code-quality/use-roslyn-analyzers?view=vs-2019).
 
-*NOTE* FxCop is now deprecated by Microsoft, and a different code analysis tool is run as part of the build pipeline in circleci. It would be good to align these, as currently it is possible to check in code that has no issues locally only to have it rejected by the circleci static analysis.
+_NOTE_ FxCop is now deprecated by Microsoft, and a different code analysis tool is run as part of the build pipeline in circleci. It would be good to align these, as currently it is possible to check in code that has no issues locally only to have it rejected by the circleci static analysis.
 
 ### Smoke testing an environment
 
 After deploying to an environment, there is a postman suite which can be run manually to 'smoke test' everything is working properly.
-This is at *PostmanTests\Addresses-api test suite.postman_collection.json*
-Load this into postman and set a global variable called *addresses-api-url*
+This is at _PostmanTests\Addresses-api test suite.postman_collection.json_
+Load this into postman and set a global variable called _addresses-api-url_
 
 The value of this should be set to the appropriate production or staging URL up and including the 'api' bit but without the trailing slash.
 Also, you will need to set the API key in each test - you will need to obtain a suitable key for the environment, they are different for V1 and V2. The key should be pasted into the 'Auth' header in each postman test.
@@ -216,15 +219,8 @@ Once set up, you can run through the tests and check the results are as excpecte
 
 ### Active Maintainers
 
-- **Selwyn Preston**, Lead Developer at London Borough of Hackney (selwyn.preston@hackney.gov.uk)
-- **Mirela Georgieva**, Lead Developer at London Borough of Hackney (mirela.georgieva@hackney.gov.uk)
-- **Matt Keyworth**, Lead Developer at London Borough of Hackney (matthew.keyworth@hackney.gov.uk)
-
-### Other Contacts
-
-- **Rashmi Shetty**, Product Owner at London Borough of Hackney (rashmi.shetty@hackney.gov.uk)
+- @LBHackney-IT/housing-products
+- @LBHackney-IT/shared-services
 
 [docker-download]: https://www.docker.com/products/docker-desktop
-[docker-compose]: https://docs.docker.com/compose/install
-[made-tech]: https://madetech.com/
 [AWS-CLI]: https://aws.amazon.com/cli/

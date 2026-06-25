@@ -16,7 +16,7 @@ resource "aws_db_subnet_group" "db_subnets" {
 }
 
 resource "aws_db_instance" "lbh-db" {
-  identifier                  = "${var.db_identifier}"
+  identifier                  = var.db_identifier
   engine                      = "postgres"
   engine_version              = var.db_engine_version # Use an appropriate db version for production instances
   instance_class              = var.db_instance_class # Use an appropriate instance class for production instances

@@ -79,7 +79,7 @@ module "postgres_db_staging" {
   publicly_accessible   = false
   project_name          = "platform apis"
   copy_tags_to_snapshot = true
-  additional_tags       = {
+  additional_tags = {
     BackupPolicy = "Prod"
   }
 }
@@ -87,21 +87,21 @@ module "postgres_db_staging" {
 /*    ELASTICSEARCH SETUP    */
 
 module "elasticsearch_db_staging" {
-  source           = "github.com/LBHackney-IT/aws-hackney-common-terraform.git//modules/database/elasticsearch"
-  vpc_id           = data.aws_vpc.staging_vpc.id
-  environment_name = "staging"
-  port             = 443
-  domain_name      = "addresses-api-es"
-  subnet_ids       = [tolist(data.aws_subnet_ids.staging.ids)[0]]
-  project_name     = "addresses-api"
-  es_version       = "7.8"
-  encrypt_at_rest  = "false"
-  instance_type    = "t3.medium.elasticsearch"
-  instance_count   = "3"
-  ebs_enabled      = "true"
-  ebs_volume_size  = "30"
-  region           = data.aws_region.current.name
-  account_id       = data.aws_caller_identity.current.account_id
+  source                 = "github.com/LBHackney-IT/aws-hackney-common-terraform.git//modules/database/elasticsearch"
+  vpc_id                 = data.aws_vpc.staging_vpc.id
+  environment_name       = "staging"
+  port                   = 443
+  domain_name            = "addresses-api-es"
+  subnet_ids             = [tolist(data.aws_subnet_ids.staging.ids)[0]]
+  project_name           = "addresses-api"
+  es_version             = "7.8"
+  encrypt_at_rest        = "false"
+  instance_type          = "t3.medium.elasticsearch"
+  instance_count         = "3"
+  ebs_enabled            = "true"
+  ebs_volume_size        = "30"
+  region                 = data.aws_region.current.name
+  account_id             = data.aws_caller_identity.current.account_id
   zone_awareness_enabled = false
 }
 
@@ -173,14 +173,14 @@ resource "aws_iam_role_policy_attachment" "attach_policy" {
 }
 
 module "dms_replication_instance_staging" {
-  source = "./modules/dms"
-  environment_name = "staging"
-  project_name = "addresses-api"
+  source                          = "./modules/dms"
+  environment_name                = "staging"
+  project_name                    = "addresses-api"
   replication_instance_identifier = "staging-dms-instance"
-  replication_instance_class = "dms.t3.small"
-  vpc_id = data.aws_vpc.staging_vpc.id
-  subnet_ids = data.aws_subnet_ids.staging.ids
-  maintenance_window = "Sun:08:00-Sun:08:30"
+  replication_instance_class      = "dms.t3.small"
+  vpc_id                          = data.aws_vpc.staging_vpc.id
+  subnet_ids                      = data.aws_subnet_ids.staging.ids
+  maintenance_window              = "Sun:08:00-Sun:08:30"
 }
 resource "aws_dms_endpoint" "address_elasticsearch" {
   endpoint_id   = "target-addresses-es"
@@ -217,7 +217,7 @@ module "source_db_endpoint" {
 }
 
 module "address-es-dms-local-addresses" {
-  source                       = "github.com/LBHackney-IT/aws-dms-terraform.git?ref=b15e5a9374faed9ce5105ef35aceebfdad6fbf68//dms_replication_task"
+  source                       = "github.com/LBHackney-IT/aws-dms-terraform.git//dms_replication_task"
   environment_name             = "stg"
   project_name                 = "addresses-api"
   migration_type               = "full-load"
@@ -235,7 +235,7 @@ module "address-es-dms-local-addresses" {
 }
 
 module "address-es-dms-national-addresses" {
-  source                       = "github.com/LBHackney-IT/aws-dms-terraform.git?ref=b15e5a9374faed9ce5105ef35aceebfdad6fbf68//dms_replication_task"
+  source                       = "github.com/LBHackney-IT/aws-dms-terraform.git//dms_replication_task"
   environment_name             = "stg"
   project_name                 = "addresses-api"
   migration_type               = "full-load-and-cdc"
