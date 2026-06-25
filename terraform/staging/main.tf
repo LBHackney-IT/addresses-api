@@ -217,7 +217,7 @@ module "source_db_endpoint" {
 }
 
 module "address-es-dms-local-addresses" {
-  source                       = "github.com/LBHackney-IT/aws-dms-terraform.git?ref=b15e5a9374faed9ce5105ef35aceebfdad6fbf68//dms_replication_task"
+  source                       = "github.com/LBHackney-IT/aws-dms-terraform.git//dms_replication_task"
   environment_name             = "stg"
   project_name                 = "addresses-api"
   migration_type               = "full-load"
@@ -235,7 +235,7 @@ module "address-es-dms-local-addresses" {
 }
 
 module "address-es-dms-national-addresses" {
-  source                       = "github.com/LBHackney-IT/aws-dms-terraform.git?ref=b15e5a9374faed9ce5105ef35aceebfdad6fbf68//dms_replication_task"
+  source                       = "github.com/LBHackney-IT/aws-dms-terraform.git//dms_replication_task"
   environment_name             = "stg"
   project_name                 = "addresses-api"
   migration_type               = "full-load-and-cdc"
