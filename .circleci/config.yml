@@ -217,7 +217,7 @@ workflows:
           requires:
             - assume-role-production
 
-  check-and-deploy-staging-and-production:
+  deploy-api-code-stg-and-prod:
     jobs:
       - build-and-test:
           filters:
@@ -227,37 +227,22 @@ workflows:
           context: api-assume-role-staging-context
           requires:
             - build-and-test
-          filters:
-            branches:
-              only: master
       - deploy-to-staging:
           context: "Serverless Framework"
           requires:
             - assume-role-staging
-          filters:
-            branches:
-              only: master
-      - permit-production-deployment-workflow:
+      - permit-production-deployment:
           type: approval
           requires:
             - deploy-to-staging
-          filters:
-            branches:
-              only: master
       - assume-role-production:
           context: api-assume-role-production-context
           requires:
-            - permit-production-deployment-workflow
-          filters:
-            branches:
-              only: master
+            - permit-production-deployment
       - deploy-to-production:
           context: "Serverless Framework"
           requires:
             - assume-role-production
-          filters:
-            branches:
-              only: master
 
   deploy-staging-and-production-terraform:
     jobs:
