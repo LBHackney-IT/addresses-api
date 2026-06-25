@@ -20,6 +20,12 @@ references:
   attach_workspace: &attach_workspace
     attach_workspace:
       at: *workspace_root
+  master_only: &master_only
+    branches:
+      only: master
+  ignore_master: &ignore_master
+    branches:
+      ignore: master
 
 commands:
   terraform-init:
@@ -133,9 +139,7 @@ workflows:
           name: assume-role-staging
           context: api-assume-role-staging-context
           aws-account: $AWS_ACCOUNT_STAGING
-          filters:
-            branches:
-              ignore: master
+          filters: *ignore_master
       - preview-terraform:
           name: preview-staging-terraform
           environment: "staging"
@@ -144,9 +148,7 @@ workflows:
           name: assume-role-production
           context: api-assume-role-production-context
           aws-account: $AWS_ACCOUNT_PRODUCTION
-          filters:
-            branches:
-              ignore: master
+          filters: *ignore_master
       - preview-terraform:
           name: preview-production-terraform
           environment: "production"
@@ -155,9 +157,7 @@ workflows:
   deploy-api-code-stg-and-prod:
     jobs:
       - build-and-test:
-          filters:
-            branches:
-              only: master
+          filters: *master_only
       - assume-role:
           name: assume-role-staging
           context: api-assume-role-staging-context
@@ -186,9 +186,7 @@ workflows:
     jobs:
       - start-staging-terraform-release:
           type: approval
-          filters:
-            branches:
-              only: master
+          filters: *master_only
       - assume-role:
           name: assume-role-staging
           context: api-assume-role-staging-context
@@ -208,9 +206,7 @@ workflows:
 
       - start-production-terraform-release:
           type: approval
-          filters:
-            branches:
-              only: master
+          filters: *master_only
       - assume-role:
           name: assume-role-production
           context: api-assume-role-production-context
