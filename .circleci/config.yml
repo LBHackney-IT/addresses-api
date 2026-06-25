@@ -27,20 +27,6 @@ references:
     branches:
       ignore: master
 
-commands:
-  terraform-init:
-    description: "Initializes Terraform configuration for a specific environment"
-    parameters:
-      environment:
-        type: string
-    steps:
-      - run:
-          name: get and init
-          command: |
-            cd ./terraform/<<parameters.environment>>/
-            terraform get -update=true
-            terraform init
-
 jobs:
   check-code-formatting:
     executor: docker-dotnet
@@ -77,36 +63,34 @@ jobs:
           root: *workspace_root
           paths:
             - .aws
-  preview-terraform:
+  execute-terraform:
     executor: docker-terraform
     parameters:
       environment:
-        type: string
+        type: enum
+        enum: ["staging", "production"]
+      action:
+        type: enum
+        enum: ["preview", "deploy"]
     steps:
       - *attach_workspace
       - checkout
-      - terraform-init:
-          environment: <<parameters.environment>>
       - run:
-          name: Terraform Plan (Preview)
+          name: Terraform Init
           command: |
             cd ./terraform/<<parameters.environment>>/
-            terraform plan
-  release-terraform:
-    executor: docker-terraform
-    parameters:
-      environment:
-        type: string
-    steps:
-      - *attach_workspace
-      - checkout
-      - terraform-init:
-          environment: <<parameters.environment>>
+            terraform get -update=true
+            terraform init
       - run:
-          name: Terraform Apply (Release)
+          name: Terraform <<parameters.action>>
           command: |
             cd ./terraform/<<parameters.environment>>/
-            terraform apply -auto-approve
+
+            if [ "<<parameters.action>>" = "preview" ]; then
+              terraform plan
+            elif [ "<<parameters.action>>" = "deploy" ]; then
+              terraform apply -auto-approve
+            fi
   deploy-lambda:
     executor: docker-dotnet
     parameters:
@@ -140,18 +124,20 @@ workflows:
           context: api-assume-role-staging-context
           aws-account: $AWS_ACCOUNT_STAGING
           filters: *ignore_master
-      - preview-terraform:
+      - execute-terraform:
           name: preview-staging-terraform
           environment: "staging"
+          action: "preview"
           requires: [assume-role-staging]
       - assume-role:
           name: assume-role-production
           context: api-assume-role-production-context
           aws-account: $AWS_ACCOUNT_PRODUCTION
           filters: *ignore_master
-      - preview-terraform:
+      - execute-terraform:
           name: preview-production-terraform
           environment: "production"
+          action: "preview"
           requires: [assume-role-production]
 
   deploy-api-code-stg-and-prod:
@@ -192,18 +178,19 @@ workflows:
           context: api-assume-role-staging-context
           aws-account: $AWS_ACCOUNT_STAGING
           requires: [start-staging-terraform-release]
-      - preview-terraform:
+      - execute-terraform:
           name: preview-staging-terraform
           environment: "staging"
+          action: "preview"
           requires: [assume-role-staging]
       - permit-staging-terraform-release:
           type: approval
           requires: [preview-staging-terraform]
-      - release-terraform:
+      - execute-terraform:
           name: release-staging-terraform
           environment: "staging"
+          action: "deploy"
           requires: [permit-staging-terraform-release]
-
       - start-production-terraform-release:
           type: approval
           filters: *master_only
@@ -212,14 +199,16 @@ workflows:
           context: api-assume-role-production-context
           aws-account: $AWS_ACCOUNT_PRODUCTION
           requires: [start-production-terraform-release]
-      - preview-terraform:
+      - execute-terraform:
           name: preview-production-terraform
           environment: "production"
+          action: "preview"
           requires: [assume-role-production]
       - permit-production-terraform-release:
           type: approval
           requires: [preview-production-terraform]
-      - release-terraform:
+      - execute-terraform:
           name: release-production-terraform
           environment: "production"
+          action: "deploy"
           requires: [permit-production-terraform-release]
