@@ -246,7 +246,7 @@ workflows:
 
   deploy-staging-and-production-terraform:
     jobs:
-      - permit-staging-and-production-terraform-workflow:
+      - start-staging-terraform-release:
           type: approval
           filters:
             branches:
@@ -254,28 +254,19 @@ workflows:
       - assume-role-staging:
           context: api-assume-role-staging-context
           requires:
-            - permit-staging-and-production-terraform-workflow
-          filters:
-            branches:
-              only: master
+            - start-staging-terraform-release
       - preview-terraform:
           name: preview-staging-terraform
           environment: "staging"
           requires:
             - assume-role-staging
-      - continue-with-staging-terraform-release:
+      - permit-staging-terraform-release:
           type: approval
           requires:
-            - preview-terraform-staging-changes
-          filters:
-            branches:
-              only: master
+            - preview-staging-terraform
       - release-staging-terraform:
           requires:
-            - continue-with-staging-terraform-release
-          filters:
-            branches:
-              only: master
+            - permit-staging-terraform-release
       - permit-production-terraform-workflow:
           type: approval
           requires:
