@@ -57,10 +57,10 @@ variable "project_name" {
 variable "additional_tags" {
   description = "[optional] Extra tags that will be appended to the module tags."
   type        = map(string)
-  default     = { }
+  default     = {}
 }
 variable "db_parameter_group_name" {
-  type = string
+  type    = string
   default = null
 }
 variable "db_allow_major_version_upgrade" {
@@ -69,11 +69,11 @@ variable "db_allow_major_version_upgrade" {
 }
 variable "copy_tags_to_snapshot" {
   description = "[optional] Copy the database instance tags onto the snapshot. Makes it easier to preserve instance tags on backup -> restore."
-  type = bool
-  default = false
+  type        = bool
+  default     = false
 }
 variable "deletion_protection" {
   description = "[optional] Database cannot be deleted while this is set to 'true'. Prevents accidental deletions due TF 'replace'."
-  type = bool
-  default = false
+  type        = bool
+  default     = false
 }
