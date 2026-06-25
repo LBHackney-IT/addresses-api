@@ -113,7 +113,7 @@ jobs:
       - checkout
       - run:
           name: Run formatter check
-          command: dotnet format --verify-no-changes
+          command: dotnet format --verify-no-changes --severity warn
   build-and-test:
     executor: docker-python
     steps:
