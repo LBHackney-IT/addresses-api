@@ -37,7 +37,6 @@ commands:
           root: *workspace_root
           paths:
             - .aws
-
   terraform-init:
     description: "Initializes Terraform configuration for a specific environment"
     parameters:
@@ -50,39 +49,6 @@ commands:
             cd ./terraform/<<parameters.environment>>/
             terraform get -update=true
             terraform init
-
-  # terraform-preview:
-  #   description: "Previews terraform configuration changes"
-  #   parameters:
-  #     environment:
-  #       type: string
-  #   steps:
-  #     - *attach_workspace
-  #     - checkout
-  #     - terraform-init:
-  #         environment: <<parameters.environment>>
-  #     - run:
-  #         name: preview
-  #         command: |
-  #           cd ./terraform/<<parameters.environment>>/
-  #           terraform plan
-
-  terraform-apply-changes:
-    description: "Initializes and applies terraform configuration"
-    parameters:
-      environment:
-        type: string
-    steps:
-      - *attach_workspace
-      - checkout
-      - terraform-init:
-          environment: <<parameters.environment>>
-      - run:
-          name: apply
-          command: |
-            cd ./terraform/<<parameters.environment>>/
-            terraform apply -auto-approve
-
   deploy-lambda:
     description: "Deploys API via Serverless"
     parameters:
@@ -137,7 +103,6 @@ jobs:
     steps:
       - assume-role-and-persist-workspace:
           aws-account: $AWS_ACCOUNT_PRODUCTION
-
   preview-terraform:
     executor: docker-terraform
     parameters:
@@ -153,28 +118,21 @@ jobs:
           command: |
             cd ./terraform/<<parameters.environment>>/
             terraform plan
-
-  # preview-staging-terraform:
-  #   executor: docker-terraform
-  #   steps:
-  #     - terraform-preview:
-  #         environment: "staging"
-  # preview-production-terraform:
-  #   executor: docker-terraform
-  #   steps:
-  #     - terraform-preview:
-  #         environment: "production"
-
-  release-staging-terraform:
+  release-terraform:
     executor: docker-terraform
+    parameters:
+      environment:
+        type: string
     steps:
-      - terraform-apply-changes:
-          environment: "staging"
-  release-production-terraform:
-    executor: docker-terraform
-    steps:
-      - terraform-apply-changes:
-          environment: "production"
+      - *attach_workspace
+      - checkout
+      - terraform-init:
+          environment: <<parameters.environment>>
+      - run:
+          name: Terraform Apply (Release)
+          command: |
+            cd ./terraform/<<parameters.environment>>/
+            terraform apply -auto-approve
   deploy-to-staging:
     executor: docker-dotnet
     steps:
@@ -259,7 +217,9 @@ workflows:
           type: approval
           requires:
             - preview-staging-terraform
-      - release-staging-terraform:
+      - release-terraform:
+          name: release-staging-terraform
+          environment: "staging"
           requires:
             - permit-staging-terraform-release
 
@@ -281,6 +241,8 @@ workflows:
           type: approval
           requires:
             - preview-production-terraform
-      - release-production-terraform:
+      - release-terraform:
+          name: release-production-terraform
+          environment: "production"
           requires:
             - permit-production-terraform-release
