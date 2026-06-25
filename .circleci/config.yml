@@ -267,35 +267,25 @@ workflows:
       - release-staging-terraform:
           requires:
             - permit-staging-terraform-release
-      - permit-production-terraform-workflow:
+
+      - start-production-terraform-release:
           type: approval
-          requires:
-            - release-staging-terraform
           filters:
             branches:
               only: master
       - assume-role-production:
           context: api-assume-role-production-context
           requires:
-            - permit-production-terraform-workflow
-          filters:
-            branches:
-              only: master
+            - start-production-terraform-release
       - preview-terraform:
           name: preview-production-terraform
           environment: "production"
           requires:
             - assume-role-production
-      - continue-with-production-terraform-release:
+      - permit-production-terraform-release:
           type: approval
           requires:
-            - preview-terraform-production-changes
-          filters:
-            branches:
-              only: master
+            - preview-production-terraform
       - release-production-terraform:
           requires:
-            - continue-with-production-terraform-release
-          filters:
-            branches:
-              only: master
+            - permit-production-terraform-release
