@@ -139,8 +139,10 @@ workflows:
     jobs:
       - check-code-formatting
       - build-and-test
-      - assume-role-staging:
+      - assume-role:
+          name: assume-role-staging
           context: api-assume-role-staging-context
+          aws-account: $AWS_ACCOUNT_STAGING
           filters:
             branches:
               ignore: master
@@ -148,8 +150,10 @@ workflows:
           name: preview-staging-terraform
           environment: "staging"
           requires: [assume-role-staging]
-      - assume-role-production:
+      - assume-role:
+          name: assume-role-production
           context: api-assume-role-production-context
+          aws-account: $AWS_ACCOUNT_PRODUCTION
           filters:
             branches:
               ignore: master
