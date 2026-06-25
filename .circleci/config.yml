@@ -147,8 +147,7 @@ workflows:
       - preview-terraform:
           name: preview-staging-terraform
           environment: "staging"
-          requires:
-            - assume-role-staging
+          requires: [assume-role-staging]
       - assume-role-production:
           context: api-assume-role-production-context
           filters:
@@ -157,8 +156,7 @@ workflows:
       - preview-terraform:
           name: preview-production-terraform
           environment: "production"
-          requires:
-            - assume-role-production
+          requires: [assume-role-production]
 
   deploy-api-code-stg-and-prod:
     jobs:
@@ -170,26 +168,21 @@ workflows:
           name: assume-role-staging
           context: api-assume-role-staging-context
           aws-account: $AWS_ACCOUNT_STAGING
-          requires:
-            - build-and-test
+          requires: [build-and-test]
       - deploy-to-staging:
           context: "Serverless Framework"
-          requires:
-            - assume-role-staging
+          requires: [assume-role-staging]
       - permit-production-deployment:
           type: approval
-          requires:
-            - deploy-to-staging
+          requires: [deploy-to-staging]
       - assume-role:
           name: assume-role-production
           context: api-assume-role-production-context
           aws-account: $AWS_ACCOUNT_PRODUCTION
-          requires:
-            - permit-production-deployment
+          requires: [permit-production-deployment]
       - deploy-to-production:
           context: "Serverless Framework"
-          requires:
-            - assume-role-production
+          requires: [assume-role-production]
 
   deploy-staging-and-production-terraform:
     jobs:
@@ -202,22 +195,18 @@ workflows:
           name: assume-role-staging
           context: api-assume-role-staging-context
           aws-account: $AWS_ACCOUNT_STAGING
-          requires:
-            - start-staging-terraform-release
+          requires: [start-staging-terraform-release]
       - preview-terraform:
           name: preview-staging-terraform
           environment: "staging"
-          requires:
-            - assume-role-staging
+          requires: [assume-role-staging]
       - permit-staging-terraform-release:
           type: approval
-          requires:
-            - preview-staging-terraform
+          requires: [preview-staging-terraform]
       - release-terraform:
           name: release-staging-terraform
           environment: "staging"
-          requires:
-            - permit-staging-terraform-release
+          requires: [permit-staging-terraform-release]
 
       - start-production-terraform-release:
           type: approval
@@ -228,19 +217,15 @@ workflows:
           name: assume-role-production
           context: api-assume-role-production-context
           aws-account: $AWS_ACCOUNT_PRODUCTION
-          requires:
-            - start-production-terraform-release
+          requires: [start-production-terraform-release]
       - preview-terraform:
           name: preview-production-terraform
           environment: "production"
-          requires:
-            - assume-role-production
+          requires: [assume-role-production]
       - permit-production-terraform-release:
           type: approval
-          requires:
-            - preview-production-terraform
+          requires: [preview-production-terraform]
       - release-terraform:
           name: release-production-terraform
           environment: "production"
-          requires:
-            - permit-production-terraform-release
+          requires: [permit-production-terraform-release]
