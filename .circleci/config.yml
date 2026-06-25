@@ -22,21 +22,6 @@ references:
       at: *workspace_root
 
 commands:
-  assume-role-and-persist-workspace:
-    description: "Assumes deployment role and persists credentials across jobs"
-    parameters:
-      aws-account:
-        type: string
-    steps:
-      - checkout
-      - aws_assume_role/assume_role:
-          account: <<parameters.aws-account>>
-          profile_name: default
-          role: "LBH_Circle_CI_Deployment_Role"
-      - persist_to_workspace:
-          root: *workspace_root
-          paths:
-            - .aws
   terraform-init:
     description: "Initializes Terraform configuration for a specific environment"
     parameters:
@@ -93,16 +78,21 @@ jobs:
           command: |
             docker compose up -d test-elasticsearch
             docker compose run addresses-api-test
-  assume-role-staging:
+  assume-role:
     executor: docker-python
+    parameters:
+      aws-account:
+        type: string
     steps:
-      - assume-role-and-persist-workspace:
-          aws-account: $AWS_ACCOUNT_STAGING
-  assume-role-production:
-    executor: docker-python
-    steps:
-      - assume-role-and-persist-workspace:
-          aws-account: $AWS_ACCOUNT_PRODUCTION
+      - checkout
+      - aws_assume_role/assume_role:
+          account: <<parameters.aws-account>>
+          profile_name: default
+          role: "LBH_Circle_CI_Deployment_Role"
+      - persist_to_workspace:
+          root: *workspace_root
+          paths:
+            - .aws
   preview-terraform:
     executor: docker-terraform
     parameters:
@@ -176,8 +166,10 @@ workflows:
           filters:
             branches:
               only: master
-      - assume-role-staging:
+      - assume-role:
+          name: assume-role-staging
           context: api-assume-role-staging-context
+          aws-account: $AWS_ACCOUNT_STAGING
           requires:
             - build-and-test
       - deploy-to-staging:
@@ -188,8 +180,10 @@ workflows:
           type: approval
           requires:
             - deploy-to-staging
-      - assume-role-production:
+      - assume-role:
+          name: assume-role-production
           context: api-assume-role-production-context
+          aws-account: $AWS_ACCOUNT_PRODUCTION
           requires:
             - permit-production-deployment
       - deploy-to-production:
@@ -204,8 +198,10 @@ workflows:
           filters:
             branches:
               only: master
-      - assume-role-staging:
+      - assume-role:
+          name: assume-role-staging
           context: api-assume-role-staging-context
+          aws-account: $AWS_ACCOUNT_STAGING
           requires:
             - start-staging-terraform-release
       - preview-terraform:
@@ -228,8 +224,10 @@ workflows:
           filters:
             branches:
               only: master
-      - assume-role-production:
+      - assume-role:
+          name: assume-role-production
           context: api-assume-role-production-context
+          aws-account: $AWS_ACCOUNT_PRODUCTION
           requires:
             - start-production-terraform-release
       - preview-terraform:
