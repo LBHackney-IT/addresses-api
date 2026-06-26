@@ -117,8 +117,10 @@ jobs:
 workflows:
   feature:
     jobs:
-      - check-code-formatting
-      - build-and-test
+      - check-code-formatting:
+          filters: *ignore_master
+      - build-and-test:
+          filters: *ignore_master
       - assume-role:
           name: assume-role-staging
           context: api-assume-role-staging-context
