@@ -49,6 +49,11 @@ variable "db_password" {
 variable "storage_encrypted" {
   type = string
 }
+variable "kms_key_id" {
+  description = "The ARN for the KMS encryption key"
+  type        = string
+  default     = null
+}
 variable "multi_az" {
   type = string
 }
@@ -80,4 +85,13 @@ variable "deletion_protection" {
   description = "[optional] Database cannot be deleted while this is set to 'true'. Prevents accidental deletions due TF 'replace'."
   type        = bool
   default     = false
+}
+variable "performance_insights" {
+  description = "Configuration block for Performance Insights"
+  type = object({
+    enabled          = optional(bool, false)
+    retention_period = optional(number, 7)
+    kms_key_id       = optional(string, null)
+  })
+  default = {}
 }

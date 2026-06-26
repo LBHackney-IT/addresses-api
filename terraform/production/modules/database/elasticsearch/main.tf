@@ -39,8 +39,13 @@ CONFIG
     instance_type          = var.instance_type
     instance_count         = var.instance_count
     zone_awareness_enabled = var.zone_awareness_enabled
-    zone_awareness_config {
-      availability_zone_count = var.availability_zone_count
+
+    dynamic "zone_awareness_config" {
+      for_each = var.zone_awareness_enabled ? [1] : []
+      
+      content {
+        availability_zone_count = var.availability_zone_count
+      }
     }
   }
   ebs_options {

@@ -57,6 +57,10 @@ data "aws_ssm_parameter" "addresses_postgres_hostname" {
   name = "/addresses-api/production/postgres-hostname"
 }
 
+data "aws_kms_key" "local_backup_key" {
+  key_id = "alias/local-backup-key"
+}
+
 module "postgres_db_production" {
   source                   = "./modules/database/postgres"
   environment_name         = "production"
@@ -75,11 +79,17 @@ module "postgres_db_production" {
   db_username              = data.aws_ssm_parameter.addresses_postgres_username.value
   db_password              = data.aws_ssm_parameter.addresses_postgres_db_password.value
   storage_encrypted        = true
+  kms_key_id               = data.aws_kms_key.local_backup_key.arn
   multi_az                 = true //only true if production deployment
   publicly_accessible      = false
   project_name             = "platform apis"
   deletion_protection      = true
   copy_tags_to_snapshot    = true
+  performance_insights = {
+    enabled           = true
+    retention_period  = 7
+    kms_key_id        = data.aws_kms_key.local_backup_key.arn
+  }
   additional_tags = {
     BackupPolicy = "Prod"
   }

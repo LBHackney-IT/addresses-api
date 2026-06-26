@@ -35,6 +35,7 @@ resource "aws_db_instance" "lbh-db" {
   monitoring_interval         = var.monitoring_interval //this is for enhanced Monitoring there will already be some basic monitoring available
   backup_retention_period     = 30
   storage_encrypted           = true
+  kms_key_id                  = var.kms_key_id
   multi_az                    = var.multi_az
   auto_minor_version_upgrade  = true
   allow_major_version_upgrade = var.db_allow_major_version_upgrade
@@ -47,6 +48,11 @@ resource "aws_db_instance" "lbh-db" {
   deletion_protection   = var.deletion_protection
   skip_final_snapshot   = true
   copy_tags_to_snapshot = var.copy_tags_to_snapshot
+
+  # Monitoring
+  performance_insights_enabled          = var.performance_insights.enabled
+  performance_insights_retention_period = var.performance_insights.retention_period
+  performance_insights_kms_key_id       = coalesce(var.performance_insights.kms_key_id, var.kms_key_id)
 
   tags = merge(
     var.additional_tags,
