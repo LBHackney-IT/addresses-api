@@ -49,6 +49,11 @@ variable "db_password" {
 variable "storage_encrypted" {
   type = string
 }
+variable "kms_key_id" {
+  description = "The ARN for the KMS encryption key"
+  type        = string
+  default     = null
+}
 variable "multi_az" {
   type = string
 }
