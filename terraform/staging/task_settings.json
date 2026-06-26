@@ -171,5 +171,9 @@
   "LoopbackPreventionSettings": null,
   "BeforeImageSettings": null,
   "FailTaskWhenCleanTaskResourceFailed": false,
-  "TTSettings": null
+  "TTSettings": {
+    "EnableTT": false,
+    "TTRecordSettings": null,
+    "TTS3Settings": null
+  }
 }
