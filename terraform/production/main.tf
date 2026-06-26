@@ -103,6 +103,8 @@ module "elasticsearch_db_production" {
   ebs_volume_size  = "60"
   region           = data.aws_region.current.name
   account_id       = data.aws_caller_identity.current.account_id
+
+  zone_awareness_enabled = false
 }
 
 data "aws_ssm_parameter" "addresses_elasticsearch_domain" {
