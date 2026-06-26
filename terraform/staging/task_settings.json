@@ -27,6 +27,9 @@
     "CommitRate": 10000
   },
   "Logging": {
+    "CloudWatchLogGroup": "dms-tasks-${dms_replication_instance_name}",
+    "CloudWatchLogStream": "dms-task-${dms_instance_task_resource}",
+    "EnableLogContext": false,
     "EnableLogging": true,
     "LogComponents": [{
         "Id": "TRANSFORMATION",
@@ -109,6 +112,7 @@
   "ControlTablesSettings": {
     "historyTimeslotInMinutes": 5,
     "ControlSchema": "",
+    "FullLoadExceptionTableEnabled": false,
     "HistoryTimeslotInMinutes": 5,
     "HistoryTableEnabled": false,
     "SuspendedTablesTableEnabled": false,
@@ -126,9 +130,11 @@
   },
   "ErrorBehavior": {
     "DataErrorPolicy": "LOG_ERROR",
+    "DataMaskingErrorPolicy": "STOP_TASK",
     "DataTruncationErrorPolicy": "LOG_ERROR",
     "DataErrorEscalationPolicy": "SUSPEND_TABLE",
     "DataErrorEscalationCount": 0,
+    "EventErrorPolicy": "IGNORE",
     "TableErrorPolicy": "SUSPEND_TABLE",
     "TableErrorEscalationPolicy": "STOP_TASK",
     "TableErrorEscalationCount": 0,
@@ -157,10 +163,13 @@
     "CommitTimeout": 1,
     "MemoryLimitTotal": 1024,
     "MemoryKeepTime": 60,
+    "RecoveryTimeout": -1,
     "StatementCacheSize": 50
   },
   "PostProcessingRules": null,
   "CharacterSetSettings": null,
   "LoopbackPreventionSettings": null,
-  "BeforeImageSettings": null
+  "BeforeImageSettings": null,
+  "FailTaskWhenCleanTaskResourceFailed": false,
+  "TTSettings": null
 }

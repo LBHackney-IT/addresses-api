@@ -66,10 +66,11 @@ module "postgres_db_production" {
   db_port                  = 5500
   subnet_ids               = data.aws_subnet_ids.production.ids
   db_engine                = "postgres"
-  db_engine_version        = "16.8"
-  db_instance_class        = "db.t3.small"
+  db_engine_version        = "16.13"
+  db_instance_class        = "db.t3.medium"
   db_allocated_storage     = 100
-  db_max_allocated_storage = 250
+  db_max_allocated_storage = 0
+  monitoring_interval      = 0
   maintenance_window       = "sun:10:00-sun:10:30"
   db_username              = data.aws_ssm_parameter.addresses_postgres_username.value
   db_password              = data.aws_ssm_parameter.addresses_postgres_db_password.value
@@ -102,6 +103,8 @@ module "elasticsearch_db_production" {
   ebs_volume_size  = "60"
   region           = data.aws_region.current.name
   account_id       = data.aws_caller_identity.current.account_id
+
+  zone_awareness_enabled = false
 }
 
 data "aws_ssm_parameter" "addresses_elasticsearch_domain" {
@@ -206,22 +209,4 @@ module "address-es-dms-local-addresses" {
   source_endpoint_arn = module.source_db_endpoint.dms_endpoint_arn
   target_endpoint_arn = aws_dms_endpoint.address_elasticsearch.endpoint_arn
   task_table_mappings = file("${path.module}/selection_rules_local.json")
-}
-
-module "address-es-dms-national-addresses" {
-  source                       = "github.com/LBHackney-IT/aws-dms-terraform.git//dms_replication_task"
-  environment_name             = "production"
-  project_name                 = "addresses-api"
-  migration_type               = "full-load-and-cdc"
-  replication_instance_arn     = "arn:aws:dms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rep:65CJ5HE2DMCUW5X6EPKTKUDVWA"
-  replication_task_indentifier = "addresses-api-es-dms-task-national-addresses"
-  task_settings = templatefile("${path.module}/task_settings.json",
-    {
-      dms_replication_instance_name = "production-dms-instance",
-      dms_instance_task_resource    = "AIB7Y6RGZOCQCUQ7UQHWTW2QNJ5OBWMKDWOBNDA"
-    }
-  )
-  source_endpoint_arn = module.source_db_endpoint.dms_endpoint_arn
-  target_endpoint_arn = aws_dms_endpoint.address_elasticsearch.endpoint_arn
-  task_table_mappings = file("${path.module}/selection_rules_national.json")
 }

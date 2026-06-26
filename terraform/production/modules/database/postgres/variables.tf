@@ -33,6 +33,10 @@ variable "db_max_allocated_storage" {
   type        = number
   default     = 0
 }
+variable "monitoring_interval" {
+  type    = number
+  default = 0
+}
 variable "maintenance_window" {
   type = string //e.g. "tue:10:00-tue:10:30"
 }

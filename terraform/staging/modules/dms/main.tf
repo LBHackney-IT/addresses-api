@@ -21,8 +21,8 @@ resource "aws_dms_replication_instance" "address_dms_rep_instance" {
   replication_instance_class  = var.replication_instance_class
   replication_instance_id     = var.replication_instance_identifier
   replication_subnet_group_id = aws_dms_replication_subnet_group.dms_subnet_group.id
-  engine_version              = "3.5.3"
-  auto_minor_version_upgrade  = false
+  engine_version              = "3.5.4"
+  auto_minor_version_upgrade  = true
   publicly_accessible         = false
   allocated_storage           = 20
   availability_zone           = "eu-west-2a"
@@ -36,4 +36,4 @@ resource "aws_dms_replication_instance" "address_dms_rep_instance" {
   }
 
   vpc_security_group_ids = ["sg-0f2b37cc9a9e2cb60"]
-} 
+}

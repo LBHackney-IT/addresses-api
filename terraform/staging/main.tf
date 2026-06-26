@@ -68,7 +68,7 @@ module "postgres_db_staging" {
   db_port               = 5502
   subnet_ids            = data.aws_subnet_ids.staging.ids
   db_engine             = "postgres"
-  db_engine_version     = "16.8"
+  db_engine_version     = "16.13"
   db_instance_class     = "db.t3.micro"
   db_allocated_storage  = 100
   maintenance_window    = "sun:10:00-sun:10:30"
@@ -226,7 +226,7 @@ module "address-es-dms-local-addresses" {
   task_settings = templatefile("${path.module}/task_settings.json",
     {
       dms_replication_instance_name = "staging-dms-instance",
-      dms_instance_task_resource    = "to-be-updated-local" // Will be updated once the task has been deployed
+      dms_instance_task_resource    = "ZMFZ7R2ZF5BGFNU6T3OTYNWJPE"
     }
   )
   source_endpoint_arn = module.source_db_endpoint.dms_endpoint_arn
@@ -244,7 +244,7 @@ module "address-es-dms-national-addresses" {
   task_settings = templatefile("${path.module}/task_settings.json",
     {
       dms_replication_instance_name = "staging-dms-instance",
-      dms_instance_task_resource    = "to-be-updated-national" // Will be updated once the task has been deployed
+      dms_instance_task_resource    = "ICYNOPE3CNGK7FCOIEUT5XCQ2A"
     }
   )
   source_endpoint_arn = module.source_db_endpoint.dms_endpoint_arn
