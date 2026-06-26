@@ -49,6 +49,11 @@ resource "aws_db_instance" "lbh-db" {
   skip_final_snapshot   = true
   copy_tags_to_snapshot = var.copy_tags_to_snapshot
 
+  # Monitoring
+  performance_insights_enabled          = var.performance_insights.enabled
+  performance_insights_retention_period = var.performance_insights.retention_period
+  performance_insights_kms_key_id       = coalesce(var.performance_insights.kms_key_id, var.kms_key_id)
+
   tags = merge(
     var.additional_tags,
     {

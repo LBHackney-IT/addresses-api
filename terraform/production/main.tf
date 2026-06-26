@@ -85,6 +85,11 @@ module "postgres_db_production" {
   project_name             = "platform apis"
   deletion_protection      = true
   copy_tags_to_snapshot    = true
+  performance_insights = {
+    enabled           = true
+    retention_period  = 7
+    kms_key_id        = data.aws_kms_key.local_backup_key.arn
+  }
   additional_tags = {
     BackupPolicy = "Prod"
   }

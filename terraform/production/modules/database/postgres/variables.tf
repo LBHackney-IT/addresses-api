@@ -86,3 +86,12 @@ variable "deletion_protection" {
   type        = bool
   default     = false
 }
+variable "performance_insights" {
+  description = "Configuration block for Performance Insights"
+  type = object({
+    enabled          = optional(bool, false)
+    retention_period = optional(number, 7)
+    kms_key_id       = optional(string, null)
+  })
+  default = {}
+}
