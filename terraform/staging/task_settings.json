@@ -27,8 +27,8 @@
     "CommitRate": 10000
   },
   "Logging": {
-    "CloudWatchLogGroup": "dms-tasks-staging-dms-instance",
-    "CloudWatchLogStream": "dms-task-ZMFZ7R2ZF5BGFNU6T3OTYNWJPE",
+    "CloudWatchLogGroup": "dms-tasks-${dms_replication_instance_name}",
+    "CloudWatchLogStream": "dms-task-${dms_instance_task_resource}",
     "EnableLogContext": false,
     "EnableLogging": true,
     "LogComponents": [{
