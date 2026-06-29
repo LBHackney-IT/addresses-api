@@ -109,13 +109,22 @@ module "postgres_db_production" {
 
 /*    ELASTICSEARCH SETUP    */
 
+# When switching from `aws_subnet_ids` to `aws_subnets` data blocks the order of subnets has changed, 
+# and TF tries to move the ES domain a different subnet. To prevent this, the previously used subnet
+# was filtered by CIDR that is the definition of the subnet id used by this ES domain (see definitions):
+# https://github.com/LBHackney-IT/infrastructure/blob/979206edd3539b11fb17e00c3d97ca849fb713ed/projects/apis-production/config/terraform/prod.tfvars#L3
+data "aws_subnet" "addreses-es-domain" {
+  vpc_id     = data.aws_vpc.production_vpc.id
+  cidr_block = "10.120.8.0/26"
+}
+
 module "elasticsearch_db_production" {
   source           = "./modules/database/elasticsearch"
   vpc_id           = data.aws_vpc.production_vpc.id
   environment_name = "production"
   port             = 443
   domain_name      = "addresses-api-es"
-  subnet_ids       = [data.aws_subnets.production.ids[0]]
+  subnet_ids       = [data.aws_subnet.addreses-es-domain.id]
   project_name     = "addresses-api"
   es_version       = "7.8"
   encrypt_at_rest  = "true"
