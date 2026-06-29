@@ -41,9 +41,8 @@ data "aws_subnets" "production" {
     values = [data.aws_vpc.production_vpc.id]
   }
 
-  filter {
-    name   = "tag:Type"
-    values = ["private"]
+  tags = {
+    Type = "private"
   }
 }
 
