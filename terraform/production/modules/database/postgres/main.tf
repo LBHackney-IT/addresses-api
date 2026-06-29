@@ -31,7 +31,7 @@ resource "aws_db_instance" "lbh-db" {
   password                    = var.db_password
   vpc_security_group_ids      = [module.db_security_group.db_sg_id]
   db_subnet_group_name        = aws_db_subnet_group.db_subnets.name
-  name                        = var.db_name
+  db_name                     = var.db_name
   monitoring_interval         = var.monitoring_interval //this is for enhanced Monitoring there will already be some basic monitoring available
   backup_retention_period     = 30
   storage_encrypted           = true
