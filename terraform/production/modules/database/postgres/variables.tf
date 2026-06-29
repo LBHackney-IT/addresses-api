@@ -92,6 +92,12 @@ variable "performance_insights" {
     enabled          = optional(bool, false)
     retention_period = optional(number, 7)
     kms_key_id       = optional(string, null)
+    mode             = optional(string, "standard")
   })
   default = {}
+
+  validation {
+    condition     = contains(["standard", "advanced"], var.performance_insights.mode)
+    error_message = "performance_insights.mode must be either 'standard' or 'advanced'."
+  }
 }

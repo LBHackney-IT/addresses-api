@@ -53,6 +53,7 @@ resource "aws_db_instance" "lbh-db" {
   performance_insights_enabled          = var.performance_insights.enabled
   performance_insights_retention_period = var.performance_insights.retention_period
   performance_insights_kms_key_id       = coalesce(var.performance_insights.kms_key_id, var.kms_key_id)
+  database_insights_mode                = var.performance_insights.mode
 
   tags = merge(
     var.additional_tags,
