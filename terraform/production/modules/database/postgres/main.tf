@@ -31,7 +31,7 @@ resource "aws_db_instance" "lbh-db" {
   password                    = var.db_password
   vpc_security_group_ids      = [module.db_security_group.db_sg_id]
   db_subnet_group_name        = aws_db_subnet_group.db_subnets.name
-  name                        = var.db_name
+  db_name                     = var.db_name
   monitoring_interval         = var.monitoring_interval //this is for enhanced Monitoring there will already be some basic monitoring available
   backup_retention_period     = 30
   storage_encrypted           = true
@@ -53,6 +53,7 @@ resource "aws_db_instance" "lbh-db" {
   performance_insights_enabled          = var.performance_insights.enabled
   performance_insights_retention_period = var.performance_insights.retention_period
   performance_insights_kms_key_id       = coalesce(var.performance_insights.kms_key_id, var.kms_key_id)
+  database_insights_mode                = var.performance_insights.mode
 
   tags = merge(
     var.additional_tags,

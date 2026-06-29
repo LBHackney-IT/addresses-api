@@ -7,18 +7,6 @@
 # 6) IF ADDITIONAL RESOURCES ARE REQUIRED BY YOUR API, ADD THEM TO THIS FILE
 # 7) ENSURE THIS FILE IS PLACED WITHIN A 'terraform' FOLDER LOCATED AT THE ROOT PROJECT DIRECTORY
 
-provider "aws" {
-  region  = "eu-west-2"
-  version = "~> 2.0"
-}
-data "aws_caller_identity" "current" {}
-
-data "aws_region" "current" {}
-
-locals {
-  parameter_store = "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter"
-}
-
 terraform {
   backend "s3" {
     bucket  = "terraform-state-production-apis"
@@ -26,7 +14,27 @@ terraform {
     region  = "eu-west-2"
     key     = "services/addresses-api/state"
   }
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 6.52.0"
+    }
+  }
 }
+
+provider "aws" {
+  region  = "eu-west-2"
+}
+
+data "aws_region" "current" {}
+data "aws_caller_identity" "current" {}
+
+locals {
+  current_aws_region = data.aws_region.current.region
+  parameter_store = "arn:aws:ssm:${local.current_aws_region}:${data.aws_caller_identity.current.account_id}:parameter"
+}
+
 /*    VPC SET UP    */
 
 data "aws_vpc" "production_vpc" {
@@ -35,11 +43,14 @@ data "aws_vpc" "production_vpc" {
   }
 }
 
-data "aws_subnet_ids" "production" {
-  vpc_id = data.aws_vpc.production_vpc.id
+data "aws_subnets" "production" {
   filter {
-    name   = "tag:Type"
-    values = ["private"]
+    name   = "vpc-id"
+    values = [data.aws_vpc.production_vpc.id]
+  }
+
+  tags = {
+    Type = "private"
   }
 }
 
@@ -68,7 +79,7 @@ module "postgres_db_production" {
   db_identifier            = "addresses-api-db-production-emergency-temp"
   db_name                  = "addresses_api"
   db_port                  = 5500
-  subnet_ids               = data.aws_subnet_ids.production.ids
+  subnet_ids               = data.aws_subnets.production.ids
   db_engine                = "postgres"
   db_engine_version        = "16.13"
   db_instance_class        = "db.t3.medium"
@@ -87,8 +98,10 @@ module "postgres_db_production" {
   copy_tags_to_snapshot    = true
   performance_insights = {
     enabled           = true
-    retention_period  = 7
+    # Based on AWS docs: "To turn on Database Insights, the retention period must be at least 465 days."
+    retention_period  = 465
     kms_key_id        = data.aws_kms_key.local_backup_key.arn
+    mode              = "advanced"
   }
   additional_tags = {
     BackupPolicy = "Prod"
@@ -97,13 +110,22 @@ module "postgres_db_production" {
 
 /*    ELASTICSEARCH SETUP    */
 
+# When switching from `aws_subnet_ids` to `aws_subnets` data blocks the order of subnets has changed, 
+# and TF tries to move the ES domain a different subnet. To prevent this, the previously used subnet
+# was filtered by CIDR that is the definition of the subnet id used by this ES domain (see definitions):
+# https://github.com/LBHackney-IT/infrastructure/blob/979206edd3539b11fb17e00c3d97ca849fb713ed/projects/apis-production/config/terraform/prod.tfvars#L3
+data "aws_subnet" "addreses-es-domain" {
+  vpc_id     = data.aws_vpc.production_vpc.id
+  cidr_block = "10.120.8.0/26"
+}
+
 module "elasticsearch_db_production" {
   source           = "./modules/database/elasticsearch"
   vpc_id           = data.aws_vpc.production_vpc.id
   environment_name = "production"
   port             = 443
   domain_name      = "addresses-api-es"
-  subnet_ids       = [tolist(data.aws_subnet_ids.production.ids)[0]]
+  subnet_ids       = [data.aws_subnet.addreses-es-domain.id]
   project_name     = "addresses-api"
   es_version       = "7.8"
   encrypt_at_rest  = "true"
@@ -111,7 +133,7 @@ module "elasticsearch_db_production" {
   instance_count   = "6"
   ebs_enabled      = "true"
   ebs_volume_size  = "60"
-  region           = data.aws_region.current.name
+  region           = local.current_aws_region
   account_id       = data.aws_caller_identity.current.account_id
 
   zone_awareness_enabled = false
@@ -208,7 +230,7 @@ module "address-es-dms-local-addresses" {
   environment_name             = "production"
   project_name                 = "addresses-api"
   migration_type               = "full-load"
-  replication_instance_arn     = "arn:aws:dms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rep:65CJ5HE2DMCUW5X6EPKTKUDVWA"
+  replication_instance_arn     = "arn:aws:dms:${local.current_aws_region}:${data.aws_caller_identity.current.account_id}:rep:65CJ5HE2DMCUW5X6EPKTKUDVWA"
   replication_task_indentifier = "addresses-api-es-dms-task-local-addresses"
   task_settings = templatefile("${path.module}/task_settings.json",
     {
