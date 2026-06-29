@@ -35,8 +35,12 @@ data "aws_vpc" "production_vpc" {
   }
 }
 
-data "aws_subnet_ids" "production" {
-  vpc_id = data.aws_vpc.production_vpc.id
+data "aws_subnets" "production" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.production_vpc.id]
+  }
+
   filter {
     name   = "tag:Type"
     values = ["private"]
@@ -68,7 +72,7 @@ module "postgres_db_production" {
   db_identifier            = "addresses-api-db-production-emergency-temp"
   db_name                  = "addresses_api"
   db_port                  = 5500
-  subnet_ids               = data.aws_subnet_ids.production.ids
+  subnet_ids               = data.aws_subnets.production.ids
   db_engine                = "postgres"
   db_engine_version        = "16.13"
   db_instance_class        = "db.t3.medium"
@@ -105,7 +109,7 @@ module "elasticsearch_db_production" {
   environment_name = "production"
   port             = 443
   domain_name      = "addresses-api-es"
-  subnet_ids       = [tolist(data.aws_subnet_ids.production.ids)[0]]
+  subnet_ids       = [data.aws_subnets.production.ids[0]]
   project_name     = "addresses-api"
   es_version       = "7.8"
   encrypt_at_rest  = "true"
