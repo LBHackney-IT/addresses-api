@@ -87,8 +87,10 @@ module "postgres_db_production" {
   copy_tags_to_snapshot    = true
   performance_insights = {
     enabled           = true
-    retention_period  = 7
+    # Based on AWS docs: "To turn on Database Insights, the retention period must be at least 465 days."
+    retention_period  = 465
     kms_key_id        = data.aws_kms_key.local_backup_key.arn
+    mode              = "advanced"
   }
   additional_tags = {
     BackupPolicy = "Prod"
