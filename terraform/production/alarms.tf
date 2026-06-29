@@ -17,7 +17,7 @@ resource "aws_cloudwatch_metric_alarm" "address_api_db_transactions_log_disk_usa
   statistic           = "Average"
 
   dimensions = {
-    DBInstanceIdentifier = "${module.postgres_db_production.instance_id}"
+    DBInstanceIdentifier = "${module.postgres_db_production.instance_identifier}"
   }
 }
 
@@ -34,6 +34,6 @@ resource "aws_cloudwatch_metric_alarm" "address_api_db_free_storage_space" {
   statistic           = "Average"
 
   dimensions = {
-    DBInstanceIdentifier = "${module.postgres_db_production.instance_id}"
+    DBInstanceIdentifier = "${module.postgres_db_production.instance_identifier}"
   }
 }
