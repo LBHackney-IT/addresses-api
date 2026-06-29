@@ -31,7 +31,8 @@ data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
 
 locals {
-  parameter_store = "arn:aws:ssm:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:parameter"
+  current_aws_region = data.aws_region.current.region
+  parameter_store = "arn:aws:ssm:${local.current_aws_region}:${data.aws_caller_identity.current.account_id}:parameter"
 }
 
 /*    VPC SET UP    */
@@ -132,7 +133,7 @@ module "elasticsearch_db_production" {
   instance_count   = "6"
   ebs_enabled      = "true"
   ebs_volume_size  = "60"
-  region           = data.aws_region.current.name
+  region           = local.current_aws_region
   account_id       = data.aws_caller_identity.current.account_id
 
   zone_awareness_enabled = false
@@ -229,7 +230,7 @@ module "address-es-dms-local-addresses" {
   environment_name             = "production"
   project_name                 = "addresses-api"
   migration_type               = "full-load"
-  replication_instance_arn     = "arn:aws:dms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rep:65CJ5HE2DMCUW5X6EPKTKUDVWA"
+  replication_instance_arn     = "arn:aws:dms:${local.current_aws_region}:${data.aws_caller_identity.current.account_id}:rep:65CJ5HE2DMCUW5X6EPKTKUDVWA"
   replication_task_indentifier = "addresses-api-es-dms-task-local-addresses"
   task_settings = templatefile("${path.module}/task_settings.json",
     {
