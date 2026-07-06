@@ -15,9 +15,10 @@ namespace AddressesAPI.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
-                .HasAnnotation("ProductVersion", "3.1.6")
+                .HasAnnotation("ProductVersion", "6.0.36")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("AddressesAPI.Infrastructure.CrossReference", b =>
                 {
@@ -51,7 +52,7 @@ namespace AddressesAPI.Infrastructure.Migrations
 
                     b.HasKey("CrossRefKey");
 
-                    b.ToTable("hackney_xref","dbo");
+                    b.ToTable("hackney_xref", "dbo");
                 });
 
             modelBuilder.Entity("AddressesAPI.Infrastructure.HackneyAddress", b =>
@@ -231,7 +232,7 @@ namespace AddressesAPI.Infrastructure.Migrations
 
                     b.HasKey("AddressKey");
 
-                    b.ToTable("hackney_address","dbo");
+                    b.ToTable("hackney_address", "dbo");
                 });
 
             modelBuilder.Entity("AddressesAPI.Infrastructure.NationalAddress", b =>
@@ -411,7 +412,7 @@ namespace AddressesAPI.Infrastructure.Migrations
 
                     b.HasKey("AddressKey");
 
-                    b.ToTable("national_address","dbo");
+                    b.ToTable("national_address", "dbo");
                 });
 #pragma warning restore 612, 618
         }
