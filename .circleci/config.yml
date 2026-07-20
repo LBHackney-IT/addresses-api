@@ -122,6 +122,16 @@ workflows:
       - build-and-test:
           filters: *ignore_master
       - assume-role:
+          name: assume-role-development
+          context: api-assume-role-development-context
+          aws-account: $AWS_ACCOUNT_DEVELOPMENT
+          filters: *ignore_master
+      - execute-terraform:
+          name: preview-development-terraform
+          environment: "development"
+          action: "preview"
+          requires: [assume-role-development]
+      - assume-role:
           name: assume-role-staging
           context: api-assume-role-staging-context
           aws-account: $AWS_ACCOUNT_STAGING
