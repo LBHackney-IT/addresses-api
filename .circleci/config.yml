@@ -68,7 +68,7 @@ jobs:
     parameters:
       environment:
         type: enum
-        enum: ["staging", "production"]
+        enum: ["development", "staging", "production"]
       action:
         type: enum
         enum: ["preview", "deploy"]
