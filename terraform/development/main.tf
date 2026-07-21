@@ -31,6 +31,7 @@ data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 locals {
   parameter_store = "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter"
+  db_port         = 5501
 }
 
 /*    VPC SET UP    */
@@ -89,13 +90,27 @@ resource "aws_ssm_parameter" "addresses_postgres_db_username" {
   }
 }
 
+resource "aws_ssm_parameter" "addresses_postgres_db_port" {
+  description = "Addresses API Development Postgres DB Port"
+  name        = "/addresses-api/development/postgres-port"
+  type        = "String"
+  value       = local.db_port
+}
+
+resource "aws_ssm_parameter" "addresses_postgres_db_hostname" {
+  description = "Addresses API Development Postgres DB Hostname"
+  name        = "/addresses-api/development/postgres-hostname"
+  type        = "String"
+  value       = module.postgres_db_development.instance_endpoint
+}
+
 module "postgres_db_development" {
   source                    = "./modules/database/postgres"
   environment_name          = "development"
   vpc_id                    = data.aws_vpc.development_vpc.id
   db_identifier             = "addresses-api-db-development"
   db_name                   = "addresses_api"
-  db_port                   = 5501
+  db_port                   = local.db_port
   subnet_ids                = data.aws_subnets.development.ids
   db_engine                 = "postgres"
   db_engine_version         = "16.13"

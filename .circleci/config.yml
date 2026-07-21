@@ -160,6 +160,21 @@ workflows:
       #     action: "preview"
       #     requires: [assume-role-production]
 
+  deploy-api-code-dev:
+    jobs:
+      - assume-role:
+          name: assume-role-development
+          context: api-assume-role-development-context
+          aws-account: $AWS_ACCOUNT_DEVELOPMENT
+      - permit-development-deployment:
+          type: approval
+          requires: [assume-role-development]
+      - deploy-lambda:
+          name: deploy-to-development
+          stage: "development"
+          context: "Serverless Framework"
+          requires: [permit-development-deployment]
+
   deploy-api-code-stg-and-prod:
     jobs:
       - build-and-test:
