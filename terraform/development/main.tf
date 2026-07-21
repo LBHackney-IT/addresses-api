@@ -84,6 +84,20 @@ resource "aws_ssm_parameter" "addresses_postgres_db_password" {
   }
 }
 
+resource "aws_ssm_parameter" "addresses_postgres_db_username" {
+  description = "Addresses API Development Postgres DB Username"
+  name        = "/addresses-api/development/postgres-username"
+  type        = "SecureString"
+  value       = "to_be_set_manually"
+
+  lifecycle {
+    ignore_changes = [
+      value,
+    ]
+  }
+}
+
+
 module "postgres_db_development" {
   source                   = "./modules/database/postgres"
   environment_name         = "development"
