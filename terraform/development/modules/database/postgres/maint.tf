@@ -28,7 +28,7 @@ resource "aws_db_instance" "lbh_db" {
   backup_window               = "00:01-00:31"
   username                    = var.db_username
   password                    = var.db_password
-  vpc_security_group_ids      = concat([module.db_security_group.db_sg_id], var.additional_security_group_ids)
+  vpc_security_group_ids      = [module.db_security_group.db_sg_id]
   db_subnet_group_name        = aws_db_subnet_group.db_subnets.name
   db_name                     = var.db_name
   monitoring_interval         = var.monitoring_interval

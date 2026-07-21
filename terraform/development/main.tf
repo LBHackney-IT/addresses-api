@@ -104,56 +104,46 @@ resource "aws_ssm_parameter" "addresses_postgres_db_hostname" {
   value       = module.postgres_db_development.instance_endpoint
 }
 
-# Bastion access is postgres-specific and lives outside the shared DB security group
-# module so elasticsearch (and other consumers) are not forced to accept the same ingress.
-resource "aws_security_group" "postgres_bastion_access" {
-  name_prefix = "addresses-api-postgres-bastion-"
-  description = "Allow bastion host access to addresses API postgres"
-  vpc_id      = data.aws_vpc.development_vpc.id
-
-  ingress {
-    description     = "allow inbound traffic from bastion host"
-    from_port       = local.db_port
-    to_port         = local.db_port
-    protocol        = "tcp"
-    security_groups = ["sg-073fee129434a7e0c"]
-  }
-
-  tags = {
-    Name        = "addresses-api-postgres-bastion-development"
-    Environment = "development"
-  }
-}
-
 module "postgres_db_development" {
-  source                        = "./modules/database/postgres"
-  environment_name              = "development"
-  vpc_id                        = data.aws_vpc.development_vpc.id
-  db_identifier                 = "addresses-api-db-development"
-  db_name                       = "addresses_api"
-  db_port                       = local.db_port
-  subnet_ids                    = data.aws_subnets.development.ids
-  db_engine                     = "postgres"
-  db_engine_version             = "16.13"
-  db_instance_class             = "db.t4g.small"
-  db_allocated_storage          = 100
-  db_max_allocated_storage      = 0
-  monitoring_interval           = 0
-  maintenance_window            = "sun:10:00-sun:10:30"
-  db_username                   = aws_ssm_parameter.addresses_postgres_db_username.value
-  db_password                   = aws_ssm_parameter.addresses_postgres_db_password.value
-  storage_encrypted             = true
-  kms_key_id                    = data.aws_kms_key.local_backup_key.arn
-  multi_az                      = false
-  publicly_accessible           = false
-  project_name                  = "platform apis"
-  deletion_protection           = true
-  copy_tags_to_snapshot         = true
-  additional_security_group_ids = [aws_security_group.postgres_bastion_access.id]
+  source                   = "./modules/database/postgres"
+  environment_name         = "development"
+  vpc_id                   = data.aws_vpc.development_vpc.id
+  db_identifier            = "addresses-api-db-development"
+  db_name                  = "addresses_api"
+  db_port                  = local.db_port
+  subnet_ids               = data.aws_subnets.development.ids
+  db_engine                = "postgres"
+  db_engine_version        = "16.13"
+  db_instance_class        = "db.t4g.small"
+  db_allocated_storage     = 100
+  db_max_allocated_storage = 0
+  monitoring_interval      = 0
+  maintenance_window       = "sun:10:00-sun:10:30"
+  db_username              = aws_ssm_parameter.addresses_postgres_db_username.value
+  db_password              = aws_ssm_parameter.addresses_postgres_db_password.value
+  storage_encrypted        = true
+  kms_key_id               = data.aws_kms_key.local_backup_key.arn
+  multi_az                 = false
+  publicly_accessible      = false
+  project_name             = "platform apis"
+  deletion_protection      = true
+  copy_tags_to_snapshot    = true
   additional_tags = {
     BackupPolicy = "Dev"
   }
 }
+
+# Bastion access is postgres-specific; keep it outside the shared DB security group module
+# so elasticsearch (and other consumers) are not forced to accept the same ingress.
+# resource "aws_security_group_rule" "postgres_bastion_ingress" {
+#   type                     = "ingress"
+#   description              = "allow inbound traffic from bastion host"
+#   from_port                = local.db_port
+#   to_port                  = local.db_port
+#   protocol                 = "tcp"
+#   security_group_id        = module.postgres_db_development.security_group_id
+#   source_security_group_id = "sg-073fee129434a7e0c"
+# }
 
 /*    ELASTICSEARCH SETUP    */
 
