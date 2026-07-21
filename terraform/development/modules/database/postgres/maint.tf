@@ -17,19 +17,19 @@ resource "aws_db_subnet_group" "db_subnets" {
 }
 
 resource "aws_db_instance" "lbh_db" {
-  identifier            = var.db_identifier
-  engine                = "postgres"
-  engine_version        = var.db_engine_version
-  instance_class        = var.db_instance_class
-  allocated_storage     = var.db_allocated_storage
-  max_allocated_storage = var.db_max_allocated_storage
-  ca_cert_identifier    = "rds-ca-rsa2048-g1"
-  storage_type          = "gp2"
-  port                  = var.db_port
-  maintenance_window    = var.maintenance_window
-  backup_window         = "00:01-00:31"
-  //username                    = var.db_username
-  //password                    = var.db_password
+  identifier                  = var.db_identifier
+  engine                      = "postgres"
+  engine_version              = var.db_engine_version
+  instance_class              = var.db_instance_class
+  allocated_storage           = var.db_allocated_storage
+  max_allocated_storage       = var.db_max_allocated_storage
+  ca_cert_identifier          = "rds-ca-rsa2048-g1"
+  storage_type                = "gp2"
+  port                        = var.db_port
+  maintenance_window          = var.maintenance_window
+  backup_window               = "00:01-00:31"
+  username                    = var.db_username
+  password                    = var.db_password
   vpc_security_group_ids      = [module.db_security_group.db_sg_id]
   db_subnet_group_name        = aws_db_subnet_group.db_subnets.name
   db_name                     = var.db_name

@@ -33,17 +33,7 @@ locals {
   parameter_store = "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter"
 }
 
-//TODO: check if still needed
-data "aws_iam_role" "ec2_container_service_role" {
-  name = "ecsServiceRole"
-}
-//TODO: check if still needed
-data "aws_iam_role" "ecs_task_execution_role" {
-  name = "ecsTaskExecutionRole"
-}
-
 /*    VPC SET UP    */
-
 data "aws_vpc" "development_vpc" {
   tags = {
     Name = "apis-dev"
@@ -71,6 +61,7 @@ import {
   to = module.postgres_db_development.aws_db_instance.lbh_db
 }
 
+//resource deployed first separately and then used in the db module after value changes
 resource "aws_ssm_parameter" "addresses_postgres_db_password" {
   description = "Addresses API Development Postgres DB Password"
   name        = "/addresses-api/development/postgres-password"
@@ -84,6 +75,7 @@ resource "aws_ssm_parameter" "addresses_postgres_db_password" {
   }
 }
 
+//resource deployed first separately and then used in the db module after value changes
 resource "aws_ssm_parameter" "addresses_postgres_db_username" {
   description = "Addresses API Development Postgres DB Username"
   name        = "/addresses-api/development/postgres-username"
@@ -97,24 +89,23 @@ resource "aws_ssm_parameter" "addresses_postgres_db_username" {
   }
 }
 
-
 module "postgres_db_development" {
-  source                   = "./modules/database/postgres"
-  environment_name         = "development"
-  vpc_id                   = data.aws_vpc.development_vpc.id
-  db_identifier            = "addresses-api-db-development"
-  db_name                  = "addresses_api"
-  db_port                  = 5501
-  subnet_ids               = data.aws_subnets.development.ids
-  db_engine                = "postgres"
-  db_engine_version        = "16.13"
-  db_instance_class        = "db.t4g.small"
-  db_allocated_storage     = 100
-  db_max_allocated_storage = 0
-  monitoring_interval      = 0
-  maintenance_window       = "sun:10:00-sun:10:30"
-  #db_username              = data.aws_ssm_parameter.addresses_postgres_username.value
-  #db_password              = data.aws_ssm_parameter.addresses_postgres_db_password.value
+  source                    = "./modules/database/postgres"
+  environment_name          = "development"
+  vpc_id                    = data.aws_vpc.development_vpc.id
+  db_identifier             = "addresses-api-db-development"
+  db_name                   = "addresses_api"
+  db_port                   = 5501
+  subnet_ids                = data.aws_subnets.development.ids
+  db_engine                 = "postgres"
+  db_engine_version         = "16.13"
+  db_instance_class         = "db.t4g.small"
+  db_allocated_storage      = 100
+  db_max_allocated_storage  = 0
+  monitoring_interval       = 0
+  maintenance_window        = "sun:10:00-sun:10:30"
+  db_username               = aws_ssm_parameter.addresses_postgres_db_username.value
+  db_password               = aws_ssm_parameter.addresses_postgres_db_password.value
   storage_encrypted         = true
   kms_key_id                = data.aws_kms_key.local_backup_key.arn
   multi_az                  = false

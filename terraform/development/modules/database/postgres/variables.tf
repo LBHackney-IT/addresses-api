@@ -40,12 +40,12 @@ variable "monitoring_interval" {
 variable "maintenance_window" {
   type = string //e.g. "tue:10:00-tue:10:30"
 }
-#variable "db_username" {
-#type = string
-#}
-#variable "db_password" {
-#type = string
-#}
+variable "db_username" {
+  type = string
+}
+variable "db_password" {
+  type = string
+}
 variable "storage_encrypted" {
   type = string
 }
