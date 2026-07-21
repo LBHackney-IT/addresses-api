@@ -24,7 +24,7 @@ resource "aws_db_instance" "lbh_db" {
   allocated_storage           = var.db_allocated_storage
   max_allocated_storage       = var.db_max_allocated_storage
   ca_cert_identifier          = "rds-ca-rsa2048-g1"
-  storage_type                = "gp2"
+  storage_type                = "gp3"
   port                        = var.db_port
   maintenance_window          = var.maintenance_window
   backup_window               = "00:01-00:31"
@@ -42,7 +42,7 @@ resource "aws_db_instance" "lbh_db" {
   allow_major_version_upgrade = var.db_allow_major_version_upgrade
   parameter_group_name        = var.db_parameter_group_name
 
-  apply_immediately   = false
+  apply_immediately   = true
   publicly_accessible = var.publicly_accessible
 
   # Deletion / Restore related
