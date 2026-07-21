@@ -86,3 +86,8 @@ variable "deletion_protection" {
   type        = bool
   default     = false
 }
+variable "additional_security_group_ids" {
+  description = "Additional security group IDs to attach to the database instance (e.g. bastion access)."
+  type        = list(string)
+  default     = []
+}
