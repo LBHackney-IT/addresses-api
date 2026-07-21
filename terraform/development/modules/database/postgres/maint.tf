@@ -1,9 +1,10 @@
 module "db_security_group" {
-  source           = "../../security_groups/database/internal_only_traffic"
-  vpc_id           = var.vpc_id
-  db_name          = var.db_name
-  db_port          = var.db_port
-  environment_name = var.environment_name
+  source                    = "../../security_groups/database/internal_only_traffic"
+  vpc_id                    = var.vpc_id
+  db_name                   = var.db_name
+  db_port                   = var.db_port
+  environment_name          = var.environment_name
+  bastion_security_group_id = var.bastion_security_group_id
 }
 
 resource "aws_db_subnet_group" "db_subnets" {

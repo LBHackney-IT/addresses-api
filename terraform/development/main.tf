@@ -88,7 +88,7 @@ module "postgres_db_development" {
   db_allocated_storage     = 100
   db_max_allocated_storage = 0
   monitoring_interval      = 0
-  maintenance_window       = "sun:11:00-sun:11:30"
+  maintenance_window       = "sun:10:00-sun:10:30"
   #db_username              = data.aws_ssm_parameter.addresses_postgres_username.value
   #db_password              = data.aws_ssm_parameter.addresses_postgres_db_password.value
   storage_encrypted     = true
@@ -96,8 +96,9 @@ module "postgres_db_development" {
   multi_az              = false
   publicly_accessible   = false
   project_name          = "platform apis"
-  deletion_protection   = true
-  copy_tags_to_snapshot = true
+  deletion_protection       = true
+  copy_tags_to_snapshot     = true
+  bastion_security_group_id = "sg-073fee129434a7e0c"
   additional_tags = {
     BackupPolicy = "Dev"
   }
