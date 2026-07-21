@@ -71,9 +71,19 @@ import {
   to = module.postgres_db_development.aws_db_instance.lbh_db
 }
 
-//TODO: username and password handling against restored db
-//TODO: check port and storage configuration. We don't need that much storage. Maybe only 60GB
-//TODO: change admin password
+resource "aws_ssm_parameter" "addresses_postgres_db_password" {
+  description = "Addresses API Development Postgres DB Password"
+  name        = "/addresses-api/development/postgres-password"
+  type        = "SecureString"
+  value       = "to_be_set_manually"
+
+  lifecycle {
+    ignore_changes = [
+      value,
+    ]
+  }
+}
+
 module "postgres_db_development" {
   source                   = "./modules/database/postgres"
   environment_name         = "development"
@@ -91,11 +101,11 @@ module "postgres_db_development" {
   maintenance_window       = "sun:10:00-sun:10:30"
   #db_username              = data.aws_ssm_parameter.addresses_postgres_username.value
   #db_password              = data.aws_ssm_parameter.addresses_postgres_db_password.value
-  storage_encrypted     = true
-  kms_key_id            = data.aws_kms_key.local_backup_key.arn
-  multi_az              = false
-  publicly_accessible   = false
-  project_name          = "platform apis"
+  storage_encrypted         = true
+  kms_key_id                = data.aws_kms_key.local_backup_key.arn
+  multi_az                  = false
+  publicly_accessible       = false
+  project_name              = "platform apis"
   deletion_protection       = true
   copy_tags_to_snapshot     = true
   bastion_security_group_id = "sg-073fee129434a7e0c"
