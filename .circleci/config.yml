@@ -131,6 +131,14 @@ workflows:
           environment: "development"
           action: "preview"
           requires: [assume-role-development]
+      - permit-development-terraform-deployment:
+          type: approval
+          requires: [preview-development-terraform]
+      - execute-terraform:
+          name: release-development-terraform
+          environment: "development"
+          action: "deploy"
+          requires: [permit-development-terraform-deployment]
       - assume-role:
           name: assume-role-staging
           context: api-assume-role-staging-context
