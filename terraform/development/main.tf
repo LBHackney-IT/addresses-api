@@ -105,29 +105,29 @@ resource "aws_ssm_parameter" "addresses_postgres_db_hostname" {
 }
 
 module "postgres_db_development" {
-  source                    = "./modules/database/postgres"
-  environment_name          = "development"
-  vpc_id                    = data.aws_vpc.development_vpc.id
-  db_identifier             = "addresses-api-db-development"
-  db_name                   = "addresses_api"
-  db_port                   = local.db_port
-  subnet_ids                = data.aws_subnets.development.ids
-  db_engine                 = "postgres"
-  db_engine_version         = "16.13"
-  db_instance_class         = "db.t4g.small"
-  db_allocated_storage      = 100
-  db_max_allocated_storage  = 0
-  monitoring_interval       = 0
-  maintenance_window        = "sun:10:00-sun:10:30"
-  db_username               = aws_ssm_parameter.addresses_postgres_db_username.value
-  db_password               = aws_ssm_parameter.addresses_postgres_db_password.value
-  storage_encrypted         = true
-  kms_key_id                = data.aws_kms_key.local_backup_key.arn
-  multi_az                  = false
-  publicly_accessible       = false
-  project_name              = "platform apis"
-  deletion_protection   = true
-  copy_tags_to_snapshot = true
+  source                   = "./modules/database/postgres"
+  environment_name         = "development"
+  vpc_id                   = data.aws_vpc.development_vpc.id
+  db_identifier            = "addresses-api-db-development"
+  db_name                  = "addresses_api"
+  db_port                  = local.db_port
+  subnet_ids               = data.aws_subnets.development.ids
+  db_engine                = "postgres"
+  db_engine_version        = "16.13"
+  db_instance_class        = "db.t4g.small"
+  db_allocated_storage     = 100
+  db_max_allocated_storage = 0
+  monitoring_interval      = 0
+  maintenance_window       = "sun:10:00-sun:10:30"
+  db_username              = aws_ssm_parameter.addresses_postgres_db_username.value
+  db_password              = aws_ssm_parameter.addresses_postgres_db_password.value
+  storage_encrypted        = true
+  kms_key_id               = data.aws_kms_key.local_backup_key.arn
+  multi_az                 = false
+  publicly_accessible      = false
+  project_name             = "platform apis"
+  deletion_protection      = true
+  copy_tags_to_snapshot    = true
   additional_tags = {
     BackupPolicy = "Dev"
   }
@@ -135,22 +135,19 @@ module "postgres_db_development" {
 
 # Bastion access is postgres-specific; keep it outside the shared DB security group module
 # so elasticsearch (and other consumers) are not forced to accept the same ingress.
-resource "aws_security_group_rule" "postgres_bastion_ingress" {
-  type                     = "ingress"
-  description              = "allow inbound traffic from bastion host"
-  from_port                = local.db_port
-  to_port                  = local.db_port
-  protocol                 = "tcp"
-  security_group_id        = module.postgres_db_development.security_group_id
-  source_security_group_id = "sg-073fee129434a7e0c"
-}
+# resource "aws_security_group_rule" "postgres_bastion_ingress" {
+#   type                     = "ingress"
+#   description              = "allow inbound traffic from bastion host"
+#   from_port                = local.db_port
+#   to_port                  = local.db_port
+#   protocol                 = "tcp"
+#   security_group_id        = module.postgres_db_development.security_group_id
+#   source_security_group_id = "sg-073fee129434a7e0c"
+# }
 
 /*    ELASTICSEARCH SETUP    */
 
-# When switching from `aws_subnet_ids` to `aws_subnets` data blocks the order of subnets has changed, 
-# and TF tries to move the ES domain a different subnet. To prevent this, the previously used subnet
-# was filtered by CIDR that is the definition of the subnet id used by this ES domain (see definitions):
-# https://github.com/LBHackney-IT/infrastructure/blob/979206edd3539b11fb17e00c3d97ca849fb713ed/projects/apis-development/config/terraform/dev.tfvars#L3
+#apis-dev-private-eu-west-2b
 data "aws_subnet" "addreses-es-domain" {
   vpc_id     = data.aws_vpc.development_vpc.id
   cidr_block = "10.120.6.0/25"
@@ -176,10 +173,12 @@ module "elasticsearch_db_development" {
   zone_awareness_enabled = false
 }
 
-//TODO: grab from module output
-# data "aws_ssm_parameter" "addresses_elasticsearch_domain" {
-#   name = "/addresses-api/development/elasticsearch-domain"
-# }
+resource "aws_ssm_parameter" "addresses_elasticsearch_domain" {
+  description = "Addresses API Development Elasticsearch Domain"
+  name        = "/addresses-api/development/elasticsearch-domain"
+  type        = "String"
+  value       = module.elasticsearch_db_development.es_endpoint_url
+}
 
 # /*    DMS SETUP    */
 # data "aws_iam_policy_document" "dms-assume-role-policy" {
@@ -236,7 +235,7 @@ module "elasticsearch_db_development" {
 #   ssl_mode      = "none"
 
 #   elasticsearch_settings {
-#     endpoint_uri            = data.aws_ssm_parameter.addresses_elasticsearch_domain.value
+#     endpoint_uri            = ssm_parameter.addresses_elasticsearch_domain.value
 #     service_access_role_arn = aws_iam_role.dms_service_role.arn
 #   }
 
@@ -254,28 +253,28 @@ module "elasticsearch_db_development" {
 #   endpoint_type           = "source"
 #   engine_name             = "postgres"
 #   database_port           = local.db_port
-#   db_server               = data.aws_ssm_parameter.addresses_postgres_hostname.value
+#   db_server               = aws_ssm_parameter.addresses_postgres_db_hostname.value
 #   ssl_mode                = "none"
 #   environment_name        = "development"
 #   project_name            = "addresses-api"
-#   db_username             = data.aws_ssm_parameter.addresses_postgres_username.value
-#   db_password             = data.aws_ssm_parameter.addresses_postgres_db_password.value
+#   db_username             = aws_ssm_parameter.addresses_postgres_db_username.value
+#   db_password             = aws_ssm_parameter.addresses_postgres_db_password.value
 # }
 
-# module "address-es-dms-local-addresses" {
-#   source                       = "github.com/LBHackney-IT/aws-dms-terraform.git//dms_replication_task"
-#   environment_name             = "development"
-#   project_name                 = "addresses-api"
-#   migration_type               = "full-load"
-#   replication_instance_arn     = "arn:aws:dms:${local.current_aws_region}:${data.aws_caller_identity.current.account_id}:rep:65CJ5HE2DMCUW5X6EPKTKUDVWA"
-#   replication_task_indentifier = "addresses-api-es-dms-task-local-addresses"
-#   task_settings = templatefile("${path.module}/task_settings.json",
-#     {
-#       dms_replication_instance_name = "development-dms-instance",
-#       dms_instance_task_resource    = "LM6NMGMJLYKDTL7SIE3PXS6RZIYDVGDIC2RL3ZI"
-#     }
-#   )
-#   source_endpoint_arn = module.source_db_endpoint.dms_endpoint_arn
-#   target_endpoint_arn = aws_dms_endpoint.address_elasticsearch.endpoint_arn
-#   task_table_mappings = file("${path.module}/selection_rules_local.json")
-# }
+# # module "address-es-dms-local-addresses" {
+# #   source                       = "github.com/LBHackney-IT/aws-dms-terraform.git//dms_replication_task"
+# #   environment_name             = "development"
+# #   project_name                 = "addresses-api"
+# #   migration_type               = "full-load"
+# #   replication_instance_arn     = "arn:aws:dms:${local.current_aws_region}:${data.aws_caller_identity.current.account_id}:rep:65CJ5HE2DMCUW5X6EPKTKUDVWA"
+# #   replication_task_indentifier = "addresses-api-es-dms-task-local-addresses"
+# #   task_settings = templatefile("${path.module}/task_settings.json",
+# #     {
+# #       dms_replication_instance_name = "development-dms-instance",
+# #       dms_instance_task_resource    = "LM6NMGMJLYKDTL7SIE3PXS6RZIYDVGDIC2RL3ZI"
+# #     }
+# #   )
+# #   source_endpoint_arn = module.source_db_endpoint.dms_endpoint_arn
+# #   target_endpoint_arn = aws_dms_endpoint.address_elasticsearch.endpoint_arn
+# #   task_table_mappings = file("${path.module}/selection_rules_local.json")
+# # }
