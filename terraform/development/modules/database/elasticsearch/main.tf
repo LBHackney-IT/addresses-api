@@ -2,7 +2,6 @@ module "db_security_group" {
   source           = "../../security_groups/database/internal_only_traffic"
   vpc_id           = var.vpc_id
   db_name          = var.domain_name
-  db_port          = var.port
   environment_name = var.environment_name
 }
 

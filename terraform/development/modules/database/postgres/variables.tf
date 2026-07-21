@@ -86,7 +86,3 @@ variable "deletion_protection" {
   type        = bool
   default     = false
 }
-variable "bastion_security_group_id" {
-  description = "Security group ID of the bastion host allowed to connect to the database"
-  type        = string
-}

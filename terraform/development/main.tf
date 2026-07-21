@@ -126,12 +126,23 @@ module "postgres_db_development" {
   multi_az                  = false
   publicly_accessible       = false
   project_name              = "platform apis"
-  deletion_protection       = true
-  copy_tags_to_snapshot     = true
-  bastion_security_group_id = "sg-073fee129434a7e0c"
+  deletion_protection   = true
+  copy_tags_to_snapshot = true
   additional_tags = {
     BackupPolicy = "Dev"
   }
+}
+
+# Bastion access is postgres-specific; keep it outside the shared DB security group module
+# so elasticsearch (and other consumers) are not forced to accept the same ingress.
+resource "aws_security_group_rule" "postgres_bastion_ingress" {
+  type                     = "ingress"
+  description              = "allow inbound traffic from bastion host"
+  from_port                = local.db_port
+  to_port                  = local.db_port
+  protocol                 = "tcp"
+  security_group_id        = module.postgres_db_development.security_group_id
+  source_security_group_id = "sg-073fee129434a7e0c"
 }
 
 /*    ELASTICSEARCH SETUP    */
