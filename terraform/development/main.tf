@@ -65,6 +65,12 @@ data "aws_kms_key" "local_backup_key" {
   key_id = "alias/local-backup-key"
 }
 
+# // db restored from backup and imported to terraform
+import {
+  id = "addresses-api-db-development"
+  to = module.postgres_db_development.aws_db_instance.lbh_db
+}
+
 //TODO: username and password handling against restored db
 //TODO: check port and storage configuration. We don't need that much storage. Maybe only 60GB
 //TODO: change admin password
@@ -78,11 +84,11 @@ module "postgres_db_development" {
   subnet_ids               = data.aws_subnets.development.ids
   db_engine                = "postgres"
   db_engine_version        = "16.13"
-  db_instance_class        = "db.t3.medium"
+  db_instance_class        = "db.t4g.small"
   db_allocated_storage     = 100
   db_max_allocated_storage = 0
   monitoring_interval      = 0
-  maintenance_window       = "sun:10:00-sun:10:30"
+  maintenance_window       = "sun:11:00-sun:11:30"
   #db_username              = data.aws_ssm_parameter.addresses_postgres_username.value
   #db_password              = data.aws_ssm_parameter.addresses_postgres_db_password.value
   storage_encrypted     = true

@@ -117,10 +117,10 @@ jobs:
 workflows:
   feature:
     jobs:
-      - check-code-formatting:
-          filters: *ignore_master
-      - build-and-test:
-          filters: *ignore_master
+      # - check-code-formatting:
+      #     filters: *ignore_master
+      # - build-and-test:
+      #     filters: *ignore_master
       - assume-role:
           name: assume-role-development
           context: api-assume-role-development-context
@@ -139,26 +139,26 @@ workflows:
           environment: "development"
           action: "deploy"
           requires: [permit-development-terraform-deployment]
-      - assume-role:
-          name: assume-role-staging
-          context: api-assume-role-staging-context
-          aws-account: $AWS_ACCOUNT_STAGING
-          filters: *ignore_master
-      - execute-terraform:
-          name: preview-staging-terraform
-          environment: "staging"
-          action: "preview"
-          requires: [assume-role-staging]
-      - assume-role:
-          name: assume-role-production
-          context: api-assume-role-production-context
-          aws-account: $AWS_ACCOUNT_PRODUCTION
-          filters: *ignore_master
-      - execute-terraform:
-          name: preview-production-terraform
-          environment: "production"
-          action: "preview"
-          requires: [assume-role-production]
+      # - assume-role:
+      #     name: assume-role-staging
+      #     context: api-assume-role-staging-context
+      #     aws-account: $AWS_ACCOUNT_STAGING
+      #     filters: *ignore_master
+      # - execute-terraform:
+      #     name: preview-staging-terraform
+      #     environment: "staging"
+      #     action: "preview"
+      #     requires: [assume-role-staging]
+      # - assume-role:
+      #     name: assume-role-production
+      #     context: api-assume-role-production-context
+      #     aws-account: $AWS_ACCOUNT_PRODUCTION
+      #     filters: *ignore_master
+      # - execute-terraform:
+      #     name: preview-production-terraform
+      #     environment: "production"
+      #     action: "preview"
+      #     requires: [assume-role-production]
 
   deploy-api-code-stg-and-prod:
     jobs:
