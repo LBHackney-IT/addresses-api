@@ -133,3 +133,138 @@ module "postgres_db_development" {
     BackupPolicy = "Dev"
   }
 }
+
+/*    ELASTICSEARCH SETUP    */
+
+# When switching from `aws_subnet_ids` to `aws_subnets` data blocks the order of subnets has changed, 
+# and TF tries to move the ES domain a different subnet. To prevent this, the previously used subnet
+# was filtered by CIDR that is the definition of the subnet id used by this ES domain (see definitions):
+# https://github.com/LBHackney-IT/infrastructure/blob/979206edd3539b11fb17e00c3d97ca849fb713ed/projects/apis-development/config/terraform/dev.tfvars#L3
+data "aws_subnet" "addreses-es-domain" {
+  vpc_id     = data.aws_vpc.development_vpc.id
+  cidr_block = "10.120.6.0/25"
+}
+
+module "elasticsearch_db_development" {
+  source           = "./modules/database/elasticsearch"
+  vpc_id           = data.aws_vpc.development_vpc.id
+  environment_name = "development"
+  port             = 443
+  domain_name      = "addresses-api-es"
+  subnet_ids       = [data.aws_subnet.addreses-es-domain.id]
+  project_name     = "addresses-api"
+  es_version       = "7.10"
+  encrypt_at_rest  = "true"
+  instance_type    = "t3.small.elasticsearch"
+  instance_count   = "1"
+  ebs_enabled      = "true"
+  ebs_volume_size  = "30"
+  region           = data.aws_region.current.name
+  account_id       = data.aws_caller_identity.current.account_id
+
+  zone_awareness_enabled = false
+}
+
+//TODO: grab from module output
+# data "aws_ssm_parameter" "addresses_elasticsearch_domain" {
+#   name = "/addresses-api/development/elasticsearch-domain"
+# }
+
+# /*    DMS SETUP    */
+# data "aws_iam_policy_document" "dms-assume-role-policy" {
+#   statement {
+#     actions = ["sts:AssumeRole"]
+
+#     principals {
+#       type        = "Service"
+#       identifiers = ["dms.amazonaws.com"]
+#     }
+#   }
+# }
+
+# resource "aws_iam_role" "dms_service_role" {
+#   name               = "dms_service_role"
+#   path               = "/system/"
+#   assume_role_policy = data.aws_iam_policy_document.dms-assume-role-policy.json
+# }
+
+# resource "aws_iam_policy" "es_policy" {
+#   name        = "DMS_Elasticsearch_Addresses"
+#   description = "A policy allowing you CRUD operations on addresses API elasticsearch cluster"
+
+#   policy = <<EOF
+# {
+#     "Version": "2012-10-17",
+#     "Statement": [
+#         {
+#             "Effect": "Allow",
+#             "Action": [
+#                        "es:ESHttpDelete",
+#                        "es:ESHttpGet",
+#                        "es:ESHttpHead",
+#                        "es:ESHttpPost",
+#                        "es:ESHttpPut"
+#                      ],
+#             "Resource": "${module.elasticsearch_db_development.es_arn}"
+#         }
+#     ]
+# }
+# EOF
+# }
+
+# resource "aws_iam_role_policy_attachment" "attach_policy" {
+#   role       = aws_iam_role.dms_service_role.name
+#   policy_arn = aws_iam_policy.es_policy.arn
+# }
+
+# resource "aws_dms_endpoint" "address_elasticsearch" {
+#   endpoint_id   = "target-addresses-es"
+#   endpoint_type = "target"
+#   engine_name   = "elasticsearch"
+#   port          = 443
+#   ssl_mode      = "none"
+
+#   elasticsearch_settings {
+#     endpoint_uri            = data.aws_ssm_parameter.addresses_elasticsearch_domain.value
+#     service_access_role_arn = aws_iam_role.dms_service_role.arn
+#   }
+
+#   tags = {
+#     Name         = "target-addresses-es",
+#     Environment  = "development",
+#     project_name = "addresses-api"
+#   }
+# }
+
+# module "source_db_endpoint" {
+#   source                  = "github.com/LBHackney-IT/aws-dms-terraform.git//dms_endpoint"
+#   database_name           = "addresses_api"
+#   dms_endpoint_identifier = "source-addresses-postgres"
+#   endpoint_type           = "source"
+#   engine_name             = "postgres"
+#   database_port           = local.db_port
+#   db_server               = data.aws_ssm_parameter.addresses_postgres_hostname.value
+#   ssl_mode                = "none"
+#   environment_name        = "development"
+#   project_name            = "addresses-api"
+#   db_username             = data.aws_ssm_parameter.addresses_postgres_username.value
+#   db_password             = data.aws_ssm_parameter.addresses_postgres_db_password.value
+# }
+
+# module "address-es-dms-local-addresses" {
+#   source                       = "github.com/LBHackney-IT/aws-dms-terraform.git//dms_replication_task"
+#   environment_name             = "development"
+#   project_name                 = "addresses-api"
+#   migration_type               = "full-load"
+#   replication_instance_arn     = "arn:aws:dms:${local.current_aws_region}:${data.aws_caller_identity.current.account_id}:rep:65CJ5HE2DMCUW5X6EPKTKUDVWA"
+#   replication_task_indentifier = "addresses-api-es-dms-task-local-addresses"
+#   task_settings = templatefile("${path.module}/task_settings.json",
+#     {
+#       dms_replication_instance_name = "development-dms-instance",
+#       dms_instance_task_resource    = "LM6NMGMJLYKDTL7SIE3PXS6RZIYDVGDIC2RL3ZI"
+#     }
+#   )
+#   source_endpoint_arn = module.source_db_endpoint.dms_endpoint_arn
+#   target_endpoint_arn = aws_dms_endpoint.address_elasticsearch.endpoint_arn
+#   task_table_mappings = file("${path.module}/selection_rules_local.json")
+# }
