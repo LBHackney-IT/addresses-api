@@ -181,6 +181,16 @@ resource "aws_ssm_parameter" "addresses_elasticsearch_domain" {
   value       = module.elasticsearch_db_development.es_endpoint_url
 }
 
+# Queue URL for the reindex Lambdas (SQS_QUEUE_URL in serverless.yml).
+# The queue itself is created by Serverless CloudFormation as sqsQueueReindexingAlias
+# with QueueName sqs-addresses-api-reindex-${stage} — see serverless.yml.
+resource "aws_ssm_parameter" "reindexing_queue" {
+  description = "Addresses API Development reindex SQS queue URL"
+  name        = "/addresses-api/development/reindexing-queue"
+  type        = "String"
+  value       = "https://sqs.${data.aws_region.current.name}.amazonaws.com/${data.aws_caller_identity.current.account_id}/sqs-addresses-api-reindex-development"
+}
+
 /*    DMS SETUP    */
 data "aws_iam_policy_document" "dms-assume-role-policy" {
   statement {
