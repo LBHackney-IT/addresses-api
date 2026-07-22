@@ -193,6 +193,17 @@ data "aws_iam_policy_document" "dms-assume-role-policy" {
   }
 }
 
+# Account-level role required for DMS to manage ENIs in the VPC
+resource "aws_iam_role" "dms-vpc-role" {
+  name               = "dms-vpc-role"
+  assume_role_policy = data.aws_iam_policy_document.dms-assume-role-policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "dms-vpc-role-AmazonDMSVPCManagementRole" {
+  role       = aws_iam_role.dms-vpc-role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"
+}
+
 resource "aws_iam_role" "dms_service_role" {
   name               = "dms_service_role"
   path               = "/system/"
@@ -228,6 +239,52 @@ resource "aws_iam_role_policy_attachment" "attach_policy" {
   policy_arn = aws_iam_policy.es_policy.arn
 }
 
+module "dms_security_group" {
+  source           = "./modules/security_groups/dms"
+  vpc_id           = data.aws_vpc.development_vpc.id
+  environment_name = "development"
+}
+
+resource "aws_security_group_rule" "postgres_dms_ingress" {
+  type                     = "ingress"
+  description              = "allow inbound traffic from DMS replication instance"
+  from_port                = local.db_port
+  to_port                  = local.db_port
+  protocol                 = "tcp"
+  security_group_id        = module.postgres_db_development.security_group_id
+  source_security_group_id = module.dms_security_group.dms_sg_id
+}
+
+resource "aws_security_group_rule" "elasticsearch_dms_ingress" {
+  type                     = "ingress"
+  description              = "allow inbound traffic from DMS replication instance"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  security_group_id        = module.elasticsearch_db_development.security_group_id
+  source_security_group_id = module.dms_security_group.dms_sg_id
+}
+
+module "dms_replication_instance_development" {
+  source                          = "./modules/dms"
+  environment_name                = "development"
+  project_name                    = "addresses-api"
+  replication_instance_identifier = "development-dms-instance"
+  replication_instance_class      = "dms.t3.small"
+  vpc_id                          = data.aws_vpc.development_vpc.id
+  subnet_ids                      = data.aws_subnets.development.ids
+  maintenance_window              = "Sun:10:00-Sun:10:30"
+  vpc_security_group_ids          = [module.dms_security_group.dms_sg_id]
+
+  depends_on = [aws_iam_role_policy_attachment.dms-vpc-role-AmazonDMSVPCManagementRole]
+}
+
+resource "aws_ssm_parameter" "dms_rep_instance_arn" {
+  name  = "/addresses-api/development/dms-rep-instance-arn"
+  type  = "String"
+  value = module.dms_replication_instance_development.dms_rep_instance_arn
+}
+
 resource "aws_dms_endpoint" "address_elasticsearch" {
   endpoint_id   = "target-addresses-es"
   endpoint_type = "target"
@@ -260,17 +317,6 @@ module "source_db_endpoint" {
   project_name            = "addresses-api"
   db_username             = aws_ssm_parameter.addresses_postgres_db_username.value
   db_password             = aws_ssm_parameter.addresses_postgres_db_password.value
-}
-
-module "dms_replication_instance_development" {
-  source                          = "./modules/dms"
-  environment_name                = "development"
-  project_name                    = "addresses-api"
-  replication_instance_identifier = "development-dms-instance"
-  replication_instance_class      = "dms.t3.small"
-  vpc_id                          = data.aws_vpc.development_vpc.id
-  subnet_ids                      = data.aws_subnets.development.ids
-  maintenance_window              = "Sun:10:00-Sun:10:30"
 }
 
 
