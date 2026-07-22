@@ -312,7 +312,7 @@ module "source_db_endpoint" {
   engine_name             = "postgres"
   database_port           = local.db_port
   db_server               = aws_ssm_parameter.addresses_postgres_db_hostname.value
-  ssl_mode                = "none"
+  ssl_mode                = "require"
   environment_name        = "development"
   project_name            = "addresses-api"
   db_username             = aws_ssm_parameter.addresses_postgres_db_username.value
