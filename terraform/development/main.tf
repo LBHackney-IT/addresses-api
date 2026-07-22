@@ -319,21 +319,28 @@ module "source_db_endpoint" {
   db_password             = aws_ssm_parameter.addresses_postgres_db_password.value
 }
 
+module "address-es-dms-local-addresses" {
+  source                       = "github.com/LBHackney-IT/aws-dms-terraform.git//dms_replication_task"
+  environment_name             = "development"
+  project_name                 = "addresses-api"
+  migration_type               = "full-load"
+  replication_instance_arn     = aws_ssm_parameter.dms_rep_instance_arn.value
+  replication_task_indentifier = "addresses-api-es-dms-task-local-addresses"
+  task_settings                = file("${path.module}/task_settings.json")
+  source_endpoint_arn          = module.source_db_endpoint.dms_endpoint_arn
+  target_endpoint_arn          = aws_dms_endpoint.address_elasticsearch.endpoint_arn
+  task_table_mappings          = file("${path.module}/selection_rules_local.json")
+}
 
-# module "address-es-dms-local-addresses" {
+# module "address-es-dms-national-addresses" {
 #   source                       = "github.com/LBHackney-IT/aws-dms-terraform.git//dms_replication_task"
 #   environment_name             = "development"
 #   project_name                 = "addresses-api"
-#   migration_type               = "full-load"
-#   replication_instance_arn     = "arn:aws:dms:${local.current_aws_region}:${data.aws_caller_identity.current.account_id}:rep:65CJ5HE2DMCUW5X6EPKTKUDVWA"
-#   replication_task_indentifier = "addresses-api-es-dms-task-local-addresses"
-#   task_settings = templatefile("${path.module}/task_settings.json",
-#     {
-#       dms_replication_instance_name = "development-dms-instance",
-#       dms_instance_task_resource    = "LM6NMGMJLYKDTL7SIE3PXS6RZIYDVGDIC2RL3ZI"
-#     }
-#   )
-#   source_endpoint_arn = module.source_db_endpoint.dms_endpoint_arn
-#   target_endpoint_arn = aws_dms_endpoint.address_elasticsearch.endpoint_arn
-#   task_table_mappings = file("${path.module}/selection_rules_local.json")
+#   migration_type               = "full-load-and-cdc"
+#   replication_instance_arn     = aws_ssm_parameter.dms_rep_instance_arn.value
+#   replication_task_indentifier = "addresses-api-es-dms-task-national-addresses"
+#   task_settings                = file("${path.module}/task_settings.json")
+#   source_endpoint_arn          = module.source_db_endpoint.dms_endpoint_arn
+#   target_endpoint_arn          = aws_dms_endpoint.address_elasticsearch.endpoint_arn
+#   task_table_mappings          = file("${path.module}/selection_rules_national.json")
 # }
