@@ -283,7 +283,7 @@ module "dms_replication_instance_development" {
   replication_instance_class      = "dms.t3.small"
   vpc_id                          = data.aws_vpc.development_vpc.id
   subnet_ids                      = data.aws_subnets.development.ids
-  maintenance_window              = "Sun:10:00-Sun:10:30"
+  maintenance_window              = "sun:10:00-sun:10:30"
   vpc_security_group_ids          = [module.dms_security_group.dms_sg_id]
 
   depends_on = [aws_iam_role_policy_attachment.dms-vpc-role-AmazonDMSVPCManagementRole]
