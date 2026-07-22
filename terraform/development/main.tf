@@ -180,86 +180,86 @@ resource "aws_ssm_parameter" "addresses_elasticsearch_domain" {
   value       = module.elasticsearch_db_development.es_endpoint_url
 }
 
-# /*    DMS SETUP    */
-# data "aws_iam_policy_document" "dms-assume-role-policy" {
-#   statement {
-#     actions = ["sts:AssumeRole"]
+/*    DMS SETUP    */
+data "aws_iam_policy_document" "dms-assume-role-policy" {
+  statement {
+    actions = ["sts:AssumeRole"]
 
-#     principals {
-#       type        = "Service"
-#       identifiers = ["dms.amazonaws.com"]
-#     }
-#   }
-# }
+    principals {
+      type        = "Service"
+      identifiers = ["dms.amazonaws.com"]
+    }
+  }
+}
 
-# resource "aws_iam_role" "dms_service_role" {
-#   name               = "dms_service_role"
-#   path               = "/system/"
-#   assume_role_policy = data.aws_iam_policy_document.dms-assume-role-policy.json
-# }
+resource "aws_iam_role" "dms_service_role" {
+  name               = "dms_service_role"
+  path               = "/system/"
+  assume_role_policy = data.aws_iam_policy_document.dms-assume-role-policy.json
+}
 
-# resource "aws_iam_policy" "es_policy" {
-#   name        = "DMS_Elasticsearch_Addresses"
-#   description = "A policy allowing you CRUD operations on addresses API elasticsearch cluster"
+resource "aws_iam_policy" "es_policy" {
+  name        = "DMS_Elasticsearch_Addresses"
+  description = "A policy allowing you CRUD operations on addresses API elasticsearch cluster"
 
-#   policy = <<EOF
-# {
-#     "Version": "2012-10-17",
-#     "Statement": [
-#         {
-#             "Effect": "Allow",
-#             "Action": [
-#                        "es:ESHttpDelete",
-#                        "es:ESHttpGet",
-#                        "es:ESHttpHead",
-#                        "es:ESHttpPost",
-#                        "es:ESHttpPut"
-#                      ],
-#             "Resource": "${module.elasticsearch_db_development.es_arn}"
-#         }
-#     ]
-# }
-# EOF
-# }
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                       "es:ESHttpDelete",
+                       "es:ESHttpGet",
+                       "es:ESHttpHead",
+                       "es:ESHttpPost",
+                       "es:ESHttpPut"
+                     ],
+            "Resource": "${module.elasticsearch_db_development.es_arn}"
+        }
+    ]
+}
+EOF
+}
 
-# resource "aws_iam_role_policy_attachment" "attach_policy" {
-#   role       = aws_iam_role.dms_service_role.name
-#   policy_arn = aws_iam_policy.es_policy.arn
-# }
+resource "aws_iam_role_policy_attachment" "attach_policy" {
+  role       = aws_iam_role.dms_service_role.name
+  policy_arn = aws_iam_policy.es_policy.arn
+}
 
-# resource "aws_dms_endpoint" "address_elasticsearch" {
-#   endpoint_id   = "target-addresses-es"
-#   endpoint_type = "target"
-#   engine_name   = "elasticsearch"
-#   port          = 443
-#   ssl_mode      = "none"
+resource "aws_dms_endpoint" "address_elasticsearch" {
+  endpoint_id   = "target-addresses-es"
+  endpoint_type = "target"
+  engine_name   = "elasticsearch"
+  port          = 443
+  ssl_mode      = "none"
 
-#   elasticsearch_settings {
-#     endpoint_uri            = ssm_parameter.addresses_elasticsearch_domain.value
-#     service_access_role_arn = aws_iam_role.dms_service_role.arn
-#   }
+  elasticsearch_settings {
+    endpoint_uri            = ssm_parameter.addresses_elasticsearch_domain.value
+    service_access_role_arn = aws_iam_role.dms_service_role.arn
+  }
 
-#   tags = {
-#     Name         = "target-addresses-es",
-#     Environment  = "development",
-#     project_name = "addresses-api"
-#   }
-# }
+  tags = {
+    Name         = "target-addresses-es",
+    Environment  = "development",
+    project_name = "addresses-api"
+  }
+}
 
-# module "source_db_endpoint" {
-#   source                  = "github.com/LBHackney-IT/aws-dms-terraform.git//dms_endpoint"
-#   database_name           = "addresses_api"
-#   dms_endpoint_identifier = "source-addresses-postgres"
-#   endpoint_type           = "source"
-#   engine_name             = "postgres"
-#   database_port           = local.db_port
-#   db_server               = aws_ssm_parameter.addresses_postgres_db_hostname.value
-#   ssl_mode                = "none"
-#   environment_name        = "development"
-#   project_name            = "addresses-api"
-#   db_username             = aws_ssm_parameter.addresses_postgres_db_username.value
-#   db_password             = aws_ssm_parameter.addresses_postgres_db_password.value
-# }
+module "source_db_endpoint" {
+  source                  = "github.com/LBHackney-IT/aws-dms-terraform.git//dms_endpoint"
+  database_name           = "addresses_api"
+  dms_endpoint_identifier = "source-addresses-postgres"
+  endpoint_type           = "source"
+  engine_name             = "postgres"
+  database_port           = local.db_port
+  db_server               = aws_ssm_parameter.addresses_postgres_db_hostname.value
+  ssl_mode                = "none"
+  environment_name        = "development"
+  project_name            = "addresses-api"
+  db_username             = aws_ssm_parameter.addresses_postgres_db_username.value
+  db_password             = aws_ssm_parameter.addresses_postgres_db_password.value
+}
 
 # # module "address-es-dms-local-addresses" {
 # #   source                       = "github.com/LBHackney-IT/aws-dms-terraform.git//dms_replication_task"
