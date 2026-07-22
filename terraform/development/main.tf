@@ -235,7 +235,7 @@ resource "aws_dms_endpoint" "address_elasticsearch" {
   ssl_mode      = "none"
 
   elasticsearch_settings {
-    endpoint_uri            = ssm_parameter.addresses_elasticsearch_domain.value
+    endpoint_uri            = aws_ssm_parameter.addresses_elasticsearch_domain.value
     service_access_role_arn = aws_iam_role.dms_service_role.arn
   }
 
