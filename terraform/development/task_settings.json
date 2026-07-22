@@ -27,8 +27,6 @@
     "CommitRate": 10000
   },
   "Logging": {
-    "CloudWatchLogGroup": null,
-    "CloudWatchLogStream": null,
     "EnableLogContext": false,
     "EnableLogging": true,
     "LogComponents": [{
