@@ -16,7 +16,7 @@ resource "aws_kms_key" "dms_premigration_assessment" {
 
   tags = {
     Name         = "addresses-api-dms-premigration-assessment-development"
-    Environment  = "development"
+    Environment  = "dev"
     project_name = "addresses-api"
   }
 }
@@ -96,7 +96,7 @@ resource "aws_s3_bucket" "dms_premigration_assessment" {
 
   tags = {
     Name         = local.dms_assessment_bucket_name
-    Environment  = "development"
+    Environment  = "dev"
     project_name = "addresses-api"
     Purpose      = "dms-premigration-assessment-reports"
   }
@@ -238,7 +238,7 @@ resource "aws_iam_role" "dms_premigration_assessment" {
 
   tags = {
     Name         = local.dms_assessment_role_name
-    Environment  = "development"
+    Environment  = "dev"
     project_name = "addresses-api"
   }
 }
