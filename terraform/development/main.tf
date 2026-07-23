@@ -181,7 +181,8 @@ resource "aws_ssm_parameter" "addresses_elasticsearch_domain" {
   description = "Addresses API Development Elasticsearch Domain"
   name        = "/addresses-api/development/elasticsearch-domain"
   type        = "String"
-  value       = module.elasticsearch_db_development.es_endpoint_url
+  # aws_elasticsearch_domain.endpoint is hostname-only; the app expects a full URI (see Startup.ConfigureElasticsearch)
+  value = "https://${module.elasticsearch_db_development.es_endpoint_url}"
 }
 
 # Queue URL for the reindex Lambdas (SQS_QUEUE_URL in serverless.yml).
