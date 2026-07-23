@@ -218,6 +218,16 @@ resource "aws_security_group_rule" "elasticsearch_lambda_ingress" {
   source_security_group_id = aws_security_group.lambda.id
 }
 
+resource "aws_security_group_rule" "elasticsearch_bastion_ingress" {
+  type                     = "ingress"
+  description              = "allow inbound traffic from bastion host"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  security_group_id        = module.elasticsearch_db_development.security_group_id
+  source_security_group_id = "sg-073fee129434a7e0c"
+}
+
 # Consumed by serverless.yml vpc.development.securityGroupIds
 resource "aws_ssm_parameter" "lambda_security_group_id" {
   description = "Addresses API Development Lambda security group ID"

@@ -29,6 +29,7 @@ flowchart TB
   ssm["SSM Parameter Store<br/>/addresses-api/development/*"]
 
   bastion -->|TCP 5501| rds
+  bastion -->|TCP 443| es
   lambda --> rds
   lambda --> es
   lambda --> ssm
@@ -55,6 +56,7 @@ flowchart LR
   esSg["Elasticsearch SG"]
 
   bastionSg -->|ingress TCP 5501| pgSg
+  bastionSg -->|ingress TCP 443| esSg
   dmsSg -->|ingress TCP 5501| pgSg
   dmsSg -->|ingress TCP 443| esSg
   dmsSg -->|egress all| internet((VPC / AWS APIs))
@@ -63,6 +65,7 @@ flowchart LR
 | Path | Rule |
 |------|------|
 | Bastion → Postgres | `aws_security_group_rule.postgres_bastion_ingress` |
+| Bastion → Elasticsearch | `aws_security_group_rule.elasticsearch_bastion_ingress` |
 | DMS → Postgres | `aws_security_group_rule.postgres_dms_ingress` |
 | DMS → Elasticsearch | `aws_security_group_rule.elasticsearch_dms_ingress` |
 
