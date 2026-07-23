@@ -214,6 +214,18 @@ resource "aws_iam_role_policy_attachment" "dms-vpc-role-AmazonDMSVPCManagementRo
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"
 }
 
+# Account-level role required for DMS task CloudWatch logging
+# (role name is case-sensitive and must be exactly dms-cloudwatch-logs-role)
+resource "aws_iam_role" "dms-cloudwatch-logs-role" {
+  name               = "dms-cloudwatch-logs-role"
+  assume_role_policy = data.aws_iam_policy_document.dms-assume-role-policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "dms-cloudwatch-logs-role-AmazonDMSCloudWatchLogsRole" {
+  role       = aws_iam_role.dms-cloudwatch-logs-role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSCloudWatchLogsRole"
+}
+
 resource "aws_iam_role" "dms_service_role" {
   name               = "dms_service_role"
   path               = "/system/"
@@ -286,7 +298,10 @@ module "dms_replication_instance_development" {
   maintenance_window              = "sun:10:00-sun:10:30"
   vpc_security_group_ids          = [module.dms_security_group.dms_sg_id]
 
-  depends_on = [aws_iam_role_policy_attachment.dms-vpc-role-AmazonDMSVPCManagementRole]
+  depends_on = [
+    aws_iam_role_policy_attachment.dms-vpc-role-AmazonDMSVPCManagementRole,
+    aws_iam_role_policy_attachment.dms-cloudwatch-logs-role-AmazonDMSCloudWatchLogsRole,
+  ]
 }
 
 resource "aws_ssm_parameter" "dms_rep_instance_arn" {
