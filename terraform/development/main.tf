@@ -146,6 +146,37 @@ resource "aws_security_group_rule" "postgres_bastion_ingress" {
   source_security_group_id = "sg-073fee129434a7e0c"
 }
 
+# Dedicated SG for Addresses API Lambdas (referenced from serverless.yml via SSM)
+resource "aws_security_group" "lambda" {
+  name        = "addresses-api-lambda-development"
+  description = "Security group for addresses-api Lambda functions (development)"
+  vpc_id      = data.aws_vpc.development_vpc.id
+
+  egress {
+    description = "allow outbound traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name         = "addresses-api-lambda-development"
+    Environment  = "development"
+    project_name = "addresses-api"
+  }
+}
+
+resource "aws_security_group_rule" "postgres_lambda_ingress" {
+  type                     = "ingress"
+  description              = "allow inbound traffic from addresses-api Lambdas"
+  from_port                = local.db_port
+  to_port                  = local.db_port
+  protocol                 = "tcp"
+  security_group_id        = module.postgres_db_development.security_group_id
+  source_security_group_id = aws_security_group.lambda.id
+}
+
 /*    ELASTICSEARCH SETUP    */
 
 #apis-dev-private-eu-west-2b
@@ -175,6 +206,24 @@ module "elasticsearch_db_development" {
   account_id       = data.aws_caller_identity.current.account_id
 
   zone_awareness_enabled = false
+}
+
+resource "aws_security_group_rule" "elasticsearch_lambda_ingress" {
+  type                     = "ingress"
+  description              = "allow inbound traffic from addresses-api Lambdas"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  security_group_id        = module.elasticsearch_db_development.security_group_id
+  source_security_group_id = aws_security_group.lambda.id
+}
+
+# Consumed by serverless.yml vpc.development.securityGroupIds
+resource "aws_ssm_parameter" "lambda_security_group_id" {
+  description = "Addresses API Development Lambda security group ID"
+  name        = "/addresses-api/development/lambda-security-group-id"
+  type        = "String"
+  value       = aws_security_group.lambda.id
 }
 
 resource "aws_ssm_parameter" "addresses_elasticsearch_domain" {
