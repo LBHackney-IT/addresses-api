@@ -217,8 +217,14 @@ resource "aws_iam_role_policy_attachment" "dms-vpc-role-AmazonDMSVPCManagementRo
 # Account-level role required for DMS task CloudWatch logging
 # (role name is case-sensitive and must be exactly dms-cloudwatch-logs-role)
 resource "aws_iam_role" "dms-cloudwatch-logs-role" {
+  description        = "Role for DMS task CloudWatch logging. Created by Addresses API Terraform."
   name               = "dms-cloudwatch-logs-role"
   assume_role_policy = data.aws_iam_policy_document.dms-assume-role-policy.json
+  tags = {
+    Name         = "dms-cloudwatch-logs-role",
+    Environment  = "development",
+    project_name = "addresses-api"
+  }
 }
 
 resource "aws_iam_role_policy_attachment" "dms-cloudwatch-logs-role-AmazonDMSCloudWatchLogsRole" {
