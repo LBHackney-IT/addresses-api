@@ -154,6 +154,9 @@ data "aws_subnet" "addreses-es-domain" {
   cidr_block = "10.120.6.0/25"
 }
 
+// robust one-off load/re-load config is 3 instances with t3.medium.elasticsearch
+// this has been scaled back to a minimum since we don't have any scheduled tasks on development
+// please see the Serverless.yml for details if you want to trigger a one-off re-run
 module "elasticsearch_db_development" {
   source           = "./modules/database/elasticsearch"
   vpc_id           = data.aws_vpc.development_vpc.id

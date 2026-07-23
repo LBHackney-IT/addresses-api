@@ -51,20 +51,7 @@ CONFIG
     ebs_enabled = var.ebs_enabled
     volume_size = var.ebs_volume_size
   }
-  # log_publishing_options {
-  #   cloudwatch_log_group_arn = "arn:aws:logs:eu-west-2:153306643385:log-group:/aws/aes/domains/addresses-api-es/application-logs"
-  #   enabled                  = true
-  #   log_type                 = "ES_APPLICATION_LOGS"
-  # }
-  # log_publishing_options {
-  #   cloudwatch_log_group_arn = "arn:aws:logs:eu-west-2:153306643385:log-group:/aws/aes/domains/addresses-api-es/search-logs"
-  #   enabled                  = true
-  #   log_type                 = "SEARCH_SLOW_LOGS"
-  # }
 
-  # snapshot_options {
-  #   automated_snapshot_start_hour = 23
-  # }
   tags = {
     Name              = "${var.domain_name}-${var.environment_name}"
     Environment       = var.environment_name

@@ -155,7 +155,7 @@ terraform/development/
 
 ## Premigration assessment (optional)
 
-DMS can run a premigration assessment before starting a task. Reports are stored in a dedicated secure S3 bucket managed in `premigration_assessment.tf`.
+DMS can run a premigration assessment before starting a task. Reports are stored in a dedicated secure S3 bucket managed in `premigration_assessment.tf` (shared by local and national tasks).
 
 | Resource | Name / SSM |
 |----------|------------|
