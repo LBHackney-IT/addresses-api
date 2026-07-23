@@ -328,7 +328,8 @@ resource "aws_dms_endpoint" "address_elasticsearch" {
   ssl_mode      = "none"
 
   elasticsearch_settings {
-    endpoint_uri            = aws_ssm_parameter.addresses_elasticsearch_domain.value
+    # DMS expects hostname (no scheme); Lambdas use the https:// SSM value above
+    endpoint_uri            = module.elasticsearch_db_development.es_endpoint_url
     service_access_role_arn = aws_iam_role.dms_service_role.arn
   }
 
