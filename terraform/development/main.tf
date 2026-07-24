@@ -188,6 +188,7 @@ data "aws_subnet" "addreses-es-domain" {
 // robust one-off load/re-load config is 3 instances with t3.medium.elasticsearch
 // this can be scaled back to a minimum (2 instaces/t3.small.elasticsearch) after initial testing 
 //  since we don't have any scheduled tasks on development and the data will be static for the foreseeable future
+// ebs_volume_size has to be at least 50 with production based data
 module "elasticsearch_db_development" {
   source           = "./modules/database/elasticsearch"
   vpc_id           = data.aws_vpc.development_vpc.id
