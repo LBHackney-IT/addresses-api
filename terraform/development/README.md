@@ -121,7 +121,7 @@ sequenceDiagram
 | Component | Identifier / notes |
 |-----------|-------------------|
 | RDS | `addresses-api-db-development`, Postgres 16.13, `db.t4g.small`, port **5501** |
-| Elasticsearch | `addresses-api-es`, version **7.10**, `t3.small` × 1, 30 GB EBS |
+| Elasticsearch | `addresses-api-es`, version **7.10**, `t3.small` × 1, 50 GB EBS |
 | DMS instance | `development-dms-instance`, engine **3.6.1**, `dms.t3.small` |
 | Source endpoint | `source-addresses-postgres`, `ssl_mode = require` |
 | Target endpoint | `target-addresses-es` |
