@@ -160,6 +160,7 @@ workflows:
           name: assume-role-development
           context: api-assume-role-development-context
           aws-account: $AWS_ACCOUNT_DEVELOPMENT
+          requires: [build-and-test]
       - deploy-lambda:
           name: deploy-to-development
           stage: "development"
