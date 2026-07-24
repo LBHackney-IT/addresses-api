@@ -201,7 +201,7 @@ module "elasticsearch_db_development" {
   instance_type    = "t3.medium.elasticsearch"
   instance_count   = "3"
   ebs_enabled      = "true"
-  ebs_volume_size  = "40"
+  ebs_volume_size  = "50"
   region           = data.aws_region.current.name
   account_id       = data.aws_caller_identity.current.account_id
 
