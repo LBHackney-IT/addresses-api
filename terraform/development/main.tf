@@ -186,8 +186,8 @@ data "aws_subnet" "addreses-es-domain" {
 }
 
 // robust one-off load/re-load config is 3 instances with t3.medium.elasticsearch
-// this has been scaled back to a minimum since we don't have any scheduled tasks on development
-// please see the Serverless.yml for details if you want to trigger a one-off re-run
+// this can be scaled back to a minimum (2 instaces/t3.small.elasticsearch) after initial testing 
+//  since we don't have any scheduled tasks on development and the data will be static for the foreseeable future
 module "elasticsearch_db_development" {
   source           = "./modules/database/elasticsearch"
   vpc_id           = data.aws_vpc.development_vpc.id
@@ -201,7 +201,7 @@ module "elasticsearch_db_development" {
   instance_type    = "t3.medium.elasticsearch"
   instance_count   = "3"
   ebs_enabled      = "true"
-  ebs_volume_size  = "30"
+  ebs_volume_size  = "40"
   region           = data.aws_region.current.name
   account_id       = data.aws_caller_identity.current.account_id
 
