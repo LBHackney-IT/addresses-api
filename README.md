@@ -183,7 +183,7 @@ _NOTE_ FxCop is now deprecated by Microsoft, and a different code analysis tool 
 ### Smoke testing an environment
 
 After deploying to an environment, there is a postman suite which can be run manually to 'smoke test' everything is working properly.
-This is at _PostmanTests\Addresses-api test suite.postman_collection.json_
+This is at _PostmanTests\Addresses-api test suite.postman_collection.json_. The easiest way to set the collection up is to simply drag and drop the json file to Postman.
 Load this into postman and set a global variable called _addresses-api-url_
 
 The value of this should be set to the appropriate production or staging URL up and including the 'api' bit but without the trailing slash.

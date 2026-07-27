@@ -1,0 +1,122 @@
+{
+  "rules": [
+    {
+      "rule-type": "selection",
+      "rule-id": "2",
+      "rule-name": "2",
+      "object-locator": {
+        "schema-name": "%",
+        "table-name": "national_address"
+      },
+      "rule-action": "include"
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "4",
+      "rule-name": "4",
+      "rule-action": "remove-column",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "%",
+        "table-name": "national_address",
+        "column-name": "postcode_nospace"
+      }
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "6",
+      "rule-name": "6",
+      "rule-action": "remove-column",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "%",
+        "table-name": "national_address",
+        "column-name": "organisation"
+      }
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "8",
+      "rule-name": "8",
+      "rule-action": "remove-column",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "%",
+        "table-name": "national_address",
+        "column-name": "latitude"
+      }
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "10",
+      "rule-name": "10",
+      "rule-action": "remove-column",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "%",
+        "table-name": "national_address",
+        "column-name": "longitude"
+      }
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "12",
+      "rule-name": "12",
+      "rule-action": "remove-column",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "%",
+        "table-name": "national_address",
+        "column-name": "planning_use_class"
+      }
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "14",
+      "rule-name": "14",
+      "rule-action": "remove-column",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "%",
+        "table-name": "national_address",
+        "column-name": "ward"
+      }
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "16",
+      "rule-name": "16",
+      "rule-action": "remove-column",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "%",
+        "table-name": "national_address",
+        "column-name": "locality"
+      }
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "18",
+      "rule-name": "18",
+      "rule-action": "remove-column",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "%",
+        "table-name": "national_address",
+        "column-name": "northing"
+      }
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "20",
+      "rule-name": "20",
+      "rule-action": "remove-column",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "%",
+        "table-name": "national_address",
+        "column-name": "easting"
+      }
+    }
+  ]
+}

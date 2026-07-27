@@ -68,7 +68,7 @@ jobs:
     parameters:
       environment:
         type: enum
-        enum: ["staging", "production"]
+        enum: ["development", "staging", "production"]
       action:
         type: enum
         enum: ["preview", "deploy"]
@@ -122,6 +122,16 @@ workflows:
       - build-and-test:
           filters: *ignore_master
       - assume-role:
+          name: assume-role-development
+          context: api-assume-role-development-context
+          aws-account: $AWS_ACCOUNT_DEVELOPMENT
+          filters: *ignore_master
+      - execute-terraform:
+          name: preview-development-terraform
+          environment: "development"
+          action: "preview"
+          requires: [assume-role-development]
+      - assume-role:
           name: assume-role-staging
           context: api-assume-role-staging-context
           aws-account: $AWS_ACCOUNT_STAGING
@@ -142,15 +152,28 @@ workflows:
           action: "preview"
           requires: [assume-role-production]
 
-  deploy-api-code-stg-and-prod:
+  deploy-api-code:
     jobs:
       - build-and-test:
           filters: *master_only
       - assume-role:
+          name: assume-role-development
+          context: api-assume-role-development-context
+          aws-account: $AWS_ACCOUNT_DEVELOPMENT
+          requires: [build-and-test]
+      - deploy-lambda:
+          name: deploy-to-development
+          stage: "development"
+          context: "Serverless Framework"
+          requires: [assume-role-development]
+      - permit-staging-deployment:
+          type: approval
+          requires: [deploy-to-development]
+      - assume-role:
           name: assume-role-staging
           context: api-assume-role-staging-context
           aws-account: $AWS_ACCOUNT_STAGING
-          requires: [build-and-test]
+          requires: [permit-staging-deployment]
       - deploy-lambda:
           name: deploy-to-staging
           stage: "staging"
@@ -170,8 +193,29 @@ workflows:
           context: "Serverless Framework"
           requires: [assume-role-production]
 
-  deploy-staging-and-production-terraform:
+  deploy-terraform:
     jobs:
+      - start-development-terraform-release:
+          type: approval
+          filters: *master_only
+      - assume-role:
+          name: assume-role-development
+          context: api-assume-role-development-context
+          aws-account: $AWS_ACCOUNT_DEVELOPMENT
+          requires: [start-development-terraform-release]
+      - execute-terraform:
+          name: preview-development-terraform
+          environment: "development"
+          action: "preview"
+          requires: [assume-role-development]
+      - permit-development-terraform-deployment:
+          type: approval
+          requires: [preview-development-terraform]
+      - execute-terraform:
+          name: release-development-terraform
+          environment: "development"
+          action: "deploy"
+          requires: [permit-development-terraform-deployment]
       - start-staging-terraform-release:
           type: approval
           filters: *master_only

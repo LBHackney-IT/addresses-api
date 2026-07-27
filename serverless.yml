@@ -41,12 +41,26 @@ functions:
       SQS_QUEUE_URL: ${ssm:/addresses-api/${self:provider.stage}/reindexing-queue}
       ELASTICSEARCH_DOMAIN_URL: ${ssm:/addresses-api/${self:provider.stage}/elasticsearch-domain}
     events:
+      # On development, enabled is false (see custom.reindexScheduleEnabled) so this cron does not run.
+      # Trigger manually: Lambda console → addresses-api-reindex-es-alias-development → Test, with e.g.:
+      # {
+      #   "alias": "hackney_addresses",
+      #   "fromIndex": "hackney_address",
+      #   "deleteAfterReindex": true
+      # }
       - schedule:
+          enabled: ${self:custom.reindexScheduleEnabled.${self:provider.stage}}
           rate: cron(0 01 * * ? *)
           input:
             alias: "hackney_addresses"
             fromIndex: "hackney_address"
             deleteAfterReindex: true
+      # National schedule stays disabled in all stages; same manual Test pattern with:
+      # {
+      #   "alias": "national_addresses",
+      #   "fromIndex": "national_address",
+      #   "deleteAfterReindex": true
+      # }
       - schedule:
           enabled: false
           rate: cron(0 02 * * ? *)
@@ -105,15 +119,6 @@ resources:
                           - Ref: 'AWS::Region'
                           - Ref: 'AWS::AccountId'
                           - 'log-group:/aws/lambda/*:*:*'
-                - Effect: "Allow"
-                  Action:
-                    - "s3:PutObject"
-                    - "s3:GetObject"
-                  Resource:
-                    Fn::Join:
-                      - ""
-                      - - "arn:aws:s3:::"
-                        - "Ref": "ServerlessDeploymentBucket"
           - PolicyName: lambdaInvocation
             PolicyDocument:
               Version: '2012-10-17'
@@ -138,12 +143,20 @@ resources:
       Properties:
         QueueName: sqs-addresses-api-reindex-${self:provider.stage}
 custom:
+  # Nightly reindex cron — off in development (use Lambda console Test instead)
+  reindexScheduleEnabled:
+    development: false
+    staging: true
+    production: true
   authorizerArns:
-    development: arn:aws:lambda:eu-west-2:859159924354:function:api-auth-verify-token-new-development-apiauthverifytokennew
+    development: arn:aws:lambda:eu-west-2:859159924354:function:api-gateway-lambda-authorizer
     staging:     arn:aws:lambda:eu-west-2:715003523189:function:api-gateway-lambda-authorizer
     production:  arn:aws:lambda:eu-west-2:153306643385:function:api-gateway-lambda-authorizer
   vpc:
     development:
+      securityGroupIds:
+        # Managed by terraform/development (aws_security_group.lambda)
+        - ${ssm:/addresses-api/development/lambda-security-group-id}
       subnetIds:
         - subnet-0deabb5d8fb9c3446
         - subnet-000b89c249f12a8ad
