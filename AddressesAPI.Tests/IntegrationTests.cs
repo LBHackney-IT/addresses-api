@@ -37,11 +37,35 @@ namespace AddressesAPI.Tests
         {
             Environment.SetEnvironmentVariable("CONNECTION_STRING", ConnectionString.TestDatabase());
             await ElasticsearchTests.BeforeAnyElasticsearchTest(ElasticsearchClient).ConfigureAwait(true);
-            _factory = new MockWebApplicationFactory<TStartup>(_connection);
-            Client = _factory.CreateClient();
-            DatabaseContext = new AddressesContext(_builder.Options);
-            DatabaseContext.Database.Migrate();
-            _transaction = DatabaseContext.Database.BeginTransaction();
+            try
+            {
+                _factory = new MockWebApplicationFactory<TStartup>(_connection);
+                Client = _factory.CreateClient();
+                // #region agent log
+                AgentDebugLog.Write("D", "IntegrationTests.cs:BaseSetup", "WebApplicationFactory CreateClient succeeded", new
+                {
+                    baseAddress = Client.BaseAddress?.ToString()
+                });
+                // #endregion
+                DatabaseContext = new AddressesContext(_builder.Options);
+                DatabaseContext.Database.Migrate();
+                _transaction = DatabaseContext.Database.BeginTransaction();
+                // #region agent log
+                AgentDebugLog.Write("D", "IntegrationTests.cs:BaseSetup", "factory and migrate succeeded", new { run = "post-fix" });
+                // #endregion
+            }
+            catch (Exception ex)
+            {
+                // #region agent log
+                AgentDebugLog.Write("D", "IntegrationTests.cs:BaseSetup", "factory or migrate failed", new
+                {
+                    type = ex.GetType().FullName,
+                    msg = ex.Message,
+                    inner = ex.InnerException?.Message
+                });
+                // #endregion
+                throw;
+            }
         }
 
         [TearDown]
@@ -60,14 +84,36 @@ namespace AddressesAPI.Tests
 
         private void ConnectToPostgresDbUsingEf()
         {
-            _connection = new NpgsqlConnection(ConnectionString.TestDatabase());
-            _connection.Open();
-            var npgsqlCommand = _connection.CreateCommand();
-            npgsqlCommand.CommandText = "SET deadlock_timeout TO 30";
-            npgsqlCommand.ExecuteNonQuery();
+            try
+            {
+                _connection = new NpgsqlConnection(ConnectionString.TestDatabase());
+                _connection.Open();
+                var npgsqlCommand = _connection.CreateCommand();
+                npgsqlCommand.CommandText = "SET deadlock_timeout TO 30";
+                npgsqlCommand.ExecuteNonQuery();
 
-            _builder = new DbContextOptionsBuilder();
-            _builder.UseNpgsql(_connection);
+                _builder = new DbContextOptionsBuilder();
+                _builder.UseNpgsql(_connection);
+                // #region agent log
+                AgentDebugLog.Write("B", "IntegrationTests.cs:ConnectToPostgresDbUsingEf", "postgres opened", new
+                {
+                    state = _connection.State.ToString(),
+                    dbHost = Environment.GetEnvironmentVariable("DB_HOST")
+                });
+                // #endregion
+            }
+            catch (Exception ex)
+            {
+                // #region agent log
+                AgentDebugLog.Write("B", "IntegrationTests.cs:ConnectToPostgresDbUsingEf", "postgres open failed", new
+                {
+                    type = ex.GetType().FullName,
+                    msg = ex.Message,
+                    inner = ex.InnerException?.Message
+                });
+                // #endregion
+                throw;
+            }
         }
     }
 }

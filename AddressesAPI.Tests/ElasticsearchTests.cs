@@ -40,6 +40,14 @@ namespace AddressesAPI.Tests
         {
             var esDomainUri = Environment.GetEnvironmentVariable("ELASTICSEARCH_DOMAIN_URL")
                               ?? "http://localhost:9202";
+            // #region agent log
+            AgentDebugLog.Write("C", "ElasticsearchTests.cs:SetupElasticsearchConnection", "es connection url", new
+            {
+                url = esDomainUri,
+                urlLength = esDomainUri?.Length,
+                hasLeadingSpace = esDomainUri != null && esDomainUri.StartsWith(" ", StringComparison.Ordinal)
+            });
+            // #endregion
             using var pool = new SingleNodeConnectionPool(new Uri(esDomainUri));
             using var settings = new ConnectionSettings(pool).PrettyJson()
                 .DisableDirectStreaming()

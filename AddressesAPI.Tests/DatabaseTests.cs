@@ -14,12 +14,39 @@ namespace AddressesAPI.Tests
         [SetUp]
         public void RunBeforeAnyTests()
         {
-            var builder = new DbContextOptionsBuilder();
-            builder.UseNpgsql(ConnectionString.TestDatabase());
-            DatabaseContext = new AddressesContext(builder.Options);
+            try
+            {
+                var builder = new DbContextOptionsBuilder();
+                builder.UseNpgsql(ConnectionString.TestDatabase());
+                DatabaseContext = new AddressesContext(builder.Options);
 
-            DatabaseContext.Database.Migrate();
-            _transaction = DatabaseContext.Database.BeginTransaction();
+                // #region agent log
+                AgentDebugLog.Write("B", "DatabaseTests.cs:RunBeforeAnyTests", "before migrate", new
+                {
+                    dbHost = System.Environment.GetEnvironmentVariable("DB_HOST"),
+                    dbPort = System.Environment.GetEnvironmentVariable("DB_PORT"),
+                    canConnect = DatabaseContext.Database.CanConnect()
+                });
+                // #endregion
+
+                DatabaseContext.Database.Migrate();
+                _transaction = DatabaseContext.Database.BeginTransaction();
+                // #region agent log
+                AgentDebugLog.Write("B", "DatabaseTests.cs:RunBeforeAnyTests", "migrate succeeded", new { run = "post-fix" });
+                // #endregion
+            }
+            catch (System.Exception ex)
+            {
+                // #region agent log
+                AgentDebugLog.Write("B", "DatabaseTests.cs:RunBeforeAnyTests", "postgres setup failed", new
+                {
+                    type = ex.GetType().FullName,
+                    msg = ex.Message,
+                    inner = ex.InnerException?.Message
+                });
+                // #endregion
+                throw;
+            }
         }
 
         [TearDown]

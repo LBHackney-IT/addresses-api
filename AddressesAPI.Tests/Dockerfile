@@ -18,4 +18,6 @@ COPY . .
 
 RUN dotnet build -c debug -o out AddressesAPI.Tests/AddressesAPI.Tests.csproj
 
-CMD dotnet test
+# #region agent log
+CMD sh -c 'mkdir -p /app/.cursor; echo "{\"sessionId\":\"f2761d\",\"hypothesisId\":\"A\",\"location\":\"Dockerfile:CMD\",\"message\":\"dotnet test starting\",\"data\":{\"pwd\":\"$(pwd)\",\"sln\":\"$(ls *.sln 2>/dev/null)\"},\"timestamp\":$(date +%s000)}" >> /app/.cursor/debug-f2761d.log; dotnet test; ec=$?; echo "{\"sessionId\":\"f2761d\",\"hypothesisId\":\"A\",\"location\":\"Dockerfile:CMD\",\"message\":\"dotnet test finished\",\"data\":{\"exitCode\":$ec},\"timestamp\":$(date +%s000)}" >> /app/.cursor/debug-f2761d.log; exit $ec'
+# #endregion
