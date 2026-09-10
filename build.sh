@@ -8,7 +8,7 @@ then
 fi
 
 #dotnet restore
-dotnet tool install --global Amazon.Lambda.Tools --version 4.0.0
+dotnet tool install --global Amazon.Lambda.Tools --version 7.0.0
 
 
 # (for CI) ensure that the newly-installed tools are on PATH
@@ -18,5 +18,5 @@ then
 fi
 
 dotnet restore
-dotnet lambda package --project-location ./Reindex --configuration release --framework net8.0 --output-package ./Reindex/bin/release/net8.0/reindex-es-alias.zip
-dotnet lambda package --project-location ./AddressesAPI --configuration release --framework net8.0 --output-package ./AddressesAPI/bin/release/net8.0/addresses-api.zip
+dotnet lambda package --project-location ./Reindex --configuration release --framework net10.0 --output-package ./Reindex/bin/release/net10.0/reindex-es-alias.zip
+dotnet lambda package --project-location ./AddressesAPI --configuration release --framework net10.0 --output-package ./AddressesAPI/bin/release/net10.0/addresses-api.zip

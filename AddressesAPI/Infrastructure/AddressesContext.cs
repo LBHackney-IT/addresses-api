@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace AddressesAPI.Infrastructure
 {
@@ -8,6 +9,14 @@ namespace AddressesAPI.Infrastructure
         public AddressesContext(DbContextOptions options) : base(options)
         {
 
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            // EF Core 9+ throws on Migrate() when the snapshot (ProductVersion 6.0.36) differs
+            // from the current model after the net10.0/EF 10 upgrade. Existing migrations are still applied.
+            optionsBuilder.ConfigureWarnings(w =>
+                w.Ignore(RelationalEventId.PendingModelChangesWarning));
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
