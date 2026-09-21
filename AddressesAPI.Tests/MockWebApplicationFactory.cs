@@ -2,6 +2,7 @@ using AddressesAPI.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Data.Common;
@@ -25,7 +26,8 @@ namespace AddressesAPI.Tests
             builder.ConfigureServices(services =>
             {
                 var dbBuilder = new DbContextOptionsBuilder();
-                dbBuilder.UseNpgsql(_connection);
+                dbBuilder.UseNpgsql(_connection)
+                    .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
                 var context = new AddressesContext(dbBuilder.Options);
                 services.AddSingleton(context);
             });

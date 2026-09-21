@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using AddressesAPI.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Storage;
 using Nest;
 using Npgsql;
@@ -82,7 +83,8 @@ namespace AddressesAPI.Tests
             npgsqlCommand.ExecuteNonQuery();
 
             _builder = new DbContextOptionsBuilder();
-            _builder.UseNpgsql(_connection);
+            _builder.UseNpgsql(_connection)
+                .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
         }
     }
 }

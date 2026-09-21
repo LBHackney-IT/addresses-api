@@ -8,13 +8,14 @@ using AddressesAPI.V1.Gateways;
 using AddressesAPI.V1.UseCase;
 using AddressesAPI.V1.UseCase.Interfaces;
 using AddressesAPI.Versioning;
+using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
 using Elasticsearch.Net;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -56,9 +57,14 @@ namespace AddressesAPI
                 o.DefaultApiVersion = new ApiVersion(1, 0);
                 o.AssumeDefaultVersionWhenUnspecified = true; // assume that the caller wants the default version if they don't specify
                 o.ApiVersionReader = new UrlSegmentApiVersionReader(); // read the version number from the url segment header)
+                o.ReportApiVersions = true;
+            })
+            .AddMvc()
+            .AddApiExplorer(o =>
+            {
+                o.GroupNameFormat = "'v'VVV";
+                o.SubstituteApiVersionInUrl = true;
             });
-
-            services.AddSingleton<IApiVersionDescriptionProvider, DefaultApiVersionDescriptionProvider>();
             services.AddSwaggerGen(c =>
             {
                 c.AddSecurityDefinition("Token",
@@ -141,7 +147,9 @@ namespace AddressesAPI
             var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING") ?? "Host=;Database=;";
 
             services.AddDbContext<AddressesContext>(
-                opt => opt.UseNpgsql(connectionString));
+                opt => opt.UseNpgsql(connectionString)
+                    .ConfigureWarnings(w =>
+                        w.Ignore(RelationalEventId.PendingModelChangesWarning)));
         }
 
         private static void RegisterV1Gateways(IServiceCollection services)

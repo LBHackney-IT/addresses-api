@@ -3,6 +3,7 @@ using AddressesAPI.V1.Boundary.Requests;
 using AddressesAPI.V1.Boundary.Responses;
 using AddressesAPI.V1.Boundary.Responses.Metadata;
 using AddressesAPI.V1.UseCase.Interfaces;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AddressesAPI.V1.Controllers

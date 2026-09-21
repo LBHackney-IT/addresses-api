@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using AddressesAPI.V1.UseCase;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AddressesAPI.V1.Controllers

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace AddressesAPI.Infrastructure
 {
@@ -8,6 +9,14 @@ namespace AddressesAPI.Infrastructure
         public AddressesContext(DbContextOptions options) : base(options)
         {
 
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            // EF 10 compares the compiled model to EF 6-era snapshots and warns even when
+            // there is no schema change. Ignore so existing migrations still apply.
+            optionsBuilder.ConfigureWarnings(w =>
+                w.Ignore(RelationalEventId.PendingModelChangesWarning));
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

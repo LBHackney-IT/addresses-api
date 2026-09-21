@@ -8,7 +8,7 @@ Hackney Addresses API user documentation is available for more information about
 
 ## Stack
 
-- .NET Core as a web framework.
+- .NET 10 LTS as a web framework.
 - nUnit as a test framework.
 
 ## Contributing
@@ -54,7 +54,7 @@ If not using your own local instances, you can use the databases provided in the
 On a separate terminal run:
 
 ```sh
-make migrate-dev-database && make seed-dev-database
+make migrate-dev-database && make seed-pg-data
 ```
 
 This will run migrations on the development database and then seed it with data. This data can then be retrieved by calling the endpoints locally.
@@ -169,16 +169,11 @@ CONNECTION_STRING="Host=127.0.0.1;Database=testdb;Username=postgres;Password=myp
 
 ## Static Code Analysis
 
-### Using [FxCop Analysers](https://www.nuget.org/packages/Microsoft.CodeAnalysis.FxCopAnalyzers)
+SDK 10 includes built-in .NET analyzers. Compiler warnings are treated as errors on the API and API test projects (`TreatWarningsAsErrors=true`). Analyzer (CA) warnings are not treated as errors (`CodeAnalysisTreatWarningsAsErrors=false`).
 
-FxCop runs code analysis when the Solution is built.
+CircleCI also runs `dotnet format --verify-no-changes --severity warn`.
 
-Both the API and Test projects have been set up to **treat all warnings from the code analysis as errors** and therefore, fail the build.
-
-However, we can select which errors to suppress by setting the severity of the responsible rule to none, e.g `dotnet_analyzer_diagnostic.<Category-or-RuleId>.severity = none`, within the `.editorconfig` file.
-Documentation on how to do this can be found [here](https://docs.microsoft.com/en-us/visualstudio/code-quality/use-roslyn-analyzers?view=vs-2019).
-
-_NOTE_ FxCop is now deprecated by Microsoft, and a different code analysis tool is run as part of the build pipeline in circleci. It would be good to align these, as currently it is possible to check in code that has no issues locally only to have it rejected by the circleci static analysis.
+CS1591 (missing XML comments) is suppressed because the API generates a documentation file for Swagger without commenting every public member.
 
 ### Smoke testing an environment
 
