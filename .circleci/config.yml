@@ -45,9 +45,7 @@ jobs:
           command: docker compose build addresses-api-test
       - run:
           name: Run tests
-          command: |
-            docker compose up -d test-elasticsearch
-            docker compose run addresses-api-test
+          command: docker compose run --rm addresses-api-test
   assume-role:
     executor: docker-python
     parameters:
