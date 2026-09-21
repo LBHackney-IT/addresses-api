@@ -18,4 +18,4 @@ COPY . .
 
 RUN dotnet build -c debug -o out AddressesAPI.Tests/AddressesAPI.Tests.csproj
 
-CMD dotnet test
+CMD dotnet test --settings test.runsettings

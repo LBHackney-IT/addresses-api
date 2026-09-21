@@ -47,9 +47,24 @@ namespace AddressesAPI.Tests
         [TearDown]
         public void BaseTearDown()
         {
-            Client.Dispose();
-            _factory.Dispose();
-            RollbackEfTransaction();
+            // #region agent log
+            ElasticsearchTests.AgentLog("E", "IntegrationTests.cs:BaseTearDown", "teardown", new
+            {
+                clientIsNull = Client == null,
+                factoryIsNull = _factory == null,
+                txIsNull = _transaction == null,
+                result = TestContext.CurrentContext?.Result?.Outcome?.Status.ToString(),
+                test = TestContext.CurrentContext?.Test?.FullName,
+                thread = System.Threading.Thread.CurrentThread.ManagedThreadId,
+                pid = Environment.ProcessId
+            });
+            // #endregion
+            Client?.Dispose();
+            _factory?.Dispose();
+            if (_transaction != null)
+            {
+                RollbackEfTransaction();
+            }
             ElasticsearchTests.DeleteAddressesIndex(ElasticsearchClient);
         }
         private void RollbackEfTransaction()
