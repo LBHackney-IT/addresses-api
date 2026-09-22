@@ -39,8 +39,6 @@ services:
     build:
       context: .
       dockerfile: AddressesAPI.Tests/Dockerfile
-    volumes:
-      - ./.cursor:/app/.cursor
     environment:
       - DB_HOST=test-database
       - DB_PORT=5432

@@ -15,7 +15,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -147,9 +146,7 @@ namespace AddressesAPI
             var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING") ?? "Host=;Database=;";
 
             services.AddDbContext<AddressesContext>(
-                opt => opt.UseNpgsql(connectionString)
-                    .ConfigureWarnings(w =>
-                        w.Ignore(RelationalEventId.PendingModelChangesWarning)));
+                opt => opt.UseNpgsql(connectionString));
         }
 
         private static void RegisterV1Gateways(IServiceCollection services)

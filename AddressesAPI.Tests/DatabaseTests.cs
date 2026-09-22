@@ -1,6 +1,5 @@
 using AddressesAPI.Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Storage;
 using NUnit.Framework;
 
@@ -16,8 +15,7 @@ namespace AddressesAPI.Tests
         public void RunBeforeAnyTests()
         {
             var builder = new DbContextOptionsBuilder();
-            builder.UseNpgsql(ConnectionString.TestDatabase())
-                .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
+            builder.UseNpgsql(ConnectionString.TestDatabase());
             DatabaseContext = new AddressesContext(builder.Options);
 
             DatabaseContext.Database.Migrate();

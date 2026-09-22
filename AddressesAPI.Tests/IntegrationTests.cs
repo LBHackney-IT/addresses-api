@@ -3,7 +3,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using AddressesAPI.Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Storage;
 using Nest;
 using Npgsql;
@@ -48,18 +47,6 @@ namespace AddressesAPI.Tests
         [TearDown]
         public void BaseTearDown()
         {
-            // #region agent log
-            ElasticsearchTests.AgentLog("E", "IntegrationTests.cs:BaseTearDown", "teardown", new
-            {
-                clientIsNull = Client == null,
-                factoryIsNull = _factory == null,
-                txIsNull = _transaction == null,
-                result = TestContext.CurrentContext?.Result?.Outcome?.Status.ToString(),
-                test = TestContext.CurrentContext?.Test?.FullName,
-                thread = System.Threading.Thread.CurrentThread.ManagedThreadId,
-                pid = Environment.ProcessId
-            });
-            // #endregion
             Client?.Dispose();
             _factory?.Dispose();
             if (_transaction != null)
@@ -83,8 +70,7 @@ namespace AddressesAPI.Tests
             npgsqlCommand.ExecuteNonQuery();
 
             _builder = new DbContextOptionsBuilder();
-            _builder.UseNpgsql(_connection)
-                .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
+            _builder.UseNpgsql(_connection);
         }
     }
 }
