@@ -13,7 +13,7 @@ executors:
       - image: "hashicorp/terraform:latest"
   docker-dotnet:
     docker:
-      - image: mcr.microsoft.com/dotnet/sdk:8.0
+      - image: mcr.microsoft.com/dotnet/sdk:10.0
 
 references:
   workspace_root: &workspace_root "~"
@@ -45,9 +45,7 @@ jobs:
           command: docker compose build addresses-api-test
       - run:
           name: Run tests
-          command: |
-            docker compose up -d test-elasticsearch
-            docker compose run addresses-api-test
+          command: docker compose run --rm addresses-api-test
   assume-role:
     executor: docker-python
     parameters:

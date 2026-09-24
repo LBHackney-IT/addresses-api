@@ -6,6 +6,7 @@ using AddressesAPI.V2.Boundary.Responses.Metadata;
 using AddressesAPI.V2.Gateways;
 using AddressesAPI.V2.UseCase;
 using AddressesAPI.V2.UseCase.Interfaces;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AddressesAPI.V2.Controllers

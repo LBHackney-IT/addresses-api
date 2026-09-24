@@ -45,10 +45,12 @@ services:
       - DB_USERNAME=postgres
       - DB_PASSWORD=mypassword
       - DB_DATABASE=testdb
-      - ELASTICSEARCH_DOMAIN_URL= http://test-elasticsearch:9200
-    links:
-      - test-database
-      - test-elasticsearch
+      - ELASTICSEARCH_DOMAIN_URL=http://test-elasticsearch:9200
+    depends_on:
+      test-database:
+        condition: service_healthy
+      test-elasticsearch:
+        condition: service_healthy
     networks:
       - elastic
       - postgres
@@ -61,6 +63,11 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=mypassword
       - POSTGRES_DB=testdb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
     networks:
       - postgres
   test-elasticsearch:
@@ -72,12 +79,17 @@ services:
     environment:
       - xpack.security.enabled=false
       - discovery.type=single-node
-      - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ports:
       - 9202:9200
     volumes:
       - esdata-test:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9200 >/dev/null || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 24
+      start_period: 40s
     networks:
       elastic:
         aliases:

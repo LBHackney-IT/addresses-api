@@ -1,3 +1,4 @@
+using System;
 using Microsoft.EntityFrameworkCore;
 
 namespace AddressesAPI.Infrastructure
@@ -5,6 +6,11 @@ namespace AddressesAPI.Infrastructure
 
     public class AddressesContext : DbContext
     {
+        static AddressesContext()
+        {
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+        }
+
         public AddressesContext(DbContextOptions options) : base(options)
         {
 

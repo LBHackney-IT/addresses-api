@@ -47,9 +47,12 @@ namespace AddressesAPI.Tests
         [TearDown]
         public void BaseTearDown()
         {
-            Client.Dispose();
-            _factory.Dispose();
-            RollbackEfTransaction();
+            Client?.Dispose();
+            _factory?.Dispose();
+            if (_transaction != null)
+            {
+                RollbackEfTransaction();
+            }
             ElasticsearchTests.DeleteAddressesIndex(ElasticsearchClient);
         }
         private void RollbackEfTransaction()

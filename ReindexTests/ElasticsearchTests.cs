@@ -1,7 +1,4 @@
 using System;
-using System.IO;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
 using Nest;
@@ -41,8 +38,8 @@ namespace ReindexTests
         {
             var esDomainUri = Environment.GetEnvironmentVariable("ELASTICSEARCH_DOMAIN_URL")
                               ?? "http://localhost:9202";
-            using var pool = new SingleNodeConnectionPool(new Uri(esDomainUri));
-            using var settings = new ConnectionSettings(pool).PrettyJson()
+            var pool = new SingleNodeConnectionPool(new Uri(esDomainUri));
+            var settings = new ConnectionSettings(pool).PrettyJson()
                 .DisableDirectStreaming()
                 .SniffOnStartup(false)
                 .ThrowExceptions();
@@ -54,7 +51,12 @@ namespace ReindexTests
             var getAllIndices = await client.Indices.GetAsync(Indices.All);
             foreach (var (name, state) in getAllIndices.Indices)
             {
-                var response = await client.Indices.DeleteAsync(name);
+                if (name.Name == "hackney_addresses" || name.Name == "national_addresses")
+                {
+                    continue;
+                }
+
+                await client.Indices.DeleteAsync(name);
             }
         }
     }

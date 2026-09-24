@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
-using System.Text;
+using System.Runtime.CompilerServices;
 using Reindex;
 
 namespace ReindexTests.MessageQueue
@@ -22,7 +20,7 @@ namespace ReindexTests.MessageQueue
 
         public static HandlerTestDouble HandlerTestDoubleFactory()
         {
-            return (HandlerTestDouble)FormatterServices.GetUninitializedObject(typeof(HandlerTestDouble));
+            return (HandlerTestDouble)RuntimeHelpers.GetUninitializedObject(typeof(HandlerTestDouble));
         }
 
         protected override void Log(string message)
