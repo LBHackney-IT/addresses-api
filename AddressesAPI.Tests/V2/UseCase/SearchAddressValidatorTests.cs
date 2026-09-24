@@ -431,7 +431,7 @@ namespace AddressesAPI.Tests.V2.UseCase
         {
             var request = new SearchAddressRequest() { CrossRefCode = crossRefCode, CrossRefValue = value };
 
-            _classUnderTest.TestValidate(request).Errors.Should().NotContain("You must provide both the code and a value, when searching by a cross reference");
+            _classUnderTest.TestValidate(request).Result.Errors.Should().NotContain("You must provide both the code and a value, when searching by a cross reference");
         }
 
         [Test]

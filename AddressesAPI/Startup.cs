@@ -56,7 +56,6 @@ namespace AddressesAPI
                 o.DefaultApiVersion = new ApiVersion(1, 0);
                 o.AssumeDefaultVersionWhenUnspecified = true; // assume that the caller wants the default version if they don't specify
                 o.ApiVersionReader = new UrlSegmentApiVersionReader(); // read the version number from the url segment header)
-                o.ReportApiVersions = true;
             })
             .AddMvc()
             .AddApiExplorer(o =>

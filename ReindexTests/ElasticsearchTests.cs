@@ -55,7 +55,8 @@ namespace ReindexTests
                 {
                     continue;
                 }
-                var response = await client.Indices.DeleteAsync(name);
+
+                await client.Indices.DeleteAsync(name);
             }
         }
     }

@@ -10,8 +10,8 @@ Record of every PackageReference change made for the net8.0 → net10.0 LTS upgr
 | Asp.Versioning.Mvc | add (replace) | Microsoft.AspNetCore.Mvc.Versioning 5.0.0 → 10.2.1 | Old package is deprecated (net5/net6 only); this is the supported net10 line |
 | Asp.Versioning.Mvc.ApiExplorer | add (replace) | Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer 5.0.0 → 10.2.1 | Companion API explorer for Swagger docs per version |
 | Dapper | delete | 2.0.35 → — | Unused: no Dapper types or `using` in the repo |
-| Elasticsearch.Net | upgrade | 7.10.0 → 7.17.5 | Latest NEST 7.x transport; keep 7.x because docker ES is 7.9.3 |
-| FluentValidation | upgrade | 8.1.3 → 11.12.0 | Latest 11.x (skip 12.x to avoid another breaking major); TestHelper stays in the main package |
+| Elasticsearch.Net | keep | 7.10.0 → 7.10.0 | Not required for net10. Server is still ES 7.9.3 |
+| FluentValidation | keep | 8.1.3 → 8.1.3 | netstandard2.0 runs on net10. 11.x changes cascade, null-property, and Must behavior used by `.Validate()` |
 | Microsoft.AspNetCore.Mvc.NewtonsoftJson | upgrade | 6.0.0 → 10.0.12 | Align with ASP.NET Core 10.0.12; keep Newtonsoft JSON contract |
 | Microsoft.AspNetCore.Mvc.Versioning | delete | 5.0.0 → — | Replaced by Asp.Versioning.Mvc |
 | Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer | delete | 5.0.0 → — | Replaced by Asp.Versioning.Mvc.ApiExplorer |
@@ -19,24 +19,24 @@ Record of every PackageReference change made for the net8.0 → net10.0 LTS upgr
 | Microsoft.EntityFrameworkCore.Relational | add | — → 10.0.12 | Same pin as EF Core so Relational stays aligned |
 | Microsoft.EntityFrameworkCore.Design | upgrade | 6.0.0 → 10.0.12 | EF tools aligned with EF 10; added `PrivateAssets=all` so it is not published to Lambda |
 | Microsoft.EntityFrameworkCore.SqlServer | delete | 6.0.36 → — | Unused: runtime uses `UseNpgsql` only |
-| NaturalSort.Extension | upgrade | 4.3.0 → 4.4.1 | Latest 4.x; used by V1 `AddressesGateway.WithNaturalSort()` |
-| NEST | upgrade | 7.10.0 → 7.17.5 | Latest NEST 7.x (EOL-frozen). Not migrating to Elastic.Clients.Elasticsearch: server is ES 7.9.3 |
-| NEST.JsonNetSerializer | upgrade | 7.10.0 → 7.17.5 | Stay paired with NEST 7.17.5 |
+| NaturalSort.Extension | keep | 4.3.0 → 4.3.0 | Not required for net10 |
+| NEST | keep | 7.10.0 → 7.10.0 | Not required for net10. Server is still ES 7.9.3. Not migrating to Elastic.Clients.Elasticsearch |
+| NEST.JsonNetSerializer | keep | 7.10.0 → 7.10.0 | Stay paired with NEST 7.10.0 |
 | Swashbuckle.AspNetCore | upgrade | 5.4.1 → 7.3.2 | Latest 7.x; unifies previous 5.4.1 / UI 7.1.0 skew. Avoided 8+/10.x OpenAPI 2 rewrite |
 | Swashbuckle.AspNetCore.Swagger | delete | 5.4.1 → — | Covered by Swashbuckle.AspNetCore metapackage |
 | Swashbuckle.AspNetCore.SwaggerGen | delete | 5.4.1 → — | Covered by Swashbuckle.AspNetCore metapackage |
 | Swashbuckle.AspNetCore.SwaggerUI | delete | 7.1.0 → — | Covered by Swashbuckle.AspNetCore 7.3.2 |
-| Npgsql.EntityFrameworkCore.PostgreSQL | upgrade | 6.0.29 → 10.0.3 | Latest Npgsql 10 provider; requires EF >= 10.0.4 (satisfied by Design 10.0.12). EF 10 `PendingModelChangesWarning` is ignored so EF 6 snapshots still migrate |
+| Npgsql.EntityFrameworkCore.PostgreSQL | upgrade | 6.0.29 → 10.0.3 | Latest Npgsql 10 provider; requires EF >= 10.0.4 (satisfied by Design 10.0.12). Legacy timestamp switch is set in `AddressesContext` so existing `timestamp without time zone` columns are not rewritten. Pending model diff is a real migration (`national_address.blpu_last_update_date` nullable), not an ignored warning |
 
 ## AddressesAPI.Tests
 
 | Package | Action | From → To | Reason |
 |---|---|---|---|
-| AutoFixture | upgrade | 4.11.0 → 4.18.1 | Latest 4.x; unify with ReindexTests. AutoFixture 5 is still preview |
+| AutoFixture | keep | 4.11.0 → 4.11.0 | Not required for net10 |
 | DotNetEnv | delete | 1.4.0 → — | Unused: no `Env.Load` |
-| Elasticsearch.Net | delete | 7.10.0 → — | Comes transitively from AddressesAPI |
+| Elasticsearch.Net | keep | 7.10.0 → 7.10.0 | Direct pin; not required to bump for net10 |
 | FluentAssertions | keep | 5.10.3 → 5.10.3 | Kept 5.x: FA 6 breaks `StatusCode.Should().Be(int)` and async `Throw<>`. 5.x is Apache and runs on net10. FA 8 is the commercial-license line we are avoiding. |
-| FluentValidation | upgrade | 8.1.3 → 11.12.0 | Match API; tests use `FluentValidation.TestHelper`. FV 8 APIs are restored via `FluentValidation8TestHelperCompat`. |
+| FluentValidation | keep | 8.1.3 → 8.1.3 | Match API. Tests use FluentValidation 8 `TestHelper` (`ShouldHaveValidationErrorFor`, `.Result.Errors`) |
 | Microsoft.AspNetCore.Mvc.NewtonsoftJson | delete | 6.0.0 → — | Transitive via API project; no direct test usage |
 | Microsoft.AspNetCore.Mvc.Versioning | delete | 5.0.0 → — | Transitive / unused in tests |
 | Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer | delete | 5.0.0 → — | Transitive / unused in tests |
@@ -44,10 +44,10 @@ Record of every PackageReference change made for the net8.0 → net10.0 LTS upgr
 | Microsoft.AspNetCore.Mvc.Testing | upgrade | 6.0.36 → 10.0.12 | Test host must match net10 TFM |
 | Microsoft.EntityFrameworkCore.SqlServer | delete | 6.0.36 → — | Unused; tests use Npgsql via API |
 | Microsoft.NET.Test.Sdk | upgrade | 17.12.0 → 18.10.1 | Current VSTest SDK with net10 support |
-| NEST | delete | 7.10.0 → — | Transitive via AddressesAPI |
+| NEST | keep | 7.10.0 → 7.10.0 | Direct pin; not required to bump for net10 |
 | Npgsql.EntityFrameworkCore.PostgreSQL | delete | 6.0.29 → — | Transitive via AddressesAPI |
 | NUnit3TestAdapter | upgrade | 4.6.0 → 6.3.0 | Current adapter; still runs NUnit 3.x |
-| Bogus | upgrade | 25.0.4 → 35.6.5 | Latest 35.x fake-data library |
+| Bogus | keep | 25.0.4 → 25.0.4 | Not required for net10 |
 | Moq | keep | 4.20.72 → 4.20.72 | Latest 4.x; Moq 5 is a different product |
 | NUnit | upgrade | 3.13.3 → 3.14.0 | Latest 3.x; skip NUnit 4 attribute/breaking changes |
 
@@ -57,10 +57,10 @@ Record of every PackageReference change made for the net8.0 → net10.0 LTS upgr
 |---|---|---|---|
 | Amazon.Lambda.Serialization.Json | upgrade | 1.8.0 → 3.0.0 | Current Newtonsoft Lambda serializer for .NET 10 |
 | Amazon.Lambda.SQSEvents | upgrade | 1.2.0 → 3.0.1 | Current SQS event contract |
-| AWSSDK.SQS | upgrade | 3.5.0.40 → 3.7.502.57 | Latest 3.7.x; skip AWS SDK v4 in this PR |
-| NEST | upgrade | 7.10.0 → 7.17.5 | Same as API; keep 7.x for ES 7.9.3 |
-| NEST.JsonNetSerializer | upgrade | 7.10.0 → 7.17.5 | Paired with NEST 7.17.5 |
-| Newtonsoft.Json | upgrade | 13.0.3 → 13.0.4 | Latest 13.x CVE pin over the Lambda serializer transitive |
+| AWSSDK.SQS | keep | 3.5.0.40 → 3.5.0.40 | Not required for net10. Skip AWS SDK v4 |
+| NEST | keep | 7.10.0 → 7.10.0 | Same as API; server is ES 7.9.3 |
+| NEST.JsonNetSerializer | keep | 7.10.0 → 7.10.0 | Paired with NEST 7.10.0 |
+| Newtonsoft.Json | keep | 13.0.3 → 13.0.3 | Direct pin over the Lambda serializer transitive. 13.0.4 patch is not required for net10 |
 
 ## ReindexTests
 

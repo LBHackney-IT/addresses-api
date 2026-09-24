@@ -53,29 +53,21 @@ namespace AddressesAPI.Tests
             var settingsDoc = await File.ReadAllTextAsync("./../../../../data/elasticsearch/index.json")
                 .ConfigureAwait(true);
 
-            try
-            {
-                await client.LowLevel.Indices.CreateAsync<BytesResponse>(name, settingsDoc)
-                    .ConfigureAwait(true);
-            }
-            catch (Exception ex) when (IsResourceAlreadyExists(ex))
-            {
-            }
-
-            client.Cluster.Health(name, h => h
-                .WaitForStatus(WaitForStatus.Yellow)
-                .Timeout("10s"));
+            await client.LowLevel.Indices.CreateAsync<BytesResponse>(name, settingsDoc)
+                .ConfigureAwait(true);
         }
 
         public static void DeleteAddressesIndex(ElasticClient client)
         {
-            client.Indices.Delete("hackney_addresses", d => d.IgnoreUnavailable());
-            client.Indices.Delete("national_addresses", d => d.IgnoreUnavailable());
-        }
+            if (client.Indices.Exists("hackney_addresses").Exists)
+            {
+                client.Indices.Delete("hackney_addresses");
+            }
 
-        private static bool IsResourceAlreadyExists(Exception ex)
-        {
-            return ex.Message.IndexOf("resource_already_exists_exception", StringComparison.OrdinalIgnoreCase) >= 0;
+            if (client.Indices.Exists("national_addresses").Exists)
+            {
+                client.Indices.Delete("national_addresses");
+            }
         }
     }
 }

@@ -20,4 +20,4 @@ COPY . .
 
 RUN dotnet build -c Debug AddressesAPI.sln
 
-CMD dotnet test AddressesAPI.sln --settings test.runsettings --no-build -c Debug
+CMD dotnet test AddressesAPI.sln --no-build -c Debug -m:1

@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-    <RunSettingsFilePath>$(MSBuildThisFileDirectory)..\test.runsettings</RunSettingsFilePath>
   </PropertyGroup>
 
   <ItemGroup>
