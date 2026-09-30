@@ -1,0 +1,6 @@
+securityGroupIds:
+  # Managed by terraform/development (aws_security_group.lambda)
+  - ${ssm:/addresses-api/development/lambda-security-group-id}
+subnetIds:
+  - subnet-0deabb5d8fb9c3446
+  - subnet-000b89c249f12a8ad
