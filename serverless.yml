@@ -2,7 +2,8 @@ service: addresses-api
 provider:
   name: aws
   runtime: dotnet10
-  vpc: ${self:custom.vpc.${opt:stage}}
+  # Loaded per stage so ${ssm:...} in other stages is not resolved at deploy time.
+  vpc: ${file(./serverless/vpc/${opt:stage}.yml)}
   stage: ${opt:stage}
   region: eu-west-2
 package:
@@ -157,25 +158,3 @@ custom:
     development: arn:aws:lambda:eu-west-2:859159924354:function:api-gateway-lambda-authorizer
     staging:     arn:aws:lambda:eu-west-2:715003523189:function:api-gateway-lambda-authorizer
     production:  arn:aws:lambda:eu-west-2:153306643385:function:api-gateway-lambda-authorizer
-  vpc:
-    development:
-      securityGroupIds:
-        # Managed by terraform/development (aws_security_group.lambda)
-        - ${ssm:/addresses-api/development/lambda-security-group-id}
-      subnetIds:
-        - subnet-0deabb5d8fb9c3446
-        - subnet-000b89c249f12a8ad
-    staging:
-      securityGroupIds:
-        - sg-0721d1d066b247b8f
-        - sg-0828e84a9e427392a
-      subnetIds:
-        - subnet-06d3de1bd9181b0d7
-        - subnet-0ed7d7713d1127656
-    production:
-      securityGroupIds:
-        - sg-0559e24a4d1ee0ddc
-        - sg-0d6c0357cc2febe32
-      subnetIds:
-        - subnet-01d3657f97a243261
-        - subnet-0b7b8fea07efabf34
