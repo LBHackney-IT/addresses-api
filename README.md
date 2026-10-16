@@ -189,7 +189,7 @@ Load this into postman and set a global variable called _addresses-api-url_
 The value of this should be set to the appropriate production or staging URL up and including the 'api' bit but without the trailing slash.
 Also, you will need to set the API key in each test - you will need to obtain a suitable key for the environment, they are different for V1 and V2. The key should be pasted into the 'Auth' header in each postman test.
 
-Once set up, you can run through the tests and check the results are as excpected.
+Once set up, you can run through the tests and check the results are as expected.
 
 ## Agreed Testing Approach
 
