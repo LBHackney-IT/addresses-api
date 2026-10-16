@@ -94,7 +94,7 @@ module "elasticsearch_db_staging" {
   domain_name            = "addresses-api-es"
   subnet_ids             = [tolist(data.aws_subnet_ids.staging.ids)[0]]
   project_name           = "addresses-api"
-  es_version             = "7.8"
+  es_version             = "7.10"
   encrypt_at_rest        = "false"
   instance_type          = "t3.medium.elasticsearch"
   instance_count         = "3"
