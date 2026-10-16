@@ -241,7 +241,7 @@ module "address-es-dms-national-addresses" {
   migration_type               = "full-load-and-cdc"
   replication_instance_arn     = aws_ssm_parameter.dms_rep_instance_arn.value
   replication_task_indentifier = "addresses-api-es-dms-task-national-addresses"
-  task_settings = templatefile("${path.module}/task_settings.json",
+  task_settings = templatefile("${path.module}/task_settings_national.json",
     {
       dms_replication_instance_name = "staging-dms-instance",
       dms_instance_task_resource    = "ICYNOPE3CNGK7FCOIEUT5XCQ2A"
