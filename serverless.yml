@@ -43,8 +43,8 @@ functions:
       SQS_QUEUE_URL: ${ssm:/addresses-api/${self:provider.stage}/reindexing-queue}
       ELASTICSEARCH_DOMAIN_URL: ${ssm:/addresses-api/${self:provider.stage}/elasticsearch-domain}
     events:
-      # On development, enabled is false (see custom.reindexScheduleEnabled) so this cron does not run.
-      # Trigger manually: Lambda console → addresses-api-reindex-es-alias-development → Test, with e.g.:
+      # On development and staging, enabled is false (see custom.reindexScheduleEnabled) so this cron does not run.
+      # Trigger manually: Lambda console → addresses-api-reindex-es-alias-<environment> → Test, with e.g.:
       # {
       #   "alias": "hackney_addresses",
       #   "fromIndex": "hackney_address",
@@ -149,10 +149,10 @@ custom:
     development: 15
     staging: 15
     production: 45
-  # Nightly reindex cron — off in development (use Lambda console Test instead)
+  # Nightly reindex cron — off in development and staging (use Lambda console Test instead)
   reindexScheduleEnabled:
     development: false
-    staging: true
+    staging: false
     production: true
   authorizerArns:
     development: arn:aws:lambda:eu-west-2:859159924354:function:api-gateway-lambda-authorizer
