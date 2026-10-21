@@ -24,7 +24,7 @@ terraform {
 }
 
 provider "aws" {
-  region  = "eu-west-2"
+  region = "eu-west-2"
 }
 
 data "aws_region" "current" {}
@@ -32,7 +32,7 @@ data "aws_caller_identity" "current" {}
 
 locals {
   current_aws_region = data.aws_region.current.region
-  parameter_store = "arn:aws:ssm:${local.current_aws_region}:${data.aws_caller_identity.current.account_id}:parameter"
+  parameter_store    = "arn:aws:ssm:${local.current_aws_region}:${data.aws_caller_identity.current.account_id}:parameter"
 }
 
 /*    VPC SET UP    */
@@ -97,11 +97,11 @@ module "postgres_db_production" {
   deletion_protection      = true
   copy_tags_to_snapshot    = true
   performance_insights = {
-    enabled           = true
+    enabled = true
     # Based on AWS docs: "To turn on Database Insights, the retention period must be at least 465 days."
-    retention_period  = 465
-    kms_key_id        = data.aws_kms_key.local_backup_key.arn
-    mode              = "advanced"
+    retention_period = 465
+    kms_key_id       = data.aws_kms_key.local_backup_key.arn
+    mode             = "advanced"
   }
   additional_tags = {
     BackupPolicy = "Prod"
@@ -127,7 +127,7 @@ module "elasticsearch_db_production" {
   domain_name      = "addresses-api-es"
   subnet_ids       = [data.aws_subnet.addreses-es-domain.id]
   project_name     = "addresses-api"
-  es_version       = "7.8"
+  es_version       = "7.10"
   encrypt_at_rest  = "true"
   instance_type    = "t3.medium.elasticsearch"
   instance_count   = "6"
