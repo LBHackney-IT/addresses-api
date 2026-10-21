@@ -22,19 +22,17 @@ resource "aws_elasticsearch_domain" "lbh_es" {
     subnet_ids         = var.subnet_ids
     security_group_ids = [module.db_security_group.db_sg_id]
   }
-  access_policies = <<CONFIG
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Action": "es:*",
-            "Principal": "*",
-            "Effect": "Allow",
-            "Resource": "arn:aws:es:${var.region}:${var.account_id}:domain/${var.domain_name}/*"
-        }
+  access_policies = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action    = "es:*"
+        Principal = "*"
+        Effect    = "Allow"
+        Resource  = "arn:aws:es:${var.region}:${var.account_id}:domain/${var.domain_name}/*"
+      }
     ]
-}
-CONFIG
+  })
   cluster_config {
     instance_type          = var.instance_type
     instance_count         = var.instance_count
