@@ -87,7 +87,7 @@ module "postgres_db_staging" {
 /*    ELASTICSEARCH SETUP    */
 
 module "elasticsearch_db_staging" {
-  source                 = "github.com/LBHackney-IT/aws-hackney-common-terraform.git//modules/database/elasticsearch"
+  source                 = "./modules/database/elasticsearch"
   vpc_id                 = data.aws_vpc.staging_vpc.id
   environment_name       = "staging"
   port                   = 443
