@@ -96,7 +96,7 @@ module "elasticsearch_db_staging" {
   project_name           = "addresses-api"
   es_version             = "7.10"
   encrypt_at_rest        = "false"
-  instance_type          = "t3.medium.elasticsearch"
+  instance_type          = "t3.small.elasticsearch"
   instance_count         = "3"
   ebs_enabled            = "true"
   ebs_volume_size        = "50"
