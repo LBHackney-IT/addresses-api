@@ -7,19 +7,6 @@
 # 6) IF ADDITIONAL RESOURCES ARE REQUIRED BY YOUR API, ADD THEM TO THIS FILE
 # 7) ENSURE THIS FILE IS PLACED WITHIN A 'terraform' FOLDER LOCATED AT THE ROOT PROJECT DIRECTORY
 
-provider "aws" {
-  region  = "eu-west-2"
-  version = "~> 2.0"
-}
-data "aws_caller_identity" "current" {}
-
-data "aws_region" "current" {}
-
-locals {
-  parameter_store = "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter"
-}
-
-
 terraform {
   backend "s3" {
     bucket  = "terraform-state-staging-apis"
@@ -27,6 +14,25 @@ terraform {
     region  = "eu-west-2"
     key     = "services/addresses-api/state"
   }
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 4.67.0"
+    }
+  }
+}
+
+provider "aws" {
+  region = "eu-west-2"
+}
+
+data "aws_caller_identity" "current" {}
+
+data "aws_region" "current" {}
+
+locals {
+  parameter_store = "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter"
 }
 
 /*    VPC SET UP    */
@@ -37,11 +43,14 @@ data "aws_vpc" "staging_vpc" {
   }
 }
 
-data "aws_subnet_ids" "staging" {
-  vpc_id = data.aws_vpc.staging_vpc.id
+data "aws_subnets" "staging" {
   filter {
-    name   = "tag:Type"
-    values = ["private"]
+    name   = "vpc-id"
+    values = [data.aws_vpc.staging_vpc.id]
+  }
+
+  tags = {
+    Type = "private"
   }
 }
 
@@ -66,7 +75,7 @@ module "postgres_db_staging" {
   db_identifier         = "addresses-api"
   db_name               = "addresses_api"
   db_port               = 5502
-  subnet_ids            = data.aws_subnet_ids.staging.ids
+  subnet_ids            = data.aws_subnets.staging.ids
   db_engine             = "postgres"
   db_engine_version     = "16.13"
   db_instance_class     = "db.t3.micro"
@@ -86,16 +95,22 @@ module "postgres_db_staging" {
 
 /*    ELASTICSEARCH SETUP    */
 
+#apis-stg-private-eu-west-2a
+data "aws_subnet" "addresses-es-domain" {
+  vpc_id     = data.aws_vpc.staging_vpc.id
+  cidr_block = "10.120.10.64/26"
+}
+
 module "elasticsearch_db_staging" {
   source                 = "./modules/database/elasticsearch"
   vpc_id                 = data.aws_vpc.staging_vpc.id
   environment_name       = "staging"
   port                   = 443
   domain_name            = "addresses-api-es"
-  subnet_ids             = [tolist(data.aws_subnet_ids.staging.ids)[0]]
+  subnet_ids             = [data.aws_subnet.addresses-es-domain.id]
   project_name           = "addresses-api"
   es_version             = "7.10"
-  encrypt_at_rest        = "false"
+  encrypt_at_rest        = "true"
   instance_type          = "t3.small.elasticsearch"
   instance_count         = "3"
   ebs_enabled            = "true"
@@ -179,7 +194,7 @@ module "dms_replication_instance_staging" {
   replication_instance_identifier = "staging-dms-instance"
   replication_instance_class      = "dms.t3.small"
   vpc_id                          = data.aws_vpc.staging_vpc.id
-  subnet_ids                      = data.aws_subnet_ids.staging.ids
+  subnet_ids                      = data.aws_subnets.staging.ids
   maintenance_window              = "Sun:08:00-Sun:08:30"
 }
 resource "aws_dms_endpoint" "address_elasticsearch" {
