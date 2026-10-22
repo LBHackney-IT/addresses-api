@@ -203,6 +203,17 @@ import {
   id = "production-dms-instance"
 }
 
+import {
+  to = module.dms_security_group.aws_security_group.dms_sg
+  id = "sg-053a1e67a48b36147"
+}
+
+module "dms_security_group" {
+  source           = "./modules/security_groups/dms"
+  vpc_id           = data.aws_vpc.production_vpc.id
+  environment_name = "production"
+}
+
 module "dms_replication_instance_production" {
   source                          = "./modules/dms"
   environment_name                = "production"
@@ -221,7 +232,7 @@ module "dms_replication_instance_production" {
     "subnet-0b7b8fea07efabf34",
   ]
   maintenance_window     = "sun:07:00-sun:07:30"
-  vpc_security_group_ids = ["sg-053a1e67a48b36147"]
+  vpc_security_group_ids = [module.dms_security_group.dms_sg_id]
 }
 
 resource "aws_dms_endpoint" "address_elasticsearch" {
