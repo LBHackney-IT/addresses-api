@@ -95,13 +95,19 @@ module "postgres_db_staging" {
 
 /*    ELASTICSEARCH SETUP    */
 
+#apis-stg-private-eu-west-2a
+data "aws_subnet" "addresses-es-domain" {
+  vpc_id     = data.aws_vpc.staging_vpc.id
+  cidr_block = "10.120.10.64/26"
+}
+
 module "elasticsearch_db_staging" {
   source                 = "./modules/database/elasticsearch"
   vpc_id                 = data.aws_vpc.staging_vpc.id
   environment_name       = "staging"
   port                   = 443
   domain_name            = "addresses-api-es"
-  subnet_ids             = [tolist(data.aws_subnets.staging.ids)[0]]
+  subnet_ids             = [data.aws_subnet.addresses-es-domain.id]
   project_name           = "addresses-api"
   es_version             = "7.10"
   encrypt_at_rest        = "true"
