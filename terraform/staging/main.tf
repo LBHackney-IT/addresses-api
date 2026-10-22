@@ -69,7 +69,7 @@ data "aws_ssm_parameter" "addresses_postgres_hostname" {
 }
 
 module "postgres_db_staging" {
-  source                = "github.com/LBHackney-IT/aws-hackney-common-terraform.git//modules/database/postgres"
+  source                = "./modules/database/postgres"
   environment_name      = "staging"
   vpc_id                = data.aws_vpc.staging_vpc.id
   db_identifier         = "addresses-api"
@@ -83,7 +83,7 @@ module "postgres_db_staging" {
   maintenance_window    = "sun:10:00-sun:10:30"
   db_username           = data.aws_ssm_parameter.addresses_postgres_username.value
   db_password           = data.aws_ssm_parameter.addresses_postgres_db_password.value
-  storage_encrypted     = false
+  storage_encrypted     = true  //forced by the module
   multi_az              = false //only true if production deployment
   publicly_accessible   = false
   project_name          = "platform apis"
