@@ -27,9 +27,6 @@
     "CommitRate": 10000
   },
   "Logging": {
-    "CloudWatchLogGroup": "dms-tasks-${dms_replication_instance_name}",
-    "CloudWatchLogStream": "dms-task-${dms_instance_task_resource}",
-    "EnableLogContext": false,
     "EnableLogging": true,
     "LogComponents": [
       {
@@ -111,7 +108,6 @@
     ]
   },
   "ControlTablesSettings": {
-    "historyTimeslotInMinutes": 5,
     "ControlSchema": "",
     "FullLoadExceptionTableEnabled": false,
     "HistoryTimeslotInMinutes": 5,

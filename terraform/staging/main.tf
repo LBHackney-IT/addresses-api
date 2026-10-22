@@ -238,15 +238,10 @@ module "address-es-dms-local-addresses" {
   migration_type               = "full-load"
   replication_instance_arn     = aws_ssm_parameter.dms_rep_instance_arn.value
   replication_task_indentifier = "addresses-api-es-dms-task-local-addresses"
-  task_settings = templatefile("${path.module}/task_settings.json",
-    {
-      dms_replication_instance_name = "staging-dms-instance",
-      dms_instance_task_resource    = "ZMFZ7R2ZF5BGFNU6T3OTYNWJPE"
-    }
-  )
-  source_endpoint_arn = module.source_db_endpoint.dms_endpoint_arn
-  target_endpoint_arn = aws_dms_endpoint.address_elasticsearch.endpoint_arn
-  task_table_mappings = file("${path.module}/selection_rules_local.json")
+  task_settings                = file("${path.module}/task_settings.json")
+  source_endpoint_arn          = module.source_db_endpoint.dms_endpoint_arn
+  target_endpoint_arn          = aws_dms_endpoint.address_elasticsearch.endpoint_arn
+  task_table_mappings          = file("${path.module}/selection_rules_local.json")
 }
 
 module "address-es-dms-national-addresses" {
@@ -256,13 +251,8 @@ module "address-es-dms-national-addresses" {
   migration_type               = "full-load-and-cdc"
   replication_instance_arn     = aws_ssm_parameter.dms_rep_instance_arn.value
   replication_task_indentifier = "addresses-api-es-dms-task-national-addresses"
-  task_settings = templatefile("${path.module}/task_settings_national.json",
-    {
-      dms_replication_instance_name = "staging-dms-instance",
-      dms_instance_task_resource    = "ICYNOPE3CNGK7FCOIEUT5XCQ2A"
-    }
-  )
-  source_endpoint_arn = module.source_db_endpoint.dms_endpoint_arn
-  target_endpoint_arn = aws_dms_endpoint.address_elasticsearch.endpoint_arn
-  task_table_mappings = file("${path.module}/selection_rules_national.json")
+  task_settings                = file("${path.module}/task_settings_national.json")
+  source_endpoint_arn          = module.source_db_endpoint.dms_endpoint_arn
+  target_endpoint_arn          = aws_dms_endpoint.address_elasticsearch.endpoint_arn
+  task_table_mappings          = file("${path.module}/selection_rules_national.json")
 }
