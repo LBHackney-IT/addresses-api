@@ -30,9 +30,7 @@ resource "aws_dms_replication_instance" "address_dms_rep_instance" {
 
   vpc_security_group_ids = var.vpc_security_group_ids
 
-  # Imported live instance. availability_zone, publicly_accessible, and
-  # replication_subnet_group_id force replacement — align those with AWS
-  # before apply.
+  # Prevent accidental replacement of the imported production instance.
   lifecycle {
     prevent_destroy = true
   }
