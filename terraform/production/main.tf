@@ -203,54 +203,25 @@ import {
   id = "production-dms-instance"
 }
 
-module "dms_security_group" {
-  source           = "./modules/security_groups/dms"
-  vpc_id           = data.aws_vpc.production_vpc.id
-  environment_name = "production"
-}
-
-resource "aws_security_group_rule" "postgres_dms_ingress" {
-  type                     = "ingress"
-  description              = "allow inbound traffic from DMS replication instance"
-  from_port                = 5500
-  to_port                  = 5500
-  protocol                 = "tcp"
-  security_group_id        = module.postgres_db_production.security_group_id
-  source_security_group_id = module.dms_security_group.dms_sg_id
-}
-
-resource "aws_security_group_rule" "elasticsearch_dms_ingress" {
-  type                     = "ingress"
-  description              = "allow inbound traffic from DMS replication instance"
-  from_port                = 443
-  to_port                  = 443
-  protocol                 = "tcp"
-  security_group_id        = module.elasticsearch_db_production.security_group_id
-  source_security_group_id = module.dms_security_group.dms_sg_id
-}
-
 module "dms_replication_instance_production" {
   source                          = "./modules/dms"
   environment_name                = "production"
-  project_name                    = "addresses-api"
+  project_name                    = "resident-information-apis"
   replication_instance_identifier = "production-dms-instance"
   replication_instance_class      = "dms.t3.small"
   replication_subnet_group_id     = local.dms_replication_subnet_group_id
-  engine_version                  = "3.6.1"
+  engine_version                  = "3.5.4"
   allocated_storage               = 20
   availability_zone               = "eu-west-2a"
   auto_minor_version_upgrade      = true
   multi_az                        = false
   vpc_id                          = data.aws_vpc.production_vpc.id
-  subnet_ids                      = data.aws_subnets.production.ids
-  maintenance_window              = "sun:10:00-sun:10:30"
-  vpc_security_group_ids          = [module.dms_security_group.dms_sg_id]
-}
-
-resource "aws_ssm_parameter" "dms_rep_instance_arn" {
-  name  = "/addresses-api/production/dms-rep-instance-arn"
-  type  = "String"
-  value = module.dms_replication_instance_production.dms_rep_instance_arn
+  subnet_ids = [
+    "subnet-01d3657f97a243261",
+    "subnet-0b7b8fea07efabf34",
+  ]
+  maintenance_window     = "sun:07:00-sun:07:30"
+  vpc_security_group_ids = ["sg-053a1e67a48b36147"]
 }
 
 resource "aws_dms_endpoint" "address_elasticsearch" {
@@ -292,7 +263,7 @@ module "address-es-dms-local-addresses" {
   environment_name             = "production"
   project_name                 = "addresses-api"
   migration_type               = "full-load"
-  replication_instance_arn     = aws_ssm_parameter.dms_rep_instance_arn.value
+  replication_instance_arn     = module.dms_replication_instance_production.dms_rep_instance_arn
   replication_task_indentifier = "addresses-api-es-dms-task-local-addresses"
   task_settings = templatefile("${path.module}/task_settings.json",
     {

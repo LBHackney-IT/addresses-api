@@ -21,7 +21,6 @@ resource "aws_dms_replication_instance" "address_dms_rep_instance" {
   allocated_storage            = var.allocated_storage
   availability_zone            = var.availability_zone
   multi_az                     = var.multi_az
-  apply_immediately            = true
 
   tags = {
     Name         = var.replication_instance_identifier
